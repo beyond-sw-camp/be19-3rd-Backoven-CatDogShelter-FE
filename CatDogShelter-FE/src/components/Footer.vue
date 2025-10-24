@@ -7,7 +7,7 @@
         <li><RouterLink to="/privacy">개인정보 처리방침</RouterLink></li>
         <li><RouterLink to="/community-guide">커뮤니티 가이드</RouterLink></li>
         <li><RouterLink to="/adoption-process">입양 절차 안내</RouterLink></li>
-        <li><RouterLink to="/volunteer">자원봉사 안내</RouterLink></li>
+        <li><RouterLink to="/volunteer-guide">자원봉사 안내</RouterLink></li>
         <li><RouterLink to="/faq">FAQ</RouterLink></li>
         <li><button class="link-button" @click="showModal = true">문의하기</button></li>
       </ul>
@@ -42,6 +42,7 @@ const handleSubmit = () => {
   border-top: 1px solid var(--footer-sep);
   color: #fff;
   padding: 18px 0 10px; /* 상하 여백 줄임 */
+  font-family: "Pretendard Variable", "Noto Sans KR", sans-serif;
   margin-top: auto;
   display: flex;
   justify-content: center;

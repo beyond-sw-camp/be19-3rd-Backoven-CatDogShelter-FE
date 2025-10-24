@@ -1,7 +1,7 @@
 <template>
 
   <div class="layout">
-    <NavBar />
+    <Header/>
     <main class="main"><router-view /></main>
     <Footer @open-contact="isContactOpen = true" />
 
@@ -31,7 +31,7 @@
 
 <script setup>
 import { ref } from 'vue'
-// import NavBar from '@/components/NavBar.vue'
+import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 
 const isContactOpen = ref(false)
