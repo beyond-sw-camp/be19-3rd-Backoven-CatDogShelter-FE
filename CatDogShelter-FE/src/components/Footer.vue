@@ -13,8 +13,10 @@
       </ul>
       <p class="footer-copy">© 2025 댕냥쉼터 | All Rights Reserved</p>
     </div>
-
-    <InquiryModal v-if="showModal" @close="showModal = false" />
+<!-- 문의 모달 -->
+    <InquiryModal v-if="showModal" @close="showModal = false" @submitted="handleSubmit"/>
+        <!-- 성공 모달 -->
+    <InquirySuccessModal v-model="showSuccess" />
   </footer>
 </template>
 
@@ -22,14 +24,22 @@
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router' // (script setup에선 import 안 해도 되지만 명시해둠)
 import InquiryModal from '@/components/InquiryModal.vue'
+import InquirySuccessModal from '@/components/InquirySuccessModal.vue'
 
 const showModal = ref(false)
+const showSuccess = ref(false)
+
+const handleSubmit = () => {
+  showModal.value = false     // 문의하기 모달 닫기
+  showSuccess.value = true    // 성공 모달 열기
+}
 </script>
 
 <style scoped>
 .footer {
   width: 100%;
   background-color: #BFB5A8;
+  border-top: 1px solid var(--footer-sep);
   color: #fff;
   padding: 18px 0 10px; /* 상하 여백 줄임 */
   margin-top: auto;
@@ -40,6 +50,7 @@ const showModal = ref(false)
 .footer-inner {
   width: 100%;
   max-width: 1400px;
+  padding: 0 20px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -53,7 +64,7 @@ const showModal = ref(false)
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 48px; /* 항목 간 간격 살짝 축소 */
+  gap: 40px; /* 항목 간 간격 살짝 축소 */
   margin: 0;
   padding: 0;
 }

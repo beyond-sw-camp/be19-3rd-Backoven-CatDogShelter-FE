@@ -4,12 +4,13 @@
       v-if="modelValue"
       class="modal-overlay"
       @click.self="close"
-      @keydown.esc="close"
-      role="dialog"
+      role="alertdialog"
       aria-modal="true"
       aria-labelledby="inquiry-success-title"
+      aria-describedby="inquiry-success-desc"
     >
-      <div class="modal-sheet" ref="sheet" tabindex="-1">
+
+      <div class="modal-sheet" ref="sheet" tabindex="-1" @keydown.esc.prevent="close">
         <!-- 헤더 -->
         <div class="modal-header">
           <h3 id="inquiry-success-title">접수완료</h3>
@@ -20,21 +21,19 @@
 
         <!-- 본문 -->
         <div class="modal-body">
-          <!-- 체크 아이콘 -->
           <div class="modal-icon" aria-hidden="true">
-            <!-- 제공한 SVG 그대로 사용 -->
             <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M45 0C20.16 0 0 20.16 0 45C0 69.84 20.16 90 45 90C69.84 90 90 69.84 90 45C90 20.16 69.84 0 45 0ZM36 67.5L13.5 45L19.845 38.655L36 54.765L70.155 20.61L76.5 27L36 67.5Z" fill="#78A55A"/>
             </svg>
           </div>
 
           <p class="modal-title">문의가 접수되었습니다</p>
-          <p class="modal-desc">
+          <p id="inquiry-success-desc" class="modal-desc">
             담당자가 내용을 확인한 후, <strong>영업일 기준 1–2일</strong> 내 답변드릴게요.
           </p>
         </div>
 
-        <!-- 풋터 -->
+        <!-- 푸터 -->
         <div class="modal-footer">
           <button class="btn-primary" @click="close">확인</button>
         </div>
@@ -44,31 +43,41 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
 
-const props = defineProps({
-  modelValue: { type: Boolean, default: false }
-})
+const props = defineProps({ modelValue: { type: Boolean, default: false } })
 const emit = defineEmits(['update:modelValue'])
 
 const sheet = ref(null)
 const close = () => emit('update:modelValue', false)
 
-// 열릴 때 포커스 이동(접근성)
+/** 열릴 때: 포커스 + 스크롤 잠금 */
 watch(() => props.modelValue, (open) => {
   if (open) {
     requestAnimationFrame(() => sheet.value?.focus())
+    lockScroll()
+  } else {
+    unlockScroll()
   }
 })
 
-// ESC 키는 overlay에 @keydown.esc 로 처리 (포커스가 시트에 있을 때 동작)
 onMounted(() => {
-  // no-op
+  if (props.modelValue) lockScroll()
 })
+onBeforeUnmount(() => unlockScroll())
+
+function lockScroll() {
+  const prev = document.body.style.overflow
+  document.body.dataset.prevOverflow = prev || ''
+  document.body.style.overflow = 'hidden'
+}
+function unlockScroll() {
+  document.body.style.overflow = document.body.dataset.prevOverflow || ''
+  delete document.body.dataset.prevOverflow
+}
 </script>
 
 <style scoped>
-/* 컬러 토큰 (브랜드 톤 참고) */
 :root {
   --brand-brown: #7A5A3A;
   --brand-beige: #EFE6DA;
@@ -93,10 +102,8 @@ onMounted(() => {
   background: var(--sheet-bg);
   border-radius: 14px;
   outline: none;
-  box-shadow:
-    0 20px 60px rgba(0,0,0,0.18),
-    0 2px 10px rgba(0,0,0,0.06);
-  overflow: hidden; /* 헤더/푸터 라운드 유지 */
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 2px 10px rgba(0,0,0,0.06);
+  overflow: hidden;
 }
 
 /* 헤더 */
@@ -153,7 +160,7 @@ onMounted(() => {
   line-height: 1.6;
 }
 
-/* 풋터 */
+/* 푸터 */
 .modal-footer {
   background: var(--brand-beige);
   padding: 20px 22px;
@@ -175,4 +182,9 @@ onMounted(() => {
 }
 .btn-primary:hover { filter: brightness(0.96); }
 .btn-primary:active { transform: translateY(1px); }
+
+/* 모션 선호도 */
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary { transition: none; }
+}
 </style>
