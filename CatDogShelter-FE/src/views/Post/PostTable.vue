@@ -19,7 +19,9 @@
             <div class="title-wrap">
               <div class="thumb" :style="thumbStyle(r.thumb)"></div>
               <span class="badge">{{ r.category }}</span>
-              <span class="title">{{ r.title }}</span>
+               <RouterLink class="title link" :to="{ name:'post.detail', params:{ id: r.id } }">
+                                {{ r.title }}
+               </RouterLink>
               <span class="comments">[{{ r.comments }}]</span>
             </div>
           </td>

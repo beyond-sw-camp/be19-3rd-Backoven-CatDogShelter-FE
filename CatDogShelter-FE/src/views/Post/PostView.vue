@@ -89,39 +89,25 @@ import PostTable from './PostTable.vue'
 
 const route = useRoute()
 const router = useRouter()
+const keyWrapRef = ref(null)
+const sortWrapRef = ref(null)
+
 
 const perPage = 10
 
-// --- 검색 상태(주소 쿼리와 동기화) ---
+// --- 검색/정렬 상태 ---
 const q = ref(route.query.q?.toString() || '')
-const searchKey = ref(route.query.key === 'author' ? 'author' : 'title') // title | author
+const searchKey = ref(route.query.key === 'author' ? 'author' : 'title')
 const openKey = ref(false)
-const keyWrapRef = ref(null)
 const searchKeyLabel = computed(() => (searchKey.value === 'title' ? '제목' : '작성자'))
 
-// --- 정렬 상태(주소 쿼리와 동기화) ---
 const sort = ref(['latest','oldest','views'].includes(route.query.sort) ? route.query.sort : 'latest')
 const openSort = ref(false)
-const sortWrapRef = ref(null)
 const sortLabel = computed(() => ({ latest:'최신순', oldest:'날짜순', views:'조회순' }[sort.value]))
 
-// 바깥 클릭 시 드롭다운 닫기
-function onClickOutside(e) {
-  if (keyWrapRef.value  && !keyWrapRef.value.contains(e.target))  openKey.value  = false
-  if (sortWrapRef.value && !sortWrapRef.value.contains(e.target)) openSort.value = false
-}
-onMounted(() => document.addEventListener('click', onClickOutside))
-onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
-
-function selectKey(key) {
-  searchKey.value = key
-  openKey.value = false
-}
-
-function selectSort(k) {
-  sort.value = k
-  openSort.value = false
-  // 정렬 변경 시 페이지 1로 리셋
+function selectKey(key){ searchKey.value = key; openKey.value = false }
+function selectSort(k){
+  sort.value = k; openSort.value = false
   router.replace({ path: route.path, query: { ...route.query, page: 1, sort: k } })
 }
 
@@ -171,28 +157,47 @@ function genDummy(n=33){
   }
   return arr
 }
-const allPosts = ref(genDummy(33))
+ const dummyPosts = ref(genDummy(33))
+ const userPosts = ref(JSON.parse(localStorage.getItem('post:items') || '[]'))
+ const allPosts = computed(() => [...userPosts.value, ...dummyPosts.value])
+
+function getSavedState(id){
+  try { return JSON.parse(localStorage.getItem(`post:detail:${id}`) || 'null') }
+  catch { return null }
+}
+
+// ✅ 모든 글에 저장값을 덮어쓴 "확장 목록"
+ const enrichedPosts = computed(() =>
+   allPosts.value.map(p => {
+    const s = getSavedState(p.id)
+    if (!s) return p
+    return {
+      ...p,
+      likes: typeof s.likes === 'number' ? s.likes : p.likes,
+      comments: Array.isArray(s.comments) ? s.comments.length : p.comments
+    }
+  })
+)
 
 // --- 필터링 + 정렬 + 페이지네이션 ---
-const filteredPosts = computed(() => {
-  const keyword = q.value.trim().toLowerCase()
-  if (!keyword) return allPosts.value
-  return allPosts.value.filter(p => {
-    const field = searchKey.value === 'author' ? p.author : p.title
-    return field.toLowerCase().includes(keyword)
-  })
-})
+ const filteredPosts = computed(() => {
+   const src = enrichedPosts.value
+   const keyword = q.value.trim().toLowerCase()
+   if (!keyword) return src
+   return src.filter(p => {
+     const field = searchKey.value === 'author' ? p.author : p.title
+     return field.toLowerCase().includes(keyword)
+   })
+ })
 
 const sortedPosts = computed(() => {
   const arr = [...filteredPosts.value]
-  if (sort.value === 'views') {
-    return arr.sort((a,b) => b.views - a.views)
-  }
- if (sort.value === 'oldest') {
-   return arr.sort((a,b) => new Date(b.date) - new Date(a.date)) // 최신 ↑ (요청대로 반대)
- }
-  // latest
-  return arr.sort((a,b) => new Date(b.date) - new Date(a.date))   // 최신 ↑
+  // 조회순
+  if (sort.value === 'views') return arr.sort((a,b) => b.views - a.views)
+  // 날짜순(오래된 → 최신) = id 오름차순
+  if (sort.value === 'oldest') return arr.sort((a,b) => a.id - b.id)
+  // 최신순(최신 → 오래된) = id 내림차순
+    return arr.sort((a,b) => b.id - a.id)
 })
 
 
@@ -211,7 +216,7 @@ function onSearch () {
     query: { ...route.query, page: 1, q: q.value, key: searchKey.value }
   })
 }
-function onWrite () { /* router.push({ name: 'free.write' }) */ }
+function onWrite () { router.push({ name: 'post.write' }) }
 function goPage (p) {
   router.replace({ path: route.path, query: { ...route.query, page: p } })
 }
