@@ -80,7 +80,7 @@ import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Pagination from './Pagination.vue'
 import PostTable from './PostTable.vue'
-import { getDummyDetail, getDummyThumb } from './detail/dummies.js'
+import { getDummyDetail, getDummyThumb, getAllDummyIds } from './detail/dummies.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -115,7 +115,7 @@ function selectSort(k){
 
 /* ---------- 더미 → 목록 데이터화 ---------- */
 /** 첫 페이지 10개: id 24 ~ 33 (오름차순) */
-const BASE_IDS = Array.from({ length: 10 }, (_, i) => 24 + i)
+const BASE_IDS = getAllDummyIds(true)
 
 /* createdAt 안전 변환(숫자면 그대로, 문자열이면 Date 파싱) */
 const toTime = (x) => {
