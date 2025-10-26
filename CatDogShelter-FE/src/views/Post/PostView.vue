@@ -7,7 +7,6 @@
     <!-- 검색 라인 -->
     <div class="toolbar">
       <div class="search-group" ref="keyWrapRef">
-        <!-- 검색 키 드롭다운(제목/작성자) -->
         <button
           class="key-select"
           type="button"
@@ -24,7 +23,6 @@
           <li :class="{active: searchKey==='author'}" @click="selectKey('author')">작성자</li>
         </ul>
 
-        <!-- 검색 인풋 + 돋보기 -->
         <label class="search-input" :aria-label="`${searchKeyLabel} 검색 입력`">
           <button class="icon-btn" type="button" @click="onSearch" aria-label="검색">
             <svg viewBox="0 0 20 20" width="18" height="18">
@@ -47,7 +45,6 @@
       <div class="meta-left">
         <span class="count">총 {{ totalCount }}개의 게시물</span>
 
-        <!-- 정렬 드롭다운 -->
         <div class="sort-wrap" ref="sortWrapRef">
           <button class="sort-select" type="button" @click="openSort = !openSort" :aria-expanded="openSort">
             {{ sortLabel }}
@@ -57,7 +54,6 @@
           </button>
           <ul v-if="openSort" class="sort-menu">
             <li :class="{active: sort==='latest'}" @click="selectSort('latest')">최신순</li>
-            <li :class="{active: sort==='oldest'}" @click="selectSort('oldest')">날짜순</li>
             <li :class="{active: sort==='views'}"  @click="selectSort('views')">조회순</li>
           </ul>
         </div>
@@ -68,10 +64,8 @@
 
     <div class="divider"></div>
 
-    <!-- 목록 테이블(필터+정렬+페이지 반영) -->
     <PostTable :rows="pageRows" :offset="numberOffset" />
 
-    <!-- 페이지네이션 -->
     <Pagination
       :page="page"
       :per-page="perPage"
@@ -86,24 +80,32 @@ import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Pagination from './Pagination.vue'
 import PostTable from './PostTable.vue'
+import { getDummyDetail, getDummyThumb } from './detail/dummies.js'
 
 const route = useRoute()
 const router = useRouter()
-const keyWrapRef = ref(null)
+
+const keyWrapRef  = ref(null)
 const sortWrapRef = ref(null)
-
-
 const perPage = 10
 
-// --- 검색/정렬 상태 ---
+/* ---------- 삭제 동기화 ---------- */
+const deletedSet = ref(new Set(JSON.parse(localStorage.getItem('post:deleted') || '[]')))
+window.addEventListener('storage', (e) => {
+  if (e.key === 'post:deleted') {
+    deletedSet.value = new Set(JSON.parse(e.newValue || '[]'))
+  }
+})
+
+/* ---------- 검색/정렬 상태 ---------- */
 const q = ref(route.query.q?.toString() || '')
 const searchKey = ref(route.query.key === 'author' ? 'author' : 'title')
 const openKey = ref(false)
 const searchKeyLabel = computed(() => (searchKey.value === 'title' ? '제목' : '작성자'))
 
-const sort = ref(['latest','oldest','views'].includes(route.query.sort) ? route.query.sort : 'latest')
+const sort = ref(['latest','views'].includes(route.query.sort) ? route.query.sort : 'latest')
 const openSort = ref(false)
-const sortLabel = computed(() => ({ latest:'최신순', oldest:'날짜순', views:'조회순' }[sort.value]))
+const sortLabel = computed(() => ({ latest:'최신순', views:'조회순' }[sort.value]))
 
 function selectKey(key){ searchKey.value = key; openKey.value = false }
 function selectSort(k){
@@ -111,95 +113,94 @@ function selectSort(k){
   router.replace({ path: route.path, query: { ...route.query, page: 1, sort: k } })
 }
 
-// --- 더미 데이터(생략 없이 그대로) ---
-const titles = [
-  '우리집 강아지 산책 코스 추천','강아지 리드줄 추천 부탁해요','강아지 배변패드 뭐가 좋아요?',
-  '강아지 사회화 팁 모음','겨울 산책 복장 추천','첫 목욕 생존기 공유',
-  '사료 바꾸고 설사 멈췄어요','하네스 vs 목줄 뭐 쓰세요?','강아지 치석 관리 어떻게?',
-  '고양이 간식 추천 받아요','고양이 모래 뭐써요?','냥이 캣타워 조립 후기',
-  '고양이 스크래처 교체했어요','캣닢 반응 모아봤어요','고양이 자동급식기 써보신 분?',
-  '냥이 장난감 TOP5','고양이 브러싱 팁','고양이 분리불안 경험담',
-  '새로 온 친구 적응 일지','야외 촬영 팁 공유','이사 후 적응기','초보 집사 질문 모음',
-  '슬개골 관리 어떻게 하세요?','손님 올 때 대처법','장마철 냄새 해결법',
-]
-const authors = [
-  '박지수','김민준','이서연','정다훈','최수빈','오슬기','류하늘','윤태호','고예린',
-  '한지훈','임가현','문채원','배도윤','서우진','이도연','정해빈','차유진','노지훈'
-]
-function inferSpeciesFromTitle(title, idx) {
-  const t = title.toLowerCase()
-  const dogWords = ['강아지','댕댕','멍','반려견','dog','리드줄','배변','훈련','산책','하네스','슬개골']
-  const catWords = ['고양','냥','야옹','반려묘','cat','캣','모래','스크래처','캣타워','캣닢','브러싱']
-  const hasDog = dogWords.some(w => t.includes(w))
-  const hasCat = catWords.some(w => t.includes(w))
-  if (hasDog && !hasCat) return '강아지'
-  if (hasCat && !hasDog) return '고양이'
-  return idx % 2 === 0 ? '강아지' : '고양이'
+/* ---------- 더미 → 목록 데이터화 ---------- */
+/** 첫 페이지 10개: id 24 ~ 33 (오름차순) */
+const BASE_IDS = Array.from({ length: 10 }, (_, i) => 24 + i)
+
+/* createdAt 안전 변환(숫자면 그대로, 문자열이면 Date 파싱) */
+const toTime = (x) => {
+  if (typeof x === 'number') return x
+  const t = new Date(x).getTime()
+  return Number.isFinite(t) ? t : 0
 }
-function pad2(n){ return String(n).padStart(2,'0') }
-function genDummy(n=33){
-  const arr=[]
-  for(let i=0;i<n;i++){
-    const title = titles[i % titles.length]
-    const no = n - i
-    const d  = new Date(2025, 9, 1 + (i%25))
-    arr.push({
-      id: no,
-      title,
-      author: authors[i % authors.length],
-      date: `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`,
-      views: 10 + (i*7)%120,
-      likes: 1 + (i*3)%30,
-      comments: (i*2)%6,
-      category: inferSpeciesFromTitle(title, i),
-      thumb: ''
+
+function buildSeedFromDummies() {
+  return BASE_IDS
+    .map((id, idx) => {
+      const d = getDummyDetail(id)
+      if (!d) return null
+      return {
+        id: d.id,
+        title: d.title,
+        author: d.author?.name || '',
+        date: d.date,
+        createdAt: toTime(d.createdAt ?? d.date) + idx,  // ✅ createdAt 채워넣기(유일성 보정)
+        category: d.category,
+        thumb: d.images?.[0]?.src || getDummyThumb(d.id) || '',
+        views: 10 + (idx * 7) % 120,
+        likes: d.stats?.likes ?? 0,
+        comments: d.stats?.comments ?? (d.comments?.length || 0),
+      }
     })
-  }
-  return arr
+    .filter(Boolean)
 }
- const dummyPosts = ref(genDummy(33))
- const userPosts = ref(JSON.parse(localStorage.getItem('post:items') || '[]'))
- const allPosts = computed(() => [...userPosts.value, ...dummyPosts.value])
+
+const dummyPosts = ref(buildSeedFromDummies())
+
+/** 사용자 글: 저장값에 createdAt이 없을 수도 있으니 폴백으로 채움 */
+const userPostsRaw = JSON.parse(localStorage.getItem('post:items') || '[]')
+const userPosts = ref(
+  userPostsRaw.map((p, i) => ({
+    ...p,
+    createdAt: toTime(p.createdAt ?? p.date) + i,  // ✅ 폴백
+  }))
+)
+
+/** 목록 원천 */
+const allPosts = computed(() => [...userPosts.value, ...dummyPosts.value])
 
 function getSavedState(id){
   try { return JSON.parse(localStorage.getItem(`post:detail:${id}`) || 'null') }
   catch { return null }
 }
 
-// ✅ 모든 글에 저장값을 덮어쓴 "확장 목록"
- const enrichedPosts = computed(() =>
-   allPosts.value.map(p => {
-    const s = getSavedState(p.id)
-    if (!s) return p
-    return {
-      ...p,
-      likes: typeof s.likes === 'number' ? s.likes : p.likes,
-      comments: Array.isArray(s.comments) ? s.comments.length : p.comments
-    }
-  })
+/* 저장값 & 삭제 반영 */
+const enrichedPosts = computed(() =>
+  allPosts.value
+    .filter(p => !deletedSet.value.has(p.id))
+    .map(p => {
+      const saved = getSavedState(p.id)
+      const thumbFromSaved = saved?.images?.[0]?.src || ''
+      const thumbFromDummy = getDummyThumb(p.id) || ''
+      if (!saved) {
+        return { ...p, thumb: p.thumb || thumbFromDummy }
+      }
+      return {
+        ...p,
+        likes: typeof saved.likes === 'number' ? saved.likes : p.likes,
+        comments: Array.isArray(saved.comments) ? saved.comments.length : p.comments,
+        thumb: thumbFromSaved || thumbFromDummy || p.thumb,
+      }
+    })
 )
 
-// --- 필터링 + 정렬 + 페이지네이션 ---
- const filteredPosts = computed(() => {
-   const src = enrichedPosts.value
-   const keyword = q.value.trim().toLowerCase()
-   if (!keyword) return src
-   return src.filter(p => {
-     const field = searchKey.value === 'author' ? p.author : p.title
-     return field.toLowerCase().includes(keyword)
-   })
- })
+/* ---------- 필터 + 정렬 + 페이지 ---------- */
+const filteredPosts = computed(() => {
+  const src = enrichedPosts.value
+  const keyword = q.value.trim().toLowerCase()
+  if (!keyword) return src
+  return src.filter(p => {
+    const field = (searchKey.value === 'author' ? p.author : p.title) || ''
+    return field.toLowerCase().includes(keyword)
+  })
+})
 
 const sortedPosts = computed(() => {
   const arr = [...filteredPosts.value]
-  // 조회순
-  if (sort.value === 'views') return arr.sort((a,b) => b.views - a.views)
-  // 날짜순(오래된 → 최신) = id 오름차순
-  if (sort.value === 'oldest') return arr.sort((a,b) => a.id - b.id)
-  // 최신순(최신 → 오래된) = id 내림차순
-    return arr.sort((a,b) => b.id - a.id)
+  if (sort.value === 'views') return arr.sort((a, b) => b.views - a.views)
+  // ✅ 최신순: createdAt 내림차순 (없으면 date 폴백)
+  return arr.sort((a, b) => toTime(b.createdAt ?? b.date) - toTime(a.createdAt ?? a.date))
 })
-
 
 const totalCount  = computed(() => sortedPosts.value.length)
 const page        = computed(() => Math.max(1, Number(route.query.page) || 1))
@@ -221,14 +222,25 @@ function goPage (p) {
   router.replace({ path: route.path, query: { ...route.query, page: p } })
 }
 
-// 주소 쿼리 -> UI 동기화
+/* 주소 쿼리 -> UI 동기화 */
 watch(() => route.query, (qr) => {
   q.value = (qr.q ?? '').toString()
   searchKey.value = qr.key === 'author' ? 'author' : 'title'
-  sort.value = ['latest','oldest','views'].includes(qr.sort) ? qr.sort : 'latest'
+  sort.value = ['latest','views'].includes(qr.sort) ? qr.sort : 'latest'
 })
-// 검색/정렬 후 현재 페이지 보정
+
+/* 페이지 보정 */
 watch([page, totalPages], ([p, tp]) => { if (p > tp) goPage(tp) })
+
+/* 드롭다운 밖 클릭 시 닫기 */
+function handleOutside(e) {
+  const withinKey  = keyWrapRef.value?.contains(e.target)
+  const withinSort = sortWrapRef.value?.contains(e.target)
+  if (!withinKey)  openKey.value  = false
+  if (!withinSort) openSort.value = false
+}
+onMounted(() => document.addEventListener('click', handleOutside))
+onBeforeUnmount(() => document.removeEventListener('click', handleOutside))
 </script>
 
 <style>

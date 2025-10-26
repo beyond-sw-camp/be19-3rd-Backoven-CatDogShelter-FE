@@ -1,6 +1,10 @@
 <template>
   <article v-if="post" class="post-detail">
-    <RouterLink class="back" :to="{ name: 'post', query: { page: 1 } }">← 목록으로</RouterLink>
+    <!-- 상단 바: 좌측 '목록으로', 우측 '게시글 삭제' -->
+    <div class="topbar">
+      <RouterLink class="back" :to="{ name: 'post', query: { page: 1 } }">← 목록으로</RouterLink>
+      <button class="delete-post" type="button" @click="confirmDelete">게시글 삭제</button>
+    </div>
 
     <h1 class="title">{{ post.title }}</h1>
 
@@ -32,14 +36,24 @@
     </div>
 
     <nav class="post-nav">
-      <RouterLink v-if="post.prev" :to="{ name:'post.detail', params:{ id: post.prev.id } }">← {{ post.prev.title }}</RouterLink>
-      <RouterLink v-if="post.next" :to="{ name:'post.detail', params:{ id: post.next.id } }">{{ post.next.title }} →</RouterLink>
+      <!-- 왼쪽: -1 (이전글) -->
+      <RouterLink
+        v-if="post.prev"
+        :to="{ name:'post.detail', params:{ id: post.prev.id } }"
+      >← {{ post.prev.title }}</RouterLink>
+
+      <!-- 오른쪽: +1 (다음글) -->
+      <RouterLink
+        v-if="post.next"
+        :to="{ name:'post.detail', params:{ id: post.next.id } }"
+      >{{ post.next.title }} →</RouterLink>
     </nav>
 
+    <!-- 댓글 -->
     <section class="comments">
       <h2 class="c-title">댓글 <span class="num">{{ post.stats.comments }}</span></h2>
 
-      <ul class="c-list">
+      <ul v-if="post.comments?.length" class="c-list">
         <li v-for="c in post.comments" :key="c.id" class="c-item">
           <div class="avatar" aria-hidden="true">{{ c.author?.[0] ?? '익' }}</div>
           <div class="c-box">
@@ -48,6 +62,11 @@
               <span class="c-time">{{ c.createdAt }}</span>
             </div>
             <p class="c-text">{{ c.text }}</p>
+
+            <!-- 우하단 삭제 버튼 -->
+            <div class="c-row-actions">
+              <button class="c-del" type="button" @click="removeComment(c.id)">삭제</button>
+            </div>
           </div>
         </li>
       </ul>
@@ -72,11 +91,13 @@
 
 <script setup>
 import { reactive, ref, computed, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import dummy33 from './detail/dummy-detail-33.js'
+import { useRoute, useRouter } from 'vue-router'
+import { getDummyDetail } from './detail/dummies.js'
 
 const route = useRoute()
+const router = useRouter()
 const id = computed(() => Number(route.params.id))
+
 
 const state = reactive({ post: null, isLiked: false })
 const newComment = ref('')
@@ -84,16 +105,18 @@ const nickname = ref('')
 const storageKey = computed(() => `post:detail:${id.value}`)
 
 function load(){
+  // 1) 사용자 저장 상세 우선
   const savedDetail = JSON.parse(localStorage.getItem(`post:detail:${id.value}`) || 'null')
   let base = null
   if (savedDetail && savedDetail.title) {
     base = savedDetail
-  } else if (id.value === 33) {
-    base = JSON.parse(JSON.stringify(dummy33))
   } else {
-    state.post = null; return
+    const d = getDummyDetail(id.value)   
+    if (d) base = structuredClone ? structuredClone(d) : JSON.parse(JSON.stringify(d))
   }
+  if (!base) { state.post = null; return }
 
+  // 2) 좋아요/댓글 최신 반영
   const saved = JSON.parse(localStorage.getItem(storageKey.value) || 'null')
   if (saved) {
     if (typeof saved.likes === 'number') base.stats.likes = saved.likes
@@ -128,10 +151,41 @@ function addComment(){
   newComment.value = ''
   persist()
 }
-function share(){
-  const url = location.href
-  if (navigator.share) navigator.share({ title: state.post?.title || '게시글', url }).catch(() => {})
-  else { navigator.clipboard?.writeText(url); alert('링크를 복사했어요.') }
+
+// 댓글 삭제
+function removeComment(cid) {
+  if (!state.post) return
+  if (!confirm('댓글을 삭제하시겠습니까?')) return
+  state.post.comments = state.post.comments.filter(c => c.id !== cid)
+  state.post.stats.comments = state.post.comments.length
+  persist()
+}
+
+// 게시글 삭제
+function confirmDelete() {
+  if (!state.post) return
+  if (!confirm('게시글을 삭제하시겠습니까?')) return
+  const pid = state.post.id
+
+  // 삭제 목록에 기록해 목록에서 숨김
+  const delKey = 'post:deleted'
+  const delArr = JSON.parse(localStorage.getItem(delKey) || '[]')
+  if (!delArr.includes(pid)) {
+    delArr.push(pid)
+    localStorage.setItem(delKey, JSON.stringify(delArr))
+  }
+
+  // 사용자 작성 글이면 목록 저장소에서 제거
+  const listKey = 'post:items'
+  const list = JSON.parse(localStorage.getItem(listKey) || '[]')
+  const next = list.filter(p => p.id !== pid)
+  if (next.length !== list.length) localStorage.setItem(listKey, JSON.stringify(next))
+
+  // 상세/상태 저장 제거
+  localStorage.removeItem(`post:detail:${pid}`)
+
+  alert('삭제되었습니다.')
+  router.push({ name: 'post' })
 }
 
 onMounted(load)
@@ -143,7 +197,15 @@ const isLiked = computed(() => state.isLiked)
 
 <style scoped>
 .post-detail{max-width:880px;margin:24px auto;padding:22px 24px;background:#fff;border-radius:14px;box-shadow:0 12px 22px rgba(0,0,0,.06)}
-.back{display:inline-block;margin-bottom:8px;color:#6b5b4a}
+/* 상단 바: 좌우 배치로 확실히 우측 정렬 */
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.back{color:#6b5b4a}
+.delete-post{
+  padding:6px 10px;border-radius:999px;border:1px solid #e6b6a8;
+  background:#fff5f3;color:#a23b2a;font-weight:700;cursor:pointer
+}
+.delete-post:hover{background:#ffe9e6}
+
 .title{margin:8px 0 4px;font-size:24px;font-weight:800}
 .meta{display:flex;gap:8px;color:#6b7280;font-size:14px;align-items:center}
 .dot{opacity:.6}
@@ -159,10 +221,9 @@ const isLiked = computed(() => state.isLiked)
 }
 .chip.on{background:#b87445;color:#fff;border-color:#b87445}
 
-/* prev/next */
 .post-nav{display:flex;justify-content:space-between;margin-top:18px}
 
-/* comments */
+/* 댓글 */
 .comments{margin-top:22px;background:#faf7f1;border:1px solid #eee;border-radius:12px;padding:16px}
 .c-title{margin:0 0 12px;font-size:15px}
 .c-title .num{color:#8a6a3f}
@@ -173,6 +234,9 @@ const isLiked = computed(() => state.isLiked)
 .c-head{display:flex;gap:8px;align-items:center;color:#6b7280;font-size:12px;margin-bottom:4px}
 .c-author{color:#3c3425;font-weight:700}
 .c-text{margin:0}
+.c-row-actions{display:flex;justify-content:flex-end;margin-top:6px}
+.c-del{padding:6px 10px;border-radius:999px;border:1px solid #eadfcd;background:#fff;color:#6b5b4a;cursor:pointer}
+.c-del:hover{background:#f9f3ea}
 
 .c-form{margin-top:12px;display:grid;gap:8px}
 .row{display:flex;gap:10px}

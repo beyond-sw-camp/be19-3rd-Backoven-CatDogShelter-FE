@@ -10,6 +10,21 @@
         <input v-model.trim="form.title" type="text" placeholder="제목을 입력하세요" required />
       </label>
 
+      <!-- 카테고리 -->
+      <div class="field">
+        <span class="label">카테고리 <b class="req">*</b></span>
+        <div class="seg">
+          <label class="seg-opt">
+            <input type="radio" name="cat" value="강아지" v-model="form.category" />
+            <span>강아지</span>
+          </label>
+          <label class="seg-opt">
+            <input type="radio" name="cat" value="고양이" v-model="form.category" />
+            <span>고양이</span>
+          </label>
+        </div>
+      </div>
+
       <!-- 내용 -->
       <label class="field">
         <span class="label">내용 <b class="req">*</b></span>
@@ -74,7 +89,8 @@ const images = ref([]) // dataURL 배열
 const form = ref({
   title: '',
   body: '',
-  author: '익명', // 필요하면 입력 필드로 빼도 됨
+  author: '익명',
+  category:'',
 })
 
 // 간단한 카테고리 추론(목록과 동일 로직)
@@ -136,24 +152,31 @@ function today() {
 
 function cancel(){ router.push({ name:'post' }) }
 
-function submit(){
-  if (!form.value.title.trim() || !form.value.body.trim()) return
+function submit () {
+  const listKey = 'post:items'
+  const userList = JSON.parse(localStorage.getItem(listKey) || '[]')
 
-  const id = nextId()
-  const date = today()
-  const category = inferCategory(form.value.title)
+  // 새 아이디: 기존 더미 + 사용자 글 중 최대 id + 1
+  const maxIdFromUser = userList.reduce((m, p) => Math.max(m, Number(p.id)||0), 0)
+  // 필요하면 화면에서 접근 가능한 더미 최대 id를 별도로 주입해서 계산해도 됨(지금은 33 기준)
+  const maxId = Math.max(maxIdFromUser, 33)
+  const nextId = maxId + 1
 
-  // 목록용 요약
-  const listItem = {
-    id,
-    title: form.value.title.trim(),
-    author: form.value.author || '익명',
-    date,
+  const now = Date.now()
+  const d = new Date(now)
+  const pad = n => String(n).padStart(2, '0')
+
+  const newPost = {
+    id: nextId,
+    title: form.title.trim(),
+    author: form.author.trim(), // 또는 로그인 사용자명
+    category: form.category,    // '강아지' | '고양이'
+    createdAt: now,             // 정렬의 기준
+    date: `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`, // 표시용
     views: 0,
     likes: 0,
     comments: 0,
-    category,
-    thumb: images.value[0] || '' // 첫 이미지 미리보기로 사용 가능
+    thumb: form.files?.[0]?.preview || '' // 썸네일 선택한 경우
   }
   saveListItem(listItem)
 
@@ -175,6 +198,8 @@ function submit(){
     tags: []
   }
   saveDetail(detail)
+
+  localStorage.setItem(listKey, JSON.stringify([newPost, ...userList]))
 
   // 완료 → 목록으로
   router.push({ name: 'post', query: { page: 1 } })
