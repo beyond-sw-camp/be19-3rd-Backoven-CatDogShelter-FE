@@ -237,7 +237,7 @@ const sortedReviews = computed(() => {
     result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
   }
   
-  return result
+  return result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 })
 
 // 페이지네이션 적용
