@@ -18,13 +18,8 @@ import AdoptionProcessView from '@/views/footer/AdoptionProcessView.vue'
 import VolunteerGuideView from '@/views/footer/VolunteerGuideView.vue'
 import PostWriteView from '@/views/Post/PostWriteView.vue'
 import FaqView from '@/views/footer/FaqView.vue'
-<<<<<<< HEAD
 import ShelterheadMypageView from '@/views/ShelterheadMypageView.vue'
-import VolunteerReviewDetailView from '@/views/volunteer/VolunteerReviewDetailView.vue'
-import VolunteerReviewInsertView from '@/views/volunteer/VolunteerReviewInsertView.vue'
-=======
 import LoginPlaceholderView from '@/views/LoginPlaceholderView.vue'
->>>>>>> devlop
 
 const router = createRouter({
     history: createWebHistory(),
