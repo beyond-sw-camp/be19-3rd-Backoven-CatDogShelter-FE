@@ -39,8 +39,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import VolunteerRecruitView from './VolunteerRecruitView.vue'
-import VolunteerReviewView from './VolunteerReviewView.vue'
+import VolunteerRecruitView from './recruit/VolunteerRecruitView.vue'
+import VolunteerReviewView from './review/VolunteerReviewView.vue'
 import VolunteerMineView from './VolunteerMineView.vue'
 
 const route = useRoute()

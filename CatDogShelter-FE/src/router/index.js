@@ -1,9 +1,12 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
+
+// ===== 메인 / 게시판들 =====
 import HomeView from '@/views/HomeView.vue'
 import VolunteerView from '@/views/volunteer/VolunteerView.vue'
-import DonationDetailView from '@/views/donation/DonationDetailView.vue'
 import DonationView from '@/views/DonationView.vue'
+import DonationDetailView from '@/views/donation/DonationDetailView.vue'
+import MissingDetailView from '@/views/missing/MissingDetailView.vue'
 import AdoptionView from '@/views/adoption/AdoptionView.vue'
 import MissingView from '@/views/MissingView.vue'
 import SightingView from '@/views/SightingView.vue'
@@ -22,10 +25,10 @@ import VolunteerGuideView from '@/views/footer/VolunteerGuideView.vue'
 import FaqView from '@/views/footer/FaqView.vue'
 
 // ===== 기타 뷰 =====
-import ShelterheadMypageView from '@/views/ShelterheadMypageView.vue'
+import ShelterheadMypageView from '@/views/volunteer/shelterhead/ShelterheadMypageView.vue'
 import LoginPlaceholderView from '@/views/LoginPlaceholderView.vue'
 
-// ===== 실종 글 작성 페이지 (이번에 만든 거) =====
+// ===== 실종 글 작성 =====
 import MissingPostWirte from '@/views/missing/MissingPostWirte.vue'
 
 const router = createRouter({
@@ -39,43 +42,50 @@ const router = createRouter({
       component: HomeView,
     },
 
-    // 봉사게시판
+    // 봉사게시판 (목록 페이지)
     {
       path: '/volunteer',
-      component: VolunteerView, // 봉사 게시판 메인
+      component: VolunteerView,
       children: [
         {
-          path: 'detail/:id', // 봉사모집 상세
+          // 봉사모집 상세
+          path: 'detail/:id',
           name: 'VolunteerDetail',
-          component: () => import('@/views/volunteer/VolunteerDetailView.vue'),
+          component: () =>
+            import('@/views/volunteer/recruit/VolunteerDetailView.vue'),
           props: true,
         },
         {
-          path: 'review/:id', // 봉사후기 상세
+          // 봉사후기 상세
+          path: 'review/:id',
           name: 'VolunteerReviewDetail',
-          component: () => import('@/views/volunteer/VolunteerReviewDetailView.vue'),
+          component: () =>
+            import('@/views/volunteer/review/VolunteerReviewDetailView.vue'),
           props: true,
         },
         {
-          path: 'review/insert', // 봉사후기 작성
+          // 봉사후기 작성
+          path: 'review/insert',
           name: 'VolunteerReviewInsert',
-          component: () => import('@/views/volunteer/VolunteerReviewInsertView.vue'),
+          component: () =>
+            import('@/views/volunteer/review/VolunteerReviewInsertView.vue'),
         },
       ],
     },
 
-    // 후원게시판
+    // 후원게시판 목록
     {
       path: '/donation',
       name: 'donation',
       component: DonationView,
     },
 
+    // 후원게시판 상세
     {
       path: '/donation/:id',
       name: 'donation-detail',
       component: DonationDetailView,
-      props: true
+      props: true,
     },
 
     // 입양 게시판 목록
@@ -89,7 +99,8 @@ const router = createRouter({
     {
       path: '/adoption-post/:id',
       name: 'adoptionDetail',
-      component: () => import('@/views/adoption/AdoptionDetail.vue'),
+      component: () =>
+        import('@/views/adoption/AdoptionDetail.vue'),
       props: true,
     },
 
@@ -97,7 +108,8 @@ const router = createRouter({
     {
       path: '/adoption/write',
       name: 'AdoptionWrite',
-      component: () => import('@/views/adoption/AdoptionWrite.vue'),
+      component: () =>
+        import('@/views/adoption/AdoptionWrite.vue'),
     },
 
     // 실종 게시판 목록
@@ -106,8 +118,14 @@ const router = createRouter({
       name: 'missing',
       component: MissingView,
     },
+    {
+      path: '/missing/:postId',
+      name: 'missing-detail',
+      component: MissingDetailView,
+      props: true, // 이거 켜두면 route param(postId)을 props로도 받을 수 있음
+    },
 
-    // 🔥 실종 신고 작성
+    // 실종 신고 작성
     {
       path: '/missing/write',
       name: 'missing.write',
@@ -143,7 +161,7 @@ const router = createRouter({
       props: true,
     },
 
-    // 혹시 /post.write 로 잘못 들어오는 애들 redirect
+    // 혹시 /post.write 로 들어온 애들 redirect
     {
       path: '/post.write',
       redirect: { name: 'post.write' },
@@ -156,7 +174,7 @@ const router = createRouter({
       component: HeroesView,
     },
 
-    // footer/소개/정책 쪽
+    // footer / 정책 / 안내
     {
       path: '/about',
       component: AboutView,
@@ -186,16 +204,17 @@ const router = createRouter({
       component: FaqView,
     },
 
-    // 보호소장 마이페이지 + 하위 라우트
+    // 보호소장 마이페이지
     {
       path: '/shelter-head/mypage',
       component: ShelterheadMypageView,
       children: [
         {
-          path: 'recruitinsert', // 봉사모집 글 작성
+          // 봉사모집 글 작성
+          path: 'recruitinsert',
           name: 'VolunteerRecruitInsert',
           component: () =>
-            import('@/views/volunteer/VolunteerRecruitInsertView.vue'),
+            import('@/views/volunteer/recruit/VolunteerRecruitInsertView.vue'),
         },
       ],
     },
@@ -208,7 +227,7 @@ const router = createRouter({
     },
   ],
 
-  // 라우트 이동 시 항상 화면 최상단으로
+  // 라우트 이동 시 항상 화면 최상단
   scrollBehavior: () => ({ top: 0 }),
 })
 
