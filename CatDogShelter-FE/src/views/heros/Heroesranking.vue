@@ -15,9 +15,9 @@
     <!-- 정상 표시 -->
     <template v-else>
       <!-- 타이틀 섹션 -->
-      <section class="title-section">
-        <h1 class="title">.°♔°.이달의댕냥 히어로즈⋆˚✧˖°</h1>
-      </section>
+     <section class="title-section">
+  <img src="@/assets/heros_banner.png" alt="이달의 댕냥 히어로즈" class="title-image" />
+</section>
 
       <!-- TOP 3 포디움 -->
       <div class="podium-section" v-if="top3.length >= 3">
@@ -163,14 +163,17 @@
       </section>
 
       <!-- 안내 정보 -->
-      <div class="info-box" v-if="heroesInfo.length > 0">
-        <h3>💡 댕냥히어로즈 선정 기준</h3>
-        <ul>
-          <li v-for="(info, index) in heroesInfo" :key="index">
-            {{ info }}
-          </li>
-        </ul>
-      </div>
+  <div class="info-box">
+  <h3>
+    <img src="@/assets/wings.png" class="wing-icon" alt="wing" />
+    댕냥히어로즈 선정 기준
+  </h3>
+  <ul>
+    <li v-for="(info, index) in heroesInfo" :key="index">
+      {{ info }}
+    </li>
+  </ul>
+</div>
     </template>
   </div>
 </template>
@@ -241,9 +244,9 @@ async function loadRankings() {
 
     rankings.value = Array.isArray(data) ? data : (data.rankings || []);
     heroesInfo.value = [
-      "월별 1위부터 월간랭킹만 적용 활동 시간과 기록으로 산정됩니다.",
-      "봉사 활동 누적 실적을 기반으로 배지등급이 부여됩니다.",
-      "데이터 검증을통해 비정상적 활동은 다시 검토 후 제외됩니다."
+      "매월 1일부터 말일까지의 봉사 활동 시간을 기준으로 선정됩니다.",
+      "등급은 봉사활동 누적시간에 따라 부여되며 매년 등급이 초기화됩니다.",
+      "댕냥 히어로즈분들께 다시 한번 감사드립니다."
     ];
 
     console.log('로드된 랭킹:', rankings.value.length);
@@ -390,9 +393,10 @@ onMounted(() => {
 }
 
 .dog-image img {
-  width: 100%;
+  width: 120%;
   height: auto;
   object-fit: contain;
+  margin-top: -36px;
 }
 
 .rank-number {
@@ -657,14 +661,20 @@ onMounted(() => {
 
 /* 안내 박스 */
 .info-box {
+  background-color: #FFFBEB;
   width: 100%; /* ranking-section 안에서 전체 활용 */
   max-width: 1000px; 
   margin: 32px auto 0; /* 중앙 정렬 */
-  background: #fff;
   border: 1px solid #e8dcc8;
   border-radius: 16px;
   padding: 20px 24px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.wing-icon {
+  width: 50px;
+  height: 50px;
+  margin-right: 6px;
+  vertical-align: middle;
 }
 
 
@@ -790,7 +800,14 @@ onMounted(() => {
 .info-box li {
   font-size: 14px;
 }
-
+.title-image {
+margin-left: 20px;
+  width: 400px;
+  max-width: 90%;
+  height: auto;
+  display: inline-block;
+  filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.12));
+}
 
 
 </style>
