@@ -152,58 +152,72 @@ function today() {
 
 function cancel(){ router.push({ name:'post' }) }
 
+// PostWriteView.vue <script setup> 안에서 기존 submit()만 교체
 function submit () {
+  // 간단 검증
+  if (!form.value.title.trim() || !form.value.body.trim()) {
+    alert('제목과 내용을 입력해 주세요.')
+    return
+  }
+  if (!form.value.category) {
+    alert('카테고리를 선택해 주세요.')
+    return
+  }
+
+  // 기존 사용자 글 목록
   const listKey = 'post:items'
   const userList = JSON.parse(localStorage.getItem(listKey) || '[]')
 
-  // 새 아이디: 기존 더미 + 사용자 글 중 최대 id + 1
-  const maxIdFromUser = userList.reduce((m, p) => Math.max(m, Number(p.id)||0), 0)
-  // 필요하면 화면에서 접근 가능한 더미 최대 id를 별도로 주입해서 계산해도 됨(지금은 33 기준)
-  const maxId = Math.max(maxIdFromUser, 33)
-  const nextId = maxId + 1
+  // 새 ID: (사용자 글 최대 id vs 더미 최댓값 33) 중 큰 값 + 1
+  const maxUserId = userList.reduce((m, p) => Math.max(m, Number(p.id) || 0), 0)
+  const id = Math.max(maxUserId, 33) + 1
 
+  // 날짜/시간
   const now = Date.now()
   const d = new Date(now)
   const pad = n => String(n).padStart(2, '0')
+  const date = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`
 
-  const newPost = {
-    id: nextId,
-    title: form.title.trim(),
-    author: form.author.trim(), // 또는 로그인 사용자명
-    category: form.category,    // '강아지' | '고양이'
-    createdAt: now,             // 정렬의 기준
-    date: `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`, // 표시용
+  // 목록용 아이템(목록 정렬을 위해 createdAt 포함)
+  const listItem = {
+    id,
+    title: form.value.title.trim(),
+    author: form.value.author.trim() || '익명',
+    category: form.value.category,               // '강아지' | '고양이'
+    createdAt: now,                              // 최신 글이 위로 오도록
+    date,                                        // 표시용
     views: 0,
     likes: 0,
     comments: 0,
-    thumb: form.files?.[0]?.preview || '' // 썸네일 선택한 경우
+    thumb: images.value[0] || ''                 // 첫 번째 업로드 이미지를 썸네일로
   }
-  saveListItem(listItem)
 
-  // 상세용 전체
+  // 상세 페이지용 데이터
   const detail = {
     id,
     board: 'free',
     title: listItem.title,
-    category,
-    author: { name: listItem.author, role: '' },
+    category: listItem.category,
+    author: { name: listItem.author },
     date,
     stats: { views: 0, likes: 0, comments: 0 },
     images: images.value.map((src, i) => ({ src, alt: `${listItem.title} ${i+1}` })),
-    content: form.value.body.split('\n').filter(Boolean), // 줄바꿈 단락 처리
+    content: form.value.body.split('\n').filter(Boolean), // 줄바꿈 단락화
     prev: null,
     next: null,
     comments: [],
     attachments: [],
     tags: []
   }
-  saveDetail(detail)
 
-  localStorage.setItem(listKey, JSON.stringify([newPost, ...userList]))
+  // 저장
+  localStorage.setItem(listKey, JSON.stringify([listItem, ...userList]))
+  localStorage.setItem(`post:detail:${id}`, JSON.stringify(detail))
 
-  // 완료 → 목록으로
+  // 완료 → 목록 이동
   router.push({ name: 'post', query: { page: 1 } })
 }
+
 </script>
 
 <style scoped>
@@ -216,8 +230,12 @@ function submit () {
 .label{font-weight:700;color:#4a3b2a}
 .req{color:#c95555}
 
-input[type="text"], textarea{
+input[type="text"],
+textarea,
+.dropzone {
   width:100%; padding:12px; border:1px solid #eadfcd; border-radius:12px; background:#f7f6f3;
+  box-sizing: border-box;   
+  width: 100%;
 }
 textarea{resize:vertical; min-height:220px}
 
