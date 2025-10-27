@@ -227,7 +227,7 @@ function formatDate(dateString) {
 .detail-box {
   background: #fff;
   width: 100%;
-  max-width: 800px;
+  max-width: 900px;
   padding: 40px 50px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);

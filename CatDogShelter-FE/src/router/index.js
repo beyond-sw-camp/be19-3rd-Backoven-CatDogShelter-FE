@@ -79,7 +79,11 @@ const router = createRouter({
 
         { path: '/post.write', redirect: { name: 'post.write' } },
 
-        { path: '/heroes', name: 'heroes', component: HeroesView },
+        {
+          path: '/heroes',
+          name: 'Heroes',
+          component: () => import('@/views/heros/HeroesRanking.vue')
+        },
         { path: '/about', component: AboutView },
         { path: '/terms', component: TermsView },
         { path: '/privacy', component: PrivacyView },
