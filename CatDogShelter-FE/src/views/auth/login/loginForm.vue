@@ -11,6 +11,7 @@ const { loading, error } = useAuth()
 const router = useRouter()
 const hasSignup = computed(() => router.hasRoute('signup')) 
 
+
 const roleLabel = computed(() => role.value === 'USER' ? '일반회원' : '보호소장 회원')
 const signupRoute = computed(() =>
   role.value === 'USER' ? { name: 'signup.user' } : { name: 'signup.shelter' }
@@ -25,14 +26,11 @@ const signupHint = computed(() =>
 )
 
 const submit = async () => {
-  // 백엔드에 role 함께 전달 (payload 확장)
   const ok = await login({ ...form.value, role: role.value, keep: keep.value })
   if (ok) {
-    // 성공 이벤트 상위로 통지
-    emit('success')
+    router.push({ name: 'home' }) // ✅ 원하는 페이지 이름으로
   }
 }
-
 const emit = defineEmits(['success'])
 </script>
 
