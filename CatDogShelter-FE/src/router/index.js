@@ -228,6 +228,10 @@ const router = createRouter({
         },
       ],
     },
+
+    // src/router/index.js
+    { path: '/auth/find-id', name: 'find.id', component: () => import('@/views/auth/findIdView.vue') },
+
     
 
     // ===== 여기부터는 네가 원래 아래에 쭉 적어놨던 중복 라우트들 =====
