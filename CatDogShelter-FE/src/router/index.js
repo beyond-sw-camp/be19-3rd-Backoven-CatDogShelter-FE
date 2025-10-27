@@ -18,6 +18,7 @@ import AdoptionProcessView from '@/views/footer/AdoptionProcessView.vue'
 import VolunteerGuideView from '@/views/footer/VolunteerGuideView.vue'
 import PostWriteView from '@/views/Post/PostWriteView.vue'
 import FaqView from '@/views/footer/FaqView.vue'
+
 import ShelterheadMypageView from '@/views/volunteer/shelterhead/ShelterheadMypageView.vue'
 import LoginPlaceholderView from '@/views/LoginPlaceholderView.vue'
 
@@ -75,7 +76,11 @@ const router = createRouter({
 
         { path: '/post.write', redirect: { name: 'post.write' } },
 
-        { path: '/heroes', name: 'heroes', component: HeroesView },
+        {
+          path: '/heroes',
+          name: 'Heroes',
+          component: () => import('@/views/heros/HeroesRanking.vue')
+        },
         { path: '/about', component: AboutView },
         { path: '/terms', component: TermsView },
         { path: '/privacy', component: PrivacyView },

@@ -1,9 +1,9 @@
 <template>
   <div class="container">
-    <header class="page-header">
-      <h2 class="title">입양 게시판</h2>
-      <p class="subtitle">새로운 가족을 기다리는 반려동물들을 만나보세요 🐶🐱</p>
-    </header>
+    <section class="board-wrap">
+      <h1 class="board-title">입양 게시판</h1>
+      <p class="board-sub">"새로운 가족을 기다리는 반려동물을 만나보세요 ૮  .    .  ა"</p>
+    </section>
 
     <AdoptionFilter
       v-model:animalType="filters.animalType"
@@ -70,59 +70,49 @@ const filters = reactive({
 
 async function loadPosts(page = currentPage.value) {
   loading.value = true;
-  currentPage.value = page; // 현재 페이지
+  currentPage.value = page;
 
   try {
     const url = new URL(`http://localhost:8000/post-service/adoption-post/board`);
-    
-    // 모든 요청에 공통 파라미터 추가
     url.searchParams.append("page", page - 1);
     url.searchParams.append("size", 8);
 
-    // 정렬 조건
-    if (filters.sortType) {
-      url.searchParams.append("sortType", filters.sortType);
-    }
+    const hasCondition =
+  (filters.animalType && filters.animalType !== '') ||
+  (filters.sidoName && filters.sidoName !== '') ||
+  (filters.sigunguName && filters.sigunguName !== '');
+    const hasKeyword = filters.keyword.trim() !== "";
 
-    // 키워드 검색
-    if (filters.keyword.trim()) {
+    // 조건 검색 우선 적용
+    if (hasCondition) {
+      url.pathname = "/post-service/adoption-post/search/condition";
+      if (filters.animalType) url.searchParams.append("animalType", filters.animalType);
+      if (filters.sidoName) url.searchParams.append("sidoName", filters.sidoName);
+      if (filters.sigunguName) url.searchParams.append("sigunguName", filters.sigunguName);
+    }
+    // 그 다음 키워드 검색
+    else if (hasKeyword) {
       url.pathname = "/post-service/adoption-post/search/keyword";
       url.searchParams.append("keyword", filters.keyword);
       url.searchParams.append("searchType", "title");
     }
 
-    // 조건 검색
-    if (filters.animalType || filters.sidoName || filters.sigunguName) {
-      url.pathname = "/post-service/adoption-post/search/condition";
-
-      if (filters.animalType)
-        url.searchParams.append("animalType", filters.animalType);
-
-      if (filters.sidoName)
-        url.searchParams.append("sidoName", filters.sidoName);
-
-      if (filters.sigunguName)
-        url.searchParams.append("sigunguName", filters.sigunguName);
+    // 정렬 조건 항상 포함
+    if (filters.sortType) {
+      url.searchParams.append("sortType", filters.sortType);
     }
 
     const res = await fetch(url.toString());
-    if (!res.ok) throw new Error("게시글 로드 실패");
+    if (!res.ok) throw new Error("Fail loadPosts");
 
     const data = await res.json();
 
-    // Pagination 응답 방식에 따라 처리
-    if (data.content) {
-      posts.value = data.content;
-      totalCount.value = data.totalElements;
-      totalPages.value = data.totalPages;
-    } else {
-      posts.value = data;
-      totalCount.value = data.length;
-      totalPages.value = Math.ceil(data.length / 8);
-    }
+    posts.value = data.content || data;
+    totalCount.value = data.totalElements ?? posts.value.length;
+    totalPages.value = data.totalPages ?? Math.ceil(posts.value.length / 8);
 
   } catch (e) {
-    console.error("게시글 조회 실패:", e);
+    console.error(e);
     posts.value = [];
     totalCount.value = 0;
   } finally {
@@ -130,6 +120,7 @@ async function loadPosts(page = currentPage.value) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 }
+
 import { useRouter } from "vue-router";
 const router = useRouter();
 
@@ -149,24 +140,6 @@ onMounted(() => loadPosts(1));
   max-width: 1200px;
   margin: 0 auto;
   padding: 40px 20px;
-}
-
-.page-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.title {
-  font-size: 32px;
-  font-weight: 700;
-  color: #333;
-  margin: 0 0 12px 0;
-}
-
-.subtitle {
-  font-size: 16px;
-  color: #666;
-  margin: 0;
 }
 
 .controls {
@@ -215,13 +188,14 @@ onMounted(() => loadPosts(1));
 }
 
 .card-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
-  column-gap: -2000px;   /* ← 좌우 간격만 */
-  row-gap:24px;      
-   padding-inline:12px; 
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;   /* ✅ 마지막 줄도 가운데 정렬 */
+  gap: 24px;                 /* 카드 간격 */
   margin-bottom: 40px;
+  padding-inline: 12px;      /* 양옆 살짝 여백 */
 }
+
 
 .controls {
   display: flex;
@@ -246,6 +220,24 @@ onMounted(() => loadPosts(1));
 
 .write-btn:hover {
   background: #c7a670;
+}
+.board-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 16px 0;
+}
+
+.board-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #333; /* var(--ink-0) 대응 */
+  margin: 4px 0 4px;
+}
+
+.board-sub {
+  font-size: 13px;
+  color: #666; /* var(--ink-2) 대응 */
+  margin: 0 0 16px;
 }
 
 
