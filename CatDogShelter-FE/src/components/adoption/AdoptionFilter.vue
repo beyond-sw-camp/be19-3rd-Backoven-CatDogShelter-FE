@@ -21,8 +21,6 @@
 
     <button @click="applyFilter" class="search-btn">검색</button>
 
-    <button class="post-btn">게시글 등록</button>
-
   </div>
 </template>
 

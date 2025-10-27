@@ -14,16 +14,13 @@
       @update="loadPosts"
     />
 
-    <div class="controls">
-      <div class="post-count">
-        총 <strong>{{ totalCount }}</strong>개의 게시글
-      </div>
-      <select v-model="filters.sortType" @change="loadPosts" class="sort-select">
-        <option value="">최신순</option>
-        <option value="view">조회순</option>
-        <option value="liked">좋아요순</option>
-      </select>
-    </div>
+<div class="controls">
+  <div class="post-count">
+    총 <strong>{{ totalCount }}</strong>개의 게시글
+  </div>
+
+  <button class="write-btn" @click="goWrite">게시글 등록</button>
+</div>
 
     <div v-if="loading" class="loading">
       <div class="spinner"></div>
@@ -133,7 +130,12 @@ async function loadPosts(page = currentPage.value) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 }
+import { useRouter } from "vue-router";
+const router = useRouter();
 
+function goWrite() {
+  router.push("/adoption/write");
+}
 // 페이지 변경 이벤트 처리
 function handlePageChange(page) {
   loadPosts(page);
@@ -184,19 +186,7 @@ onMounted(() => loadPosts(1));
   font-weight: 700;
 }
 
-.sort-select {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 13px;
-  background: white;
-  cursor: pointer;
-  outline: none;
-}
 
-.sort-select:focus {
-  border-color: #d0c9b8;
-}
 
 .loading {
   text-align: center;
@@ -227,24 +217,36 @@ onMounted(() => loadPosts(1));
 .card-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
-  gap: 24px;
+  column-gap: -2000px;   /* ← 좌우 간격만 */
+  row-gap:24px;      
+   padding-inline:12px; 
   margin-bottom: 40px;
 }
 
-@media (max-width: 768px) {
-  .container {
-    padding: 20px 12px;
-  }
-  
-  .card-container {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 16px;
-  }
-  
-  .controls {
-    flex-direction: column;
-    gap: 12px;
-    align-items: flex-start;
-  }
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 32px 0 20px;
+  width: 100%;
 }
+
+/* 버튼 오른쪽 붙이기 */
+.write-btn {
+  background: #d8bd89;
+  color: #3b342c;
+  font-weight: 600;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.write-btn:hover {
+  background: #c7a670;
+}
+
+
 </style>

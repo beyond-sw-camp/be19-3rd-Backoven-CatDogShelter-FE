@@ -49,7 +49,22 @@ const router = createRouter({
                     ]
         },
         { path: '/donation', name: 'donation', component: DonationView },
-        { path: '/adoption', name: 'adoption', component: AdoptionView },
+    { 
+        path: '/adoption', 
+        name : 'adoption',
+        component: AdoptionView 
+    },
+    {
+        path: "/adoption-post/:id",
+        name: "adoptionDetail",
+        component: () => import("@/views/adoption/AdoptionDetail.vue"),
+        props: true
+    },
+    {
+  path: "/adoption/write",
+  name: "AdoptionWrite",
+  component: () => import("@/views/adoption/AdoptionWrite.vue"),
+},
         { path: '/missing', name: 'missing', component: MissingView },
         { path: '/sighting', name: 'sighting', component: SightingView },
 
@@ -81,7 +96,9 @@ const router = createRouter({
         },
         { path: '/login', name: 'login', component: LoginPlaceholderView }
     ],
+    
     scrollBehavior: () => ({ top: 0 }) // 페이지 이동 시 상단으로
+    
 })
 
 export default router
