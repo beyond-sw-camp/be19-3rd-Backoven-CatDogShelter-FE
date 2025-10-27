@@ -46,12 +46,29 @@
       </div>
     </section>
 
-    <!-- ===== 게시판 헤더 (정렬, 등록 버튼) ===== -->
+    <!-- ===== 게시판 헤더 (게시글 수 / 정렬 / 작성 버튼) ===== -->
     <section class="board-headbar">
-      <div class="board-meta">
-        <span>총 {{ posts.length }}개의 게시글</span>
+      <div class="board-left">
+        <span class="board-count">총 {{ posts.length }}개의 게시글</span>
+
+        <div class="sort-row">
+          <label for="sortSelect" class="sort-label">정렬 조건</label>
+          <select
+            id="sortSelect"
+            class="sort-select"
+            v-model="sortOption"
+            @change="applySort"
+          >
+            <option value="latest">최신순</option>
+            <option value="view">조회순</option>
+            <option value="like">좋아요순</option>
+          </select>
+        </div>
       </div>
-      <button class="write-btn" @click="handleWriteClick">게시글 등록</button>
+
+      <button class="write-btn" @click="handleWriteClick">
+        게시글 등록
+      </button>
     </section>
 
     <!-- ===== 게시글 테이블 ===== -->
@@ -60,30 +77,64 @@
         <thead>
           <tr>
             <th>보호소</th>
-            <th>제목</th>
+            <th class="text-left">제목</th>
             <th>작성자</th>
             <th>조회수</th>
             <th>좋아요</th>
             <th>작성일</th>
           </tr>
         </thead>
+
         <tbody>
           <tr
             v-for="post in posts"
             :key="post.id"
-            @click="goDetail(post.id)"
             class="board-row"
+            @click="goDetail(post.id)"
           >
             <td>{{ post.shelterName }}</td>
-            <td class="text-left">{{ post.title }}</td>
+
+            <td class="text-left title-cell">
+              <span class="title-text">{{ post.title }}</span>
+            </td>
+
             <td>{{ post.userName }}</td>
-            <td>👁 {{ post.view }}</td>
+
+            <!-- 조회수 (아이콘 + 숫자) -->
+            <td class="view-cell">
+              <svg
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                aria-hidden="true"
+                class="view-icon"
+              >
+                <path
+                  d="M12 5c4.5 0 8.3 2.7 10 6.5C20.3 15.3 16.5 18 12 18S3.7 15.3 2 11.5C3.7 7.7 7.5 5 12 5Z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                />
+                <circle
+                  cx="12"
+                  cy="11.5"
+                  r="3"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                />
+              </svg>
+              <span class="view-num">{{ post.view }}</span>
+            </td>
+
             <td>❤️ {{ post.likeCount }}</td>
             <td>{{ post.createdAt }}</td>
           </tr>
 
           <tr v-if="posts.length === 0">
-            <td colspan="6" class="empty-row">등록된 게시글이 없습니다.</td>
+            <td colspan="6" class="empty-row">
+              등록된 게시글이 없습니다.
+            </td>
           </tr>
         </tbody>
       </table>
@@ -118,7 +169,9 @@
             게시글 작성은 보호소장 계정만 이용할 수 있어요.<br />
             함께 참여하실 보호소라면 지금 인증하고 시작해보세요.
           </p>
-          <button class="role-modal-close-btn" @click="closeRoleModal">닫기</button>
+          <button class="role-modal-close-btn" @click="closeRoleModal">
+            닫기
+          </button>
         </div>
       </div>
     </teleport>
@@ -131,21 +184,29 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-// 보호소장 여부 (JWT decode로 세팅해도 됨)
+// 보호소장 여부 (role 체크로 세팅 예정)
 const isShelterHead = ref(false)
 
-// 게시글 목록
+// 전체 원본 목록 (검색/정렬 전 데이터)
+const allPosts = ref([])
+
+// 화면에 실제로 렌더되는 목록
 const posts = ref([])
 
-// 통계 (일단 기본값)
+// 상단 통계 데이터
 const stats = ref({
   totalDonations: 0,
   participatingShelters: 0,
-  totalSupporters: 0,
+  totalSupporters: 0
 })
 
+// 검색 상태
 const searchField = ref('title')
 const keyword = ref('')
+
+// 정렬 상태 (latest | view | like)
+const sortOption = ref('latest')
+
 const showRoleModal = ref(false)
 
 const searchPlaceholder = computed(() => {
@@ -154,50 +215,128 @@ const searchPlaceholder = computed(() => {
   return '검색어를 입력하세요'
 })
 
-// 후원게시판 불러오기
+/**
+ * 정렬 적용
+ * sortOption.value 에 따라 posts.value를 정렬한다.
+ * posts.value 자체를 정렬하므로 검색 후에도 그대로 동작.
+ */
+function applySort() {
+  const arr = [...posts.value]
+
+  if (sortOption.value === 'latest') {
+    // createdAt 문자열을 Date로 변환 후 최신순
+    arr.sort((a, b) => {
+      // "2025-09-10 19:10" -> Date 인식하도록 공백을 T로 바꿔줌
+      const da = new Date(a.createdAt?.replace(' ', 'T'))
+      const db = new Date(b.createdAt?.replace(' ', 'T'))
+      return db - da
+    })
+  } else if (sortOption.value === 'view') {
+    arr.sort((a, b) => {
+      const va = Number(a.view ?? 0)
+      const vb = Number(b.view ?? 0)
+      return vb - va
+    })
+  } else if (sortOption.value === 'like') {
+    arr.sort((a, b) => {
+      const la = Number(a.likeCount ?? 0)
+      const lb = Number(b.likeCount ?? 0)
+      return lb - la
+    })
+  }
+
+  posts.value = arr
+}
+
+/**
+ * 후원게시판 목록 불러오기
+ * GET http://localhost:8000/post-service/donation-posts/query/posts
+ */
 async function fetchDonationPosts() {
   try {
     const res = await fetch(
-      `http://localhost:8000/post-service/donation-posts/query/posts`,
+      'http://localhost:8000/post-service/donation-posts/query/posts',
       {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json'
+          // Authorization 필요하면 추가
+          // Authorization: `Bearer ${sessionStorage.getItem('accessToken') || ''}`
+        }
       }
     )
 
     if (!res.ok) {
-      console.error('후원게시판 로드 실패:', res.status)
+      console.error('[후원게시판 로드 실패]', res.status)
       return
     }
 
     const data = await res.json()
-    posts.value = Array.isArray(data) ? data : []
 
-    // 간단히 통계 데이터 추정
+    // data가 배열이라고 가정
+    const mapped = Array.isArray(data)
+      ? data.map(item => ({
+          id: item.id,
+          shelterName: item.shelterName,
+          title: item.title,
+          userName: item.userName,
+          view: item.view,
+          likeCount: item.likeCount,
+          createdAt: item.createdAt
+        }))
+      : []
+
+    allPosts.value = mapped
+    posts.value = mapped
+
+    // 통계 갱신
     stats.value = {
-      totalDonations: data.length,
-      participatingShelters: new Set(data.map(d => d.shelterName)).size,
-      totalSupporters: data.reduce((acc, cur) => acc + (cur.likeCount ?? 0), 0),
+      totalDonations: mapped.length,
+      participatingShelters: new Set(mapped.map(p => p.shelterName)).size,
+      totalSupporters: mapped.reduce(
+        (sum, p) => sum + (p.likeCount ?? 0),
+        0
+      )
     }
+
+    // 기본 정렬(최신순) 한 번 적용
+    applySort()
   } catch (err) {
     console.error('fetchDonationPosts Error:', err)
   }
 }
 
-// 검색
+/**
+ * 검색
+ * - keyword 없으면 전체 복구
+ * - 있으면 allPosts에서 검색 후 posts 에 반영
+ * - 그리고 현재 sortOption 기준으로 다시 정렬
+ */
 function onSearch() {
-  // 현재는 단순 프론트 필터
   const k = keyword.value.trim()
-  if (!k) return fetchDonationPosts()
-  posts.value = posts.value.filter(p =>
-    String(p[searchField.value]).includes(k)
-  )
+
+  if (!k) {
+    posts.value = allPosts.value
+  } else {
+    posts.value = allPosts.value.filter(p => {
+      const field = searchField.value
+      const target = p[field]
+      if (target == null) return false
+      return String(target).includes(k)
+    })
+  }
+
+  applySort()
 }
 
-// 글쓰기 클릭
+/**
+ * 글쓰기 버튼
+ */
 function handleWriteClick() {
   if (isShelterHead.value) {
-    router.push({ name: 'DonationWrite' })
+    // 나중에 라우터 연결
+    // router.push({ name: 'donation-write' })
+    alert('작성 페이지로 이동 (라우트 연결 필요)')
   } else {
     showRoleModal.value = true
   }
@@ -207,9 +346,12 @@ function closeRoleModal() {
   showRoleModal.value = false
 }
 
-// 상세 페이지 이동
+/**
+ * 상세 페이지 이동
+ * 라우터에서 name: 'donation-detail', path: '/donation/:id'
+ */
 function goDetail(id) {
-  router.push({ name: 'DonationDetail', params: { id } })
+  router.push({ name: 'donation-detail', params: { id } })
 }
 
 onMounted(() => {
@@ -218,7 +360,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* ===== 기본 ===== */
+/* ===== 페이지 기본 ===== */
 .donation-page {
   background-color: #efe8dd;
   color: #2a1c10;
@@ -230,7 +372,7 @@ onMounted(() => {
   font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
 }
 
-/* ===== 헤더 ===== */
+/* ===== 헤더 영역 ===== */
 .page-title-row {
   display: flex;
   align-items: center;
@@ -245,9 +387,11 @@ onMounted(() => {
   font-size: 14px;
   color: #4a3a2a;
   margin-top: 6px;
+  line-height: 1.4;
+  word-break: keep-all;
 }
 
-/* ===== 검색 ===== */
+/* ===== 검색 영역 ===== */
 .search-row {
   display: flex;
   flex-wrap: wrap;
@@ -256,6 +400,13 @@ onMounted(() => {
   padding: 10px;
   border-radius: 8px;
   align-items: center;
+}
+.search-row select {
+  border: 1px solid #cbb9a2;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 14px;
+  padding: 8px 10px;
 }
 .search-input {
   flex: 1;
@@ -272,6 +423,8 @@ onMounted(() => {
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
+  font-size: 14px;
+  line-height: 1.3;
 }
 .search-btn:hover {
   background: #6f4f2a;
@@ -300,15 +453,72 @@ onMounted(() => {
   color: #8a6237;
 }
 
-/* ===== 게시판 헤드 ===== */
+/* ===== 게시판 상단 (게시글수 / 정렬 / 작성버튼) ===== */
 .board-headbar {
   background: #f8f1e5;
   border-radius: 8px;
   padding: 12px 16px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  row-gap: 12px;
 }
+
+.board-left {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  font-size: 14px;
+  color: #4a3a2a;
+}
+
+.board-count {
+  font-size: 14px;
+  color: #4a3a2a;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* 정렬 영역 */
+.sort-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.sort-label {
+  font-size: 14px;
+  color: #4a3a2a;
+  line-height: 1.4;
+}
+
+.sort-select {
+  appearance: none;
+  background-color: #fff;
+  border: 1px solid #cbb9a2;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.3;
+  padding: 8px 28px 8px 10px;
+  color: #2a1c10;
+  min-width: 90px;
+  cursor: pointer;
+
+  /* 커스텀 드롭다운 화살표 */
+  background-image:
+    linear-gradient(45deg, transparent 50%, #6f4f2a 50%),
+    linear-gradient(135deg, #6f4f2a 50%, transparent 50%);
+  background-position:
+    calc(100% - 16px) calc(50% - 3px),
+    calc(100% - 11px) calc(50% + 2px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
 .write-btn {
   background: #8a6237;
   color: #fff;
@@ -316,6 +526,9 @@ onMounted(() => {
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
+  font-size: 14px;
+  line-height: 1.3;
+  white-space: nowrap;
 }
 .write-btn:hover {
   background: #6f4f2a;
@@ -330,28 +543,46 @@ onMounted(() => {
 .board-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 720px;
 }
 .board-table th,
 .board-table td {
   text-align: center;
   padding: 10px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  font-size: 14px;
+  line-height: 1.4;
+  color: #2a1c10;
 }
 .board-table th {
   background: #ece2d4;
   font-weight: 600;
+  white-space: nowrap;
+  color: #2a1c10;
+}
+.board-row {
+  cursor: pointer;
 }
 .board-row:hover {
   background: rgba(0, 0, 0, 0.03);
-  cursor: pointer;
 }
 .text-left {
   text-align: left;
 }
+.title-cell .title-text {
+  display: inline-block;
+  max-width: 100%;
+  color: #2a1c10;
+  font-weight: 500;
+  line-height: 1.4;
+  word-break: keep-all;
+}
+
 .empty-row {
   text-align: center;
   padding: 20px;
   color: #8a7a6b;
+  font-size: 14px;
 }
 
 /* ===== 후원 안내 ===== */
@@ -373,6 +604,8 @@ onMounted(() => {
   font-size: 14px;
   color: #4a3a2a;
   margin: 4px 0;
+  line-height: 1.5;
+  word-break: keep-all;
 }
 
 /* ===== 모달 ===== */
@@ -383,6 +616,7 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 999;
 }
 .role-modal {
   background: #f8f1e5;
@@ -390,6 +624,8 @@ onMounted(() => {
   padding: 24px;
   max-width: 340px;
   text-align: center;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+  border: 1px solid rgba(0,0,0,0.07);
 }
 .role-modal-icon {
   font-size: 40px;
@@ -404,6 +640,8 @@ onMounted(() => {
   font-size: 14px;
   margin: 10px 0 20px;
   color: #2a1c10;
+  line-height: 1.5;
+  word-break: keep-all;
 }
 .role-modal-close-btn {
   width: 100%;
@@ -414,5 +652,33 @@ onMounted(() => {
   color: #6f4f2a;
   font-weight: 500;
   cursor: pointer;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+/* ===== 조회수 셀 정렬 ===== */
+.view-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  font-weight: 500;
+  font-size: 14px;
+  color: #2b1a0f;
+  line-height: 1.4;
+  text-align: center;
+  white-space: nowrap;
+}
+.view-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: block;
+}
+.view-num {
+  line-height: 1.4;
+  font-size: 14px;
+  font-weight: 500;
 }
 </style>
