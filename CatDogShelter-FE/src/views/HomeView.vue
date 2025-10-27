@@ -4,8 +4,8 @@
     <section class="hero-section">
       <div class="hero-inner">
         <!-- ===== 왼쪽 카피 영역 ===== -->
-        <div class="hero-copy">
-          <div class="hero-emoji">🪜🏡 °☁︎✧♡</div>
+        <div class="hero-copy fade-up">
+          <div class="hero-emoji">🪜 🏡  °☁︎✧ ♡</div>
 
           <h1 class="hero-title">
             댕냥이들이 새 가족을<br />
@@ -25,16 +25,18 @@
         <!-- ===== 오른쪽 비주얼 영역 ===== -->
         <div class="hero-art">
           <!-- 구름들 -->
-          <img class="cloud cloud-a" src="@/assets/cloud.png" alt="" />
-          <img class="cloud cloud-b" src="@/assets/cloud.png" alt="" />
+          <img class="cloud cloud-a float-cloud-slow" src="@/assets/cloud.png" alt="" />
+          <img class="cloud cloud-b float-cloud-fast" src="@/assets/cloud.png" alt="" />
 
           <!-- 강아지+고양이 -->
-          <img class="pets" src="@/assets/dog-cat.png" alt="댕냥이들" />
+          <img class="pets fade-up delay-1" src="@/assets/dog-cat.png" alt="댕냥이들" />
         </div>
       </div>
 
-      <!-- 하단 곡선 장식 -->
-      <div class="hero-wave"></div>
+      <!-- 하단 곡선 장식 + 움직이는 물결 -->
+      <div class="hero-wave">
+  <img src="@/assets/wave-bottom.svg" alt="" class="wave-static-svg" />
+      </div>
     </section>
 
     <!-- ================= MAIN CONTENT ================= -->
@@ -115,50 +117,50 @@
         <!-- ========= 우측 사이드 영역 ========= -->
         <aside class="main-right">
           <!-- 로그인 카드 -->
- <div class="side-card login-card">
-  <!-- ====== 비로그인 상태 ====== -->
-  <template v-if="!isLoggedIn">
-    <div class="login-top">
-      <img
-        class="brand-logo"
-        src="@/assets/logo.svg"
-        alt="댕냥쉼터 로고"
-      />
-    </div>
+          <div class="side-card login-card">
+            <!-- ====== 비로그인 상태 ====== -->
+            <template v-if="!isLoggedIn">
+              <div class="login-top">
+                <img
+                  class="brand-logo"
+                  src="@/assets/logo.svg"
+                  alt="댕냥쉼터 로고"
+                />
+              </div>
 
-    <p class="login-title">댕냥쉼터 로그인하기</p>
+              <p class="login-title">댕냥쉼터 로그인하기</p>
 
-    <button class="login-btn" @click="goLogin">
-      로그인하러 가기
-    </button>
+              <button class="login-btn" @click="goLogin">
+                로그인하러 가기
+              </button>
 
-    <small class="login-desc">로그인해야 이용하실 수 있어요!</small>
-  </template>
+              <small class="login-desc">로그인해야 이용하실 수 있어요!</small>
+            </template>
 
-  <!-- ====== 로그인 상태 ====== -->
-  <template v-else>
-    <div class="login-top logged-top">
-      <img
-        class="brand-logo big"
-        src="@/assets/logo.svg"
-        alt="댕냥쉼터 로고"
-      />
-    </div>
+            <!-- ====== 로그인 상태 ====== -->
+            <template v-else>
+              <div class="login-top logged-top">
+                <img
+                  class="brand-logo big"
+                  src="@/assets/logo.svg"
+                  alt="댕냥쉼터 로고"
+                />
+              </div>
 
-    <p class="welcome-line">
-      ♡ ·· <strong>{{ userName }}</strong>님 어서오세요!
-    </p>
+              <p class="welcome-line">
+                ♡ ·· <strong>{{ userName }}</strong>님 어서오세요!
+              </p>
 
-    <div class="profile-row">
-      <span class="user-name">{{ userName }}</span>
-      <span class="user-badge">{{ userTitle }}</span>
+              <div class="profile-row">
+                <span class="user-name">{{ userName }}</span>
+                <span class="user-badge">{{ userTitle }}</span>
 
-      <button class="mypage-btn" @click="goMypage">
-        마이페이지 열기
-      </button>
-    </div>
-  </template>
-</div>
+                <button class="mypage-btn" @click="goMypage">
+                  마이페이지 열기
+                </button>
+              </div>
+            </template>
+          </div>
 
           <!-- 댕냥히어로즈 -->
           <div class="side-card hero-card">
@@ -184,7 +186,6 @@
             </div>
 
             <div class="photo-list">
-              <!-- 여기도 나중에 :src 로 교체 -->
               <div class="photo-fallback">사진</div>
               <div class="photo-fallback">사진</div>
             </div>
@@ -221,31 +222,20 @@
 <script setup>
 import { ref, onMounted } from "vue";
 
-// // 로그인 여부 (임시 하드코딩 -> 나중에 토큰 기반으로 바꾸면 됨)
-// const isLoggedIn = ref(false);
+const isLoggedIn = ref(false);
+const userName = ref("이다인");
+const userTitle = ref("댕냥 보호천사");
 
-// // 로그인된 유저 정보 (로그인 상태일 때만 사용)
-// const userName = ref("이다인");
-// const userTitle = ref("댕냥 보호천사"); // 등급 / 칭호
+function goLogin() {
+  window.location.href = "/login";
+}
+function goMypage() {
+  window.location.href = "/mypage";
+}
+function goAdoption() {
+  window.location.href = "/adoption";
+}
 
-// function goLogin() {
-//   window.location.href = "/login";
-// }
-
-// function goMypage() {
-//   window.location.href = "/mypage"; // 실제 라우터에 맞게 바꿔
-// }
-
-// 예시) 나중에 onMounted에서 토큰 검사해서 바꾸면 됨
-// onMounted(() => {
-//   const token = sessionStorage.getItem('accessToken');
-//   if (token) {
-//     isLoggedIn.value = true;
-//     // 그리고 여기서 fetch로 유저 프로필 받아서 userName, userTitle 채우면 됨
-//   }
-// });
-
-// 임시 목데이터 (fetch 자리 세팅)
 const adoptionList = ref([
   { id: 1, name: "코숏", breed: "믹스", age: 2, neutered: true },
   { id: 2, name: "몰티즈", breed: "몰티즈", age: 1, neutered: false },
@@ -324,35 +314,17 @@ const noticeList = ref([
   { id: 33, text: "봉사 인증 방법" },
 ]);
 
-function goAdoption() {
-  window.location.href = "/adoption";
-}
-function goLogin() {
-  window.location.href = "/login";
-}
-
-// 진짜 fetch API로 채울 자리
 onMounted(async () => {
-  // 예: 입양 최신글 3개
-  // const res = await fetch('http://localhost:8000/catdogshelter/adoption-post/home?limit=3')
-  // adoptionList.value = await res.json()
-
-  // 봉사모임
-  // const volRes = await fetch('http://localhost:8000/.../volunteer?limit=6')
-  // volunteerList.value = await volRes.json()
-
-  // 자유게시판
-  // const freeRes = await fetch('http://localhost:8000/.../freeboard?limit=5')
-  // freeList.value = await freeRes.json()
-
-  // 히어로 랭킹
-  // const heroRes = await fetch('http://localhost:8000/.../volunteer/rank?limit=3')
-  // heroList.value = await heroRes.json()
+  const token = sessionStorage.getItem("accessToken");
+  if (token) {
+    isLoggedIn.value = true;
+    // 여기서 유저 정보 fetch 해서 userName, userTitle 갱신하면 됨
+  }
 });
 </script>
 
 <style scoped>
-/* ========== 공통 폰트/컬러 (네 기존 변수 유지) ========== */
+/* ========== 공통 폰트/컬러 ========== */
 :root {
   --banner-bg: #eacf9f;
   --banner-text-main: #7a4417;
@@ -365,6 +337,8 @@ onMounted(async () => {
   --shadow-btn: 0 16px 24px rgba(0, 0, 0, 0.15);
   --shadow-pet: 8px 16px 6px rgba(0, 0, 0, 0.3);
   --shadow-cloud: 0 12px 8px rgba(0, 0, 0, 0.18);
+  --wave-front: rgba(255, 255, 255, 0.4);
+  --wave-back: rgba(255, 255, 255, 0.2);
 }
 
 /* 전체 폰트 */
@@ -378,30 +352,48 @@ onMounted(async () => {
     "Noto Sans", sans-serif;
 }
 
-/* ================= HERO 배너 (네 기존 스타일 살림) ================= */
+/* ================= HERO 배너 ================= */
 .hero-section {
   position: relative;
   background-color: var(--banner-bg);
   overflow: hidden;
+  background-color: #eacf9f !important;
 }
 
 .hero-inner {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 80px 40px 140px;
+  padding: 80px 40px 160px;
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
   position: relative;
-  z-index: 1;
+  z-index: 2;
   row-gap: 48px;
 }
 
+/* ===== 텍스트 영역 ===== */
 .hero-copy {
   max-width: 560px;
   color: var(--banner-text-main);
   flex: 1 1 480px;
+}
+
+/* ⭐ 텍스트 페이드업 진입 애니메이션 */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  animation: fadeUp 0.9s ease-out forwards;
+}
+.delay-1 {
+  animation-delay: 0.15s;
+}
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hero-emoji {
@@ -412,12 +404,11 @@ onMounted(async () => {
 
 .hero-title {
   font-size: clamp(2.4rem, 1.2rem + 2vw, 4rem);
-  color : #7a4417 !important;
+  color: #7a4417 !important;
   line-height: 1.25;
   font-weight: 600;
   letter-spacing: -0.03em;
   margin: 0 0 32px;
-  color: var(--banner-text-main);
   word-break: keep-all;
 }
 
@@ -447,10 +438,10 @@ onMounted(async () => {
   transform: translateY(-1px);
 }
 
-/* 오른쪽 아트 */
+/* ===== 오른쪽 비주얼 ===== */
 .hero-art {
   position: relative;
-  padding: 0 30px 0 0 ;
+  padding: 0 30px 0 0;
   flex: 0 1 480px;
   min-width: 360px;
   max-width: 520px;
@@ -467,16 +458,32 @@ onMounted(async () => {
   user-select: none;
   pointer-events: none;
 }
+
+/* ⭐ 구름 둥실 애니메이션 */
+.float-cloud-slow {
+  animation: floatSlow 3.5s ease-in-out infinite alternate;
+}
+.float-cloud-fast {
+  animation: floatFast 3.5s ease-in-out infinite alternate;
+}
+@keyframes floatSlow {
+  0% { transform: translate(-30%, 0px); }
+  100% { transform: translate(-30%, -12px); }
+}
+@keyframes floatFast {
+  0% { transform: translate(30%, 0px); }
+  100% { transform: translate(30%, -16px); }
+}
+
 .cloud-a {
   top: -20px;
   left: 0;
-  transform: translateX(-30%);
 }
 .cloud-b {
   top: -60px;
   right: 0;
-  transform: translateX(30%);
 }
+
 .pets {
   position: relative;
   display: block;
@@ -489,26 +496,78 @@ onMounted(async () => {
   user-select: none;
 }
 
-/* 하단 라운드 웨이브 */
+/* ===== 하단 웨이브 ===== */
+
+/* hero-wave 자체는 배너 바닥에 붙어있는 영역 */
 .hero-wave {
   position: absolute;
   left: 0;
   right: 0;
   bottom: -40px;
-  height: 140px;
-  background: radial-gradient(
+  height: 160px;
+  z-index: 1;
+  pointer-events: none;
+  /* 기존 둥근 라운드 톤 그대로 유지 (배경과 자연스럽게 페이드) */
+ 
+  overflow: hidden;
+  border-bottom-left-radius: 32px;
+  border-bottom-right-radius: 32px;
+   background: radial-gradient(
     200% 100px at 50% 0%,
     var(--surface-light) 0%,
     var(--surface-light) 60%,
     transparent 61%
   );
-  z-index: 0;
+}
+
+/* wave-layer 2장 겹쳐서 흐르는 효과 */
+.wave-layer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 200%;
+  height: 80px;
+  background-repeat: repeat-x;
+  background-size: 50% 80px;
+  opacity: 1;
+  filter: blur(0.3px) drop-shadow(0 -2px 6px rgba(0,0,0,0.08));
+}
+
+/* 뒤 웨이브 (넓고 부드러운 곡선) */
+.wave-back {
+  background-image: radial-gradient(
+    circle at 50% 10%,
+    var(--wave-back) 0%,
+    rgba(255,255,255,0) 70%
+  );
+  animation: waveBackMove 12s linear infinite;
+  height: 90px;
+  bottom: 20px;
+}
+@keyframes waveBackMove {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-25%); }
+}
+
+/* 앞 웨이브 (조금 더 진하고 살짝 다른 속도) */
+.wave-front {
+  background-image: radial-gradient(
+    circle at 50% 0%,
+    var(--wave-front) 0%,
+    rgba(255,255,255,0) 70%
+  );
+  animation: waveFrontMove 6s linear infinite;
+  mix-blend-mode: screen;
+}
+@keyframes waveFrontMove {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 
 /* ================= 메인 2컬럼 레이아웃 ================= */
 .home-main {
   background-color: #f8f1e5;
-  padding: 60px 0 100px;
+  padding: 60px 120px 100px;
 }
 
 .home-inner {
@@ -661,12 +720,11 @@ onMounted(async () => {
   height: 60px;
 }
 
-
 .login-title {
   font-weight: 600;
   margin-bottom: 12px;
   color: #3a2514;
-    font-size: 1rem;
+  font-size: 1rem;
 }
 .login-btn {
   background: #7a4417;
@@ -837,13 +895,14 @@ onMounted(async () => {
 /* ================= 반응형 ================= */
 @media (max-width: 768px) {
   .hero-inner {
-    padding: 56px 20px 120px;
+    padding: 56px 20px 140px;
     justify-content: center;
+    flex-direction: column;
+    text-align: center;
   }
 
   .hero-copy {
     text-align: center;
-    align-items: center;
     margin: 0 auto;
   }
 
@@ -868,6 +927,7 @@ onMounted(async () => {
   .hero-art {
     min-width: 280px;
     max-width: 360px;
+    margin-top: 32px;
   }
 
   .cloud {
@@ -877,13 +937,11 @@ onMounted(async () => {
   .cloud-a {
     top: -10px;
     left: 20px;
-    transform: translateX(0);
   }
 
   .cloud-b {
     top: -30px;
     right: 20px;
-    transform: translateX(0);
   }
 
   .pets {
@@ -891,9 +949,31 @@ onMounted(async () => {
     max-width: 100%;
   }
 
-  /* 메인 2컬럼 -> 1컬럼 */
   .home-inner {
     grid-template-columns: 1fr;
   }
+}
+.hero-section {
+  position: relative;
+  background-color: #eacf9f; 
+  overflow: visible; 
+}
+
+.hero-wave-static {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -40px;          
+  height: 140px;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+
+}
+.wave-static-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;        
 }
 </style>
