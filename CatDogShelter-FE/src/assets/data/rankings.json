@@ -1,0 +1,357 @@
+{
+  "rankings": [
+    {
+      "rank": 1,
+      "name": "최혜원",
+      "badge": "댕냥 보호천사",
+      "adoptionTime": "32시간",
+      "adoptionCount": 45,
+      "isTop3": true
+    },
+    {
+      "rank": 2,
+      "name": "변민철",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "31시간",
+      "adoptionCount": 43,
+      "isTop3": true
+    },
+    {
+      "rank": 3,
+      "name": "이승건",
+      "badge": "댕냥 보호천사",
+      "adoptionTime": "29시간",
+      "adoptionCount": 42,
+      "isTop3": true
+    },
+    {
+      "rank": 4,
+      "name": "이지윤",
+      "badge": "댕냥 보호천사",
+      "adoptionTime": "27시간",
+      "adoptionCount": 40
+    },
+    {
+      "rank": 5,
+      "name": "곽동근",
+      "badge": "댕냥 보호천사",
+      "adoptionTime": "25시간",
+      "adoptionCount": 39
+    },
+    {
+      "rank": 6,
+      "name": "김서연",
+      "badge": "댕냥 보호천사",
+      "adoptionTime": "23시간",
+      "adoptionCount": 38
+    },
+    {
+      "rank": 7,
+      "name": "정민수",
+      "badge": "댕냥 보호천사",
+      "adoptionTime": "22시간",
+      "adoptionCount": 36
+    },
+    {
+      "rank": 8,
+      "name": "한지우",
+      "badge": "댕냥 보호천사",
+      "adoptionTime": "20시간",
+      "adoptionCount": 35
+    },
+    {
+      "rank": 9,
+      "name": "윤서은",
+      "badge": "댕냥 보호천사",
+      "adoptionTime": "19시간",
+      "adoptionCount": 33
+    },
+    {
+      "rank": 10,
+      "name": "강하늘",
+      "badge": "댕냥 보호천사",
+      "adoptionTime": "19시간",
+      "adoptionCount": 32
+    },
+    {
+      "rank": 11,
+      "name": "조예린",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "19시간",
+      "adoptionCount": 30
+    },
+    {
+      "rank": 12,
+      "name": "신동욱",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "19시간",
+      "adoptionCount": 29
+    },
+    {
+      "rank": 13,
+      "name": "황지민",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "18시간",
+      "adoptionCount": 29
+    },
+    {
+      "rank": 14,
+      "name": "오승희",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "18시간",
+      "adoptionCount": 28
+    },
+    {
+      "rank": 15,
+      "name": "임수빈",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "17시간",
+      "adoptionCount": 28
+    },
+    {
+      "rank": 16,
+      "name": "배민우",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "16시간",
+      "adoptionCount": 27
+    },
+    {
+      "rank": 17,
+      "name": "송미라",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "15시간",
+      "adoptionCount": 26
+    },
+    {
+      "rank": 18,
+      "name": "홍채윤",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "14시간",
+      "adoptionCount": 26
+    },
+    {
+      "rank": 19,
+      "name": "남궁민",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "14시간",
+      "adoptionCount": 25
+    },
+    {
+      "rank": 20,
+      "name": "서하윤",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "14시간",
+      "adoptionCount": 25
+    },
+    {
+      "rank": 21,
+      "name": "안재민",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "13시간",
+      "adoptionCount": 24
+    },
+    {
+      "rank": 22,
+      "name": "전소영",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "13시간",
+      "adoptionCount": 23
+    },
+    {
+      "rank": 23,
+      "name": "서윤우",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "13시간",
+      "adoptionCount": 23
+    },
+    {
+      "rank": 24,
+      "name": "문정현",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "12시간",
+      "adoptionCount": 22
+    },
+    {
+      "rank": 25,
+      "name": "표지훈",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "12시간",
+      "adoptionCount": 22
+    },
+    {
+      "rank": 26,
+      "name": "노수진",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "12시간",
+      "adoptionCount": 21
+    },
+    {
+      "rank": 27,
+      "name": "하민석",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "12시간",
+      "adoptionCount": 20
+    },
+    {
+      "rank": 28,
+      "name": "류나영",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "12시간",
+      "adoptionCount": 20
+    },
+    {
+      "rank": 29,
+      "name": "김태양",
+      "badge": "댕냥 천구",
+      "adoptionTime": "11시간",
+      "adoptionCount": 17
+    },
+    {
+      "rank": 30,
+      "name": "고은별",
+      "badge": "댕냥 천구",
+      "adoptionTime": "11시간",
+      "adoptionCount": 16
+    },
+    {
+      "rank": 31,
+      "name": "박우성",
+      "badge": "댕냥 보호천사",
+      "adoptionTime": "10시간",
+      "adoptionCount": 28
+    },
+    {
+      "rank": 32,
+      "name": "도현주",
+      "badge": "댕냥 천구",
+      "adoptionTime": "10시간",
+      "adoptionCount": 17
+    },
+    {
+      "rank": 33,
+      "name": "곽수아",
+      "badge": "댕냥 지킴이",
+      "adoptionTime": "9시간",
+      "adoptionCount": 23
+    },
+    {
+      "rank": 34,
+      "name": "임지헌",
+      "badge": "댕냥 천구",
+      "adoptionTime": "9시간",
+      "adoptionCount": 16
+    },
+    {
+      "rank": 35,
+      "name": "박나래",
+      "badge": "댕냥 천구",
+      "adoptionTime": "9시간",
+      "adoptionCount": 15
+    },
+    {
+      "rank": 36,
+      "name": "이지훈",
+      "badge": "댕냥 천구",
+      "adoptionTime": "8시간",
+      "adoptionCount": 15
+    },
+    {
+      "rank": 37,
+      "name": "이민아",
+      "badge": "댕냥 천구",
+      "adoptionTime": "8시간",
+      "adoptionCount": 14
+    },
+    {
+      "rank": 38,
+      "name": "박준영",
+      "badge": "댕냥 천구",
+      "adoptionTime": "6시간",
+      "adoptionCount": 13
+    },
+    {
+      "rank": 39,
+      "name": "이서현",
+      "badge": "댕냥 천구",
+      "adoptionTime": "6시간",
+      "adoptionCount": 13
+    },
+    {
+      "rank": 40,
+      "name": "박다희",
+      "badge": "댕냥 천구",
+      "adoptionTime": "5시간",
+      "adoptionCount": 13
+    },
+    {
+      "rank": 41,
+      "name": "김혜원",
+      "badge": "댕냥 발자국",
+      "adoptionTime": "4시간",
+      "adoptionCount": 11
+    },
+    {
+      "rank": 42,
+      "name": "임상민",
+      "badge": "댕냥 발자국",
+      "adoptionTime": "3시간",
+      "adoptionCount": 12
+    },
+    {
+      "rank": 43,
+      "name": "이유진",
+      "badge": "댕냥 발자국",
+      "adoptionTime": "3시간",
+      "adoptionCount": 12
+    },
+    {
+      "rank": 44,
+      "name": "이소라",
+      "badge": "댕냥 발자국",
+      "adoptionTime": "2시간",
+      "adoptionCount": 12
+    },
+    {
+      "rank": 45,
+      "name": "김예슬",
+      "badge": "댕냥 발자국",
+      "adoptionTime": "2시간",
+      "adoptionCount": 11
+    },
+    {
+      "rank": 46,
+      "name": "전도윤",
+      "badge": "댕냥 발자국",
+      "adoptionTime": "1시간",
+      "adoptionCount": 11
+    },
+    {
+      "rank": 47,
+      "name": "최지우",
+      "badge": "댕냥 발자국",
+      "adoptionTime": "1시간",
+      "adoptionCount": 11
+    },
+    {
+      "rank": 48,
+      "name": "최민나",
+      "badge": "댕냥 발자국",
+      "adoptionTime": "1시간",
+      "adoptionCount": 11
+    },
+    {
+      "rank": 49,
+      "name": "박시우",
+      "badge": "댕냥 발자국",
+      "adoptionTime": "1시간",
+      "adoptionCount": 11
+    },
+    {
+      "rank": 50,
+      "name": "박하린",
+      "badge": "댕냥 발자국",
+      "adoptionTime": "1시간",
+      "adoptionCount": 11
+    }
+  ]
+}
