@@ -13,7 +13,7 @@ import SightingView from '@/views/SightingView.vue'
 import PostView from '@/views/Post/PostView.vue'
 import PostDetailView from '@/views/Post/PostDetailView.vue'
 import PostWriteView from '@/views/Post/PostWriteView.vue'
-import HeroesView from '@/views/HeroesView.vue'
+import HeroesrankingView from '@/views/heros/HeroesrankingView.vue'
 
 // ===== Footer 영역 페이지 =====
 import AboutView from '@/views/footer/AboutView.vue'
@@ -171,7 +171,7 @@ const router = createRouter({
     {
       path: '/heroes',
       name: 'heroes',
-      component: HeroesView,
+      component: HeroesrankingView,
     },
 
     // footer / 정책 / 안내
@@ -226,12 +226,6 @@ const router = createRouter({
     { path: '/post/:id', name: 'post.detail', component: PostDetailView, props: true },
 
     { path: '/post.write', redirect: { name: 'post.write' } },
-
-    {
-      path: '/heroes',
-      name: 'Heroes',
-      component: () => import('@/views/heros/Heroesranking.vue')
-    },
     { path: '/about', component: AboutView },
     { path: '/terms', component: TermsView },
     { path: '/privacy', component: PrivacyView },

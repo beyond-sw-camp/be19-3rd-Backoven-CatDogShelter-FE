@@ -1,159 +1,161 @@
 <template>
   <div class="donation-page">
-    <!-- ===== 헤더 영역 ===== -->
-    <header class="page-top">
-      <div class="page-top-head">
-        <div class="page-title-row">
-          <span class="page-icon">🎁</span>
-          <h1 class="page-title">후원 게시판</h1>
+    <div class="donation-inner">
+      <!-- ===== 헤더 영역 ===== -->
+      <header class="page-top">
+        <div class="page-top-head">
+          <div class="page-title-row">
+            <span class="page-icon">🎁</span>
+            <h1 class="page-title">후원 게시판</h1>
+          </div>
+          <p class="page-desc">
+            보호소에 필요한 물품을 후원해주세요. 여러분의 작은 나눔이 큰 변화를 만듭니다.
+          </p>
         </div>
-        <p class="page-desc">
-          보호소에 필요한 물품을 후원해주세요. 여러분의 작은 나눔이 큰 변화를 만듭니다.
-        </p>
-      </div>
 
-      <!-- 검색 영역 -->
-      <div class="search-row">
-        <select v-model="searchField">
-          <option value="title">제목</option>
-          <option value="shelterName">보호소명</option>
-          <option value="userName">작성자</option>
-        </select>
-
-        <input
-          v-model.trim="keyword"
-          :placeholder="searchPlaceholder"
-          class="search-input"
-          @keydown.enter="onSearch"
-        />
-        <button class="search-btn" @click="onSearch">검색</button>
-      </div>
-    </header>
-
-    <!-- ===== 통계 카드 ===== -->
-    <section class="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">총 후원 건수</div>
-        <div class="stat-value">{{ stats.totalDonations }}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">참여 보호소</div>
-        <div class="stat-value">{{ stats.participatingShelters }}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">후원자 수</div>
-        <div class="stat-value">{{ stats.totalSupporters }}</div>
-      </div>
-    </section>
-
-    <!-- ===== 게시판 헤더 (게시글 수 / 정렬 / 작성 버튼) ===== -->
-    <section class="board-headbar">
-      <div class="board-left">
-        <span class="board-count">총 {{ posts.length }}개의 게시글</span>
-
-        <div class="sort-row">
-          <label for="sortSelect" class="sort-label">정렬 조건</label>
-          <select
-            id="sortSelect"
-            class="sort-select"
-            v-model="sortOption"
-            @change="applySort"
-          >
-            <option value="latest">최신순</option>
-            <option value="view">조회순</option>
-            <option value="like">좋아요순</option>
+        <!-- 검색 영역 -->
+        <div class="search-row">
+          <select v-model="searchField">
+            <option value="title">제목</option>
+            <option value="shelterName">보호소명</option>
+            <option value="userName">작성자</option>
           </select>
+
+          <input
+            v-model.trim="keyword"
+            :placeholder="searchPlaceholder"
+            class="search-input"
+            @keydown.enter="onSearch"
+          />
+          <button class="search-btn" @click="onSearch">검색</button>
         </div>
-      </div>
-
-      <button class="write-btn" @click="handleWriteClick">
-        게시글 등록
-      </button>
-    </section>
-
-    <!-- ===== 게시글 테이블 ===== -->
-    <section class="board-table-wrap">
-      <table class="board-table">
-        <thead>
-          <tr>
-            <th>보호소</th>
-            <th class="text-left">제목</th>
-            <th>작성자</th>
-            <th>조회수</th>
-            <th>좋아요</th>
-            <th>작성일</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr
-            v-for="post in posts"
-            :key="post.id"
-            class="board-row"
-            @click="goDetail(post.id)"
-          >
-            <td>{{ post.shelterName }}</td>
-
-            <td class="text-left title-cell">
-              <span class="title-text">{{ post.title }}</span>
-            </td>
-
-            <td>{{ post.userName }}</td>
-
-            <!-- 조회수 (아이콘 + 숫자) -->
-            <td class="view-cell">
-              <svg
-                viewBox="0 0 24 24"
-                width="16"
-                height="16"
-                aria-hidden="true"
-                class="view-icon"
-              >
-                <path
-                  d="M12 5c4.5 0 8.3 2.7 10 6.5C20.3 15.3 16.5 18 12 18S3.7 15.3 2 11.5C3.7 7.7 7.5 5 12 5Z"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.6"
-                />
-                <circle
-                  cx="12"
-                  cy="11.5"
-                  r="3"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.6"
-                />
-              </svg>
-              <span class="view-num">{{ post.view }}</span>
-            </td>
-
-            <td>❤️ {{ post.likeCount }}</td>
-            <td>{{ post.createdAt }}</td>
-          </tr>
-
-          <tr v-if="posts.length === 0">
-            <td colspan="6" class="empty-row">
-              등록된 게시글이 없습니다.
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <!-- ===== 보호소 후원 안내 ===== -->
-    <section class="donation-guide-box">
-      <header class="guide-head">
-        <span class="guide-icon">🎁</span>
-        <h2 class="guide-title">보호소에 후원하는 방법</h2>
       </header>
-      <p class="guide-desc">
-        후원하고 싶은 보호소에 직접 연락하거나, 온라인으로 후원 신청을 하실 수 있어요.<br />
-        사료, 간식, 생활용품, 의료용품 등 다양한 물품 후원이 가능합니다.
-      </p>
-      <p class="guide-desc">
-        게시글에 명시된 안내 외의 개인 계좌 요구는 사기일 수 있으니 주의해주세요.
-      </p>
-    </section>
+
+      <!-- ===== 통계 카드 ===== -->
+      <section class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">총 후원 건수</div>
+          <div class="stat-value">{{ stats.totalDonations }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">참여 보호소</div>
+          <div class="stat-value">{{ stats.participatingShelters }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">후원자 수</div>
+          <div class="stat-value">{{ stats.totalSupporters }}</div>
+        </div>
+      </section>
+
+      <!-- ===== 게시판 헤더 (게시글 수 / 정렬 / 작성 버튼) ===== -->
+      <section class="board-headbar">
+        <div class="board-left">
+          <span class="board-count">총 {{ posts.length }}개의 게시글</span>
+
+          <div class="sort-row">
+            <label for="sortSelect" class="sort-label">정렬 조건</label>
+            <select
+              id="sortSelect"
+              class="sort-select"
+              v-model="sortOption"
+              @change="applySort"
+            >
+              <option value="latest">최신순</option>
+              <option value="view">조회순</option>
+              <option value="like">좋아요순</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="write-btn" @click="handleWriteClick">
+          게시글 등록
+        </button>
+      </section>
+
+      <!-- ===== 게시글 테이블 ===== -->
+      <section class="board-table-wrap">
+        <table class="board-table">
+          <thead>
+            <tr>
+              <th>보호소</th>
+              <th class="text-left">제목</th>
+              <th>작성자</th>
+              <th>조회수</th>
+              <th>좋아요</th>
+              <th>작성일</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr
+              v-for="post in posts"
+              :key="post.id"
+              class="board-row"
+              @click="goDetail(post.id)"
+            >
+              <td>{{ post.shelterName }}</td>
+
+              <td class="text-left title-cell">
+                <span class="title-text">{{ post.title }}</span>
+              </td>
+
+              <td>{{ post.userName }}</td>
+
+              <!-- 조회수 (아이콘 + 숫자) -->
+              <td class="view-cell">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  aria-hidden="true"
+                  class="view-icon"
+                >
+                  <path
+                    d="M12 5c4.5 0 8.3 2.7 10 6.5C20.3 15.3 16.5 18 12 18S3.7 15.3 2 11.5C3.7 7.7 7.5 5 12 5Z"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                  />
+                  <circle
+                    cx="12"
+                    cy="11.5"
+                    r="3"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                  />
+                </svg>
+                <span class="view-num">{{ post.view }}</span>
+              </td>
+
+              <td>❤️ {{ post.likeCount }}</td>
+              <td>{{ post.createdAt }}</td>
+            </tr>
+
+            <tr v-if="posts.length === 0">
+              <td colspan="6" class="empty-row">
+                등록된 게시글이 없습니다.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ===== 보호소 후원 안내 ===== -->
+      <section class="donation-guide-box">
+        <header class="guide-head">
+          <span class="guide-icon">🎁</span>
+          <h2 class="guide-title">보호소에 후원하는 방법</h2>
+        </header>
+        <p class="guide-desc">
+          후원하고 싶은 보호소에 직접 연락하거나, 온라인으로 후원 신청을 하실 수 있어요.<br />
+          사료, 간식, 생활용품, 의료용품 등 다양한 물품 후원이 가능합니다.
+        </p>
+        <p class="guide-desc">
+          게시글에 명시된 안내 외의 개인 계좌 요구는 사기일 수 있으니 주의해주세요.
+        </p>
+      </section>
+    </div>
 
     <!-- ===== 보호소장 전용 모달 ===== -->
     <teleport to="body">
@@ -226,7 +228,6 @@ function applySort() {
   if (sortOption.value === 'latest') {
     // createdAt 문자열을 Date로 변환 후 최신순
     arr.sort((a, b) => {
-      // "2025-09-10 19:10" -> Date 인식하도록 공백을 T로 바꿔줌
       const da = new Date(a.createdAt?.replace(' ', 'T'))
       const db = new Date(b.createdAt?.replace(' ', 'T'))
       return db - da
@@ -260,7 +261,6 @@ async function fetchDonationPosts() {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
-          // Authorization 필요하면 추가
           // Authorization: `Bearer ${sessionStorage.getItem('accessToken') || ''}`
         }
       }
@@ -299,7 +299,7 @@ async function fetchDonationPosts() {
       )
     }
 
-    // 기본 정렬(최신순) 한 번 적용
+    // 기본 정렬(최신순) 적용
     applySort()
   } catch (err) {
     console.error('fetchDonationPosts Error:', err)
@@ -308,9 +308,6 @@ async function fetchDonationPosts() {
 
 /**
  * 검색
- * - keyword 없으면 전체 복구
- * - 있으면 allPosts에서 검색 후 posts 에 반영
- * - 그리고 현재 sortOption 기준으로 다시 정렬
  */
 function onSearch() {
   const k = keyword.value.trim()
@@ -334,7 +331,6 @@ function onSearch() {
  */
 function handleWriteClick() {
   if (isShelterHead.value) {
-    // 나중에 라우터 연결
     // router.push({ name: 'donation-write' })
     alert('작성 페이지로 이동 (라우트 연결 필요)')
   } else {
@@ -365,11 +361,24 @@ onMounted(() => {
   background-color: #efe8dd;
   color: #2a1c10;
   min-height: 100vh;
-  padding: 24px 100px 100px;
+
+  /* 바깥 배경 전체 영역만 담당 */
+  padding: 24px 0px 100px;
+
+  display: flex;
+  flex-direction: column;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+}
+
+/* ✅ 가운데 컨테이너 */
+.donation-inner {
+  width: 100%;
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 0 24px;
   display: flex;
   flex-direction: column;
   gap: 24px;
-  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
 }
 
 /* ===== 헤더 영역 ===== */
@@ -680,5 +689,13 @@ onMounted(() => {
   line-height: 1.4;
   font-size: 14px;
   font-weight: 500;
+}
+
+/* 반응형(모바일에서 양 옆 조금 더 붙이고 싶으면 여기 조정 가능) */
+@media (max-width: 768px) {
+  .donation-inner {
+    padding: 0 16px;
+    max-width: 100%;
+  }
 }
 </style>

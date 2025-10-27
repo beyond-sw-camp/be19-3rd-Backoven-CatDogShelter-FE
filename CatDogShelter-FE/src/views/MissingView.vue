@@ -438,7 +438,7 @@ export default {
 .missing-page {
   background-color: var(--bg-page);
   min-height: 100vh;
-  padding: 24px 0 80px;
+  padding: 24px 80px 80px;
   color: var(--brown-text);
   font-family: "Pretendard", "Noto Sans KR", system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
@@ -446,7 +446,7 @@ export default {
 }
 
 .missing-inner {
-  max-width: 900px;
+  max-width: 1150px;
   margin: 0 auto;
 }
 
