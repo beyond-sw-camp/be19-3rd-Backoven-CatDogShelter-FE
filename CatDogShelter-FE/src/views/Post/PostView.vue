@@ -90,11 +90,13 @@ const sortWrapRef = ref(null)
 const perPage = 10
 
 /* ---------- 삭제 동기화 ---------- */
-const deletedSet = ref(new Set(JSON.parse(localStorage.getItem('post:deleted') || '[]')))
+function toNumSet(json) {
+  try { return new Set((JSON.parse(json || '[]') || []).map(n => Number(n) || 0)) }
+  catch { return new Set() }
+}
+const deletedSet = ref(toNumSet(localStorage.getItem('post:deleted')))
 window.addEventListener('storage', (e) => {
-  if (e.key === 'post:deleted') {
-    deletedSet.value = new Set(JSON.parse(e.newValue || '[]'))
-  }
+  if (e.key === 'post:deleted') deletedSet.value = toNumSet(e.newValue)
 })
 
 /* ---------- 검색/정렬 상태 ---------- */

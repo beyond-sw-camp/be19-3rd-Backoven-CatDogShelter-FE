@@ -8,7 +8,7 @@ import AdoptionView from '@/views/AdoptionView.vue'
 import MissingView from '@/views/MissingView.vue'
 import SightingView from '@/views/SightingView.vue'
 import PostView from '@/views/Post/PostView.vue'
-import PostDetailView from '@/views/Post/PostDetailView.vue' 
+import PostDetailView from '@/views/Post/PostDetailView.vue'
 import HeroesView from '@/views/HeroesView.vue'
 import AboutView from '@/views/footer/AboutView.vue'
 import TermsView from '@/views/footer/TermsView.vue'
@@ -18,11 +18,17 @@ import AdoptionProcessView from '@/views/footer/AdoptionProcessView.vue'
 import VolunteerGuideView from '@/views/footer/VolunteerGuideView.vue'
 import PostWriteView from '@/views/Post/PostWriteView.vue'
 import FaqView from '@/views/footer/FaqView.vue'
+import LoginView from '@/views/auth/login/index.vue'
+import SignupUserView from '@/views/auth/signup/user/index.vue'
+import SignupShelterView from '@/views/auth/signup/shelter/index.vue'
+
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', name: 'home', component: HomeView },
+
+    // 일반 탭들
     { path: '/volunteer', name: 'volunteer', component: VolunteerView },
     { path: '/donation', name: 'donation', component: DonationView },
     { path: '/adoption', name: 'adoption', component: AdoptionView },
@@ -32,10 +38,16 @@ const router = createRouter({
     // 자유게시판
     { path: '/post', name: 'post', component: PostView },
     { path: '/post/write', name: 'post.write', component: PostWriteView },
-    { path: '/post/:id', name: 'post.detail', component: PostDetailView, props: true }, 
-
+    { path: '/post/:id', name: 'post.detail', component: PostDetailView, props: true },
     { path: '/post.write', redirect: { name: 'post.write' } },
 
+    // ✅ 로그인 라우트
+        { path: '/login', name: 'login', component: LoginView },
+    { path: '/signup', name: 'signup.user', component: SignupUserView },
+    { path: '/signup/shelter',  name: 'signup.shelter', component: SignupShelterView },
+    { path: '/_signup', name: 'signup', redirect: { name: 'signup.user' } },
+    
+    // 푸터 탭들
     { path: '/heroes', name: 'heroes', component: HeroesView },
     { path: '/about', component: AboutView },
     { path: '/terms', component: TermsView },
@@ -45,7 +57,7 @@ const router = createRouter({
     { path: '/volunteer-guide', component: VolunteerGuideView },
     { path: '/faq', component: FaqView }
   ],
-  scrollBehavior: () => ({ top: 0 }) // 페이지 이동 시 상단으로
+  scrollBehavior: () => ({ top: 0 })
 })
 
 export default router
