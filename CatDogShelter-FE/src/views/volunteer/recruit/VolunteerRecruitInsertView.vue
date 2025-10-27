@@ -1,117 +1,338 @@
+﻿<!-- VolunteerRecruitInsertView.vue -->
 <template>
-  <section class="insert-section">
+  <div class="recruit-insert-page">
     <div class="insert-container">
-      <h2 class="insert-title">🐾 봉사 모집글 등록</h2>
+      <button class="back-btn" @click="goBack">
+        <span class="back-icon">&lt;</span>
+        뒤로가기
+      </button>
+
+      <h1 class="page-title">봉사 모집글 등록</h1>
 
       <form class="insert-form" @submit.prevent="submitRecruit">
-        <div class="form-group">
-          <label for="companyName">보호소 이름</label>
-          <input
-            id="companyName"
-            v-model="recruit.companyName"
-            type="text"
-            placeholder="보호소 이름을 입력하세요"
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="title">모집 제목</label>
-          <input
-            id="title"
-            v-model="recruit.title"
-            type="text"
-            placeholder="모집 제목을 입력하세요"
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="content">모집 내용</label>
-          <textarea
-            id="content"
-            v-model="recruit.content"
-            rows="6"
-            placeholder="모집 내용을 입력하세요"
-            required
-          ></textarea>
-        </div>
-
-        <div class="form-group-row">
-          <div class="form-group half">
-            <label for="sido">시/도</label>
-            <input id="sido" v-model="recruit.sido" type="text" placeholder="예: 서울특별시" />
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label required" for="companyName">보호소 이름</label>
+            <input
+              id="companyName"
+              v-model="formData.companyName"
+              type="text"
+              class="form-input"
+              placeholder="보호소 이름을 입력해 주세요"
+              required
+            />
           </div>
-          <div class="form-group half">
-            <label for="sigungu">시/군/구</label>
-            <input id="sigungu" v-model="recruit.sigungu" type="text" placeholder="예: 마포구" />
-          </div>
-        </div>
 
-        <div class="form-group-row">
-          <div class="form-group half">
-            <label for="time">활동 시간</label>
-            <input id="time" v-model="recruit.time" type="text" placeholder="예: 3시간" />
+          <div class="form-group">
+            <label class="form-label required" for="title">모집 제목</label>
+            <input
+              id="title"
+              v-model="formData.title"
+              type="text"
+              class="form-input"
+              placeholder="모집 제목을 입력해 주세요"
+              required
+            />
           </div>
-          <div class="form-group half">
-            <label for="startcreatedAt">활동일</label>
-            <input id="startcreatedAt" v-model="recruit.startcreatedAt" type="date" />
+
+          <div class="form-group span-2">
+            <label class="form-label required" for="content">모집 내용</label>
+            <textarea
+              id="content"
+              v-model="formData.content"
+              class="form-textarea"
+              placeholder="모집 내용을 입력해 주세요"
+              rows="12"
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required" for="sido">시/도</label>
+            <select
+              id="sido"
+              v-model="formData.sido"
+              class="form-input"
+              required
+            >
+              <option value="" disabled>시/도를 선택해 주세요</option>
+              <option
+                v-for="region in sidoOptions"
+                :key="region.code"
+                :value="region.code"
+              >
+                {{ region.name }}
+              </option>
+            </select>
+          </div>
+
+  <div class="form-group">
+            <label class="form-label required" for="sigungu">시/군/구</label>
+            <select
+              id="sigungu"
+              v-model="formData.sigungu"
+              class="form-input"
+              :disabled="!formData.sido"
+              required
+            >
+              <option value="" disabled>시/군/구를 선택해 주세요</option>
+              <option
+                v-for="region in sigunguOptions"
+                :key="region.code"
+                :value="region.code"
+              >
+                {{ region.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group span-2">
+            <label class="form-label required" for="detailAddress">상세 주소</label>
+            <input
+              id="detailAddress"
+              v-model="formData.detailAddress"
+              type="text"
+              class="form-input"
+              placeholder="활동 장소를 입력해 주세요"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required" for="time">활동 시간</label>
+            <input
+              id="time"
+              v-model="formData.time"
+              type="text"
+              class="form-input"
+              placeholder="예) 3시간"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required" for="startcreatedAt">활동 날짜</label>
+            <input
+              id="startcreatedAt"
+              v-model="formData.startcreatedAt"
+              type="date"
+              class="form-input"
+              required
+            />
+          </div>
+
+          <div class="form-group span-2">
+            <label class="form-label required" for="numberOfPeople">모집 인원</label>
+            <input
+              id="numberOfPeople"
+              v-model="formData.numberOfPeople"
+              type="text"
+              class="form-input"
+              placeholder="예) 5명"
+              required
+            />
           </div>
         </div>
 
         <div class="form-group">
-          <label for="numberOfPeople">모집 인원</label>
-          <input
-            id="numberOfPeople"
-            v-model="recruit.numberOfPeople"
-            type="text"
-            placeholder="예: 5명"
-          />
-        </div>
+          <label class="form-label" for="fileInput">이미지 첨부</label>
+          <p class="upload-description">최대 5장까지 업로드할 수 있어요</p>
 
-        <div class="form-group">
-          <label for="file">대표 이미지</label>
-          <input id="file" type="file" @change="handleFileUpload" />
+          <div class="upload-area" @click="triggerFileInput">
+            <input
+              id="fileInput"
+              ref="fileInput"
+              type="file"
+              multiple
+              accept="image/*"
+              style="display: none"
+              @change="handleFileUpload"
+            />
+            <div class="upload-placeholder">
+              <span class="upload-icon">+</span>
+              <p class="upload-text">이미지를 클릭해서 업로드 해주세요</p>
+            </div>
+          </div>
+
+          <div v-if="uploadedImages.length" class="image-preview-container">
+            <div
+              v-for="(image, index) in uploadedImages"
+              :key="image.name + '-' + index"
+              class="image-preview-item"
+            >
+              <img :src="image.url" :alt="`첨부 이미지 ${index + 1}`" class="preview-image" />
+              <button type="button" class="remove-image-btn" @click="removeImage(index)">×</button>
+            </div>
+          </div>
         </div>
 
         <div class="button-group">
-          <button type="submit" class="submit-btn">등록하기</button>
           <button type="button" class="cancel-btn" @click="goBack">취소</button>
+          <button type="submit" class="submit-btn" :disabled="submitting">
+            {{ submitting ? '등록 중...' : '모집글 등록' }}
+          </button>
         </div>
       </form>
+
+      <div class="info-box">
+        <h3 class="info-box-title">모집글 작성 가이드</h3>
+        <ul class="info-list">
+          <li>봉사 장소와 시간을 정확하게 입력해 주세요.</li>
+          <li>필요한 봉사 역할과 준비물을 구체적으로 안내해 주세요.</li>
+          <li>활동 사진을 첨부하면 봉사자 모집에 도움이 돼요.</li>
+          <li>모집 인원과 마감일 정보를 꼭 확인해 주세요.</li>
+        </ul>
+      </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import regionsData from '@/assets/data/regions.json'
 
 const router = useRouter()
+const submitting = ref(false)
+const fileInput = ref(null)
 
-const recruit = ref({
+const formData = ref({
   companyName: '',
   title: '',
   content: '',
   sido: '',
   sigungu: '',
+  detailAddress: '',
   time: '',
   startcreatedAt: '',
-  numberOfPeople: '',
-  file: null
+  numberOfPeople: ''
 })
 
-const handleFileUpload = (e) => {
-  recruit.value.file = e.target.files[0]?.name || null
+const uploadedImages = ref([])
+
+const regions = regionsData
+
+const sidoOptions = computed(() =>
+  regions
+    .filter(region => region.parent === null)
+    .sort((a, b) => a.name.localeCompare(b.name, 'ko'))
+)
+
+const sigunguOptions = computed(() => {
+  if (!formData.value.sido) {
+    return []
+  }
+
+  return regions
+    .filter(region => region.parent === formData.value.sido)
+    .sort((a, b) => a.name.localeCompare(b.name, 'ko'))
+})
+
+watch(
+  () => formData.value.sido,
+  () => {
+    formData.value.sigungu = ''
+  }
+)
+
+const goBack = () => {
+  router.back()
+}
+
+const triggerFileInput = () => {
+  fileInput.value?.click()
+}
+
+const handleFileUpload = (event) => {
+  const files = Array.from(event.target?.files ?? [])
+  if (!files.length) return
+
+  const remainingSlots = Math.max(0, 5 - uploadedImages.value.length)
+  const selectedFiles = files.slice(0, remainingSlots)
+
+  selectedFiles.forEach((file) => {
+    const reader = new FileReader()
+    reader.onload = (loadEvent) => {
+      const url = typeof loadEvent.target?.result === 'string' ? loadEvent.target.result : ''
+      uploadedImages.value.push({ name: file.name, url })
+    }
+    reader.readAsDataURL(file)
+  })
+
+  if (files.length > remainingSlots) {
+    alert('이미지는 최대 5장까지만 업로드할 수 있어요.')
+  }
+
+  if (event.target) {
+    event.target.value = ''
+  }
+}
+
+const removeImage = (index) => {
+  uploadedImages.value.splice(index, 1)
+}
+
+const validateForm = () => {
+  const requiredFields = [
+    { key: 'companyName', message: '보호소 이름을 입력해 주세요.' },
+    { key: 'title', message: '모집 제목을 입력해 주세요.' },
+    { key: 'content', message: '모집 내용을 입력해 주세요.' },
+    { key: 'sido', message: '시/도를 선택해 주세요.' },
+    { key: 'sigungu', message: '시/군/구를 선택해 주세요.' },
+    { key: 'detailAddress', message: '상세 주소를 입력해 주세요.' },
+    { key: 'time', message: '활동 시간을 입력해 주세요.' },
+    { key: 'startcreatedAt', message: '활동 날짜를 선택해 주세요.' },
+    { key: 'numberOfPeople', message: '모집 인원을 입력해 주세요.' }
+  ]
+
+  for (const field of requiredFields) {
+    const value = formData.value[field.key]
+    if (typeof value === 'string') {
+      if (!value.trim()) {
+        alert(field.message)
+        return false
+      }
+    } else if (!value) {
+      alert(field.message)
+      return false
+    }
+  }
+
+  return true
+}
+
+const getRegionName = (code) => {
+  if (!code) return ''
+  const match = regions.find(region => region.code === code)
+  return match ? match.name : ''
 }
 
 const submitRecruit = async () => {
+  if (submitting.value) return
+  if (!validateForm()) return
+
+  submitting.value = true
+
+  const primaryImage = uploadedImages.value[0]?.url ?? null
+  const sidoName = getRegionName(formData.value.sido)
+  const sigunguName = getRegionName(formData.value.sigungu)
+  const detailAddress = formData.value.detailAddress.trim()
+  const fullAddress = [sidoName, sigunguName, detailAddress].filter(Boolean).join(' ')
+
   const newRecruit = {
-    ...recruit.value,
+    companyName: formData.value.companyName.trim(),
+    title: formData.value.title.trim(),
+    content: formData.value.content.trim(),
+    sido: sidoName,
+    sigungu: sigunguName,
+    detailAddress: fullAddress,
+    time: formData.value.time.trim(),
+    startcreatedAt: formData.value.startcreatedAt,
+    numberOfPeople: formData.value.numberOfPeople.trim(),
     deadline: '모집중',
     deadlineClass: 'recruiting',
     createdAt: new Date().toISOString().split('T')[0],
-    file: recruit.value.file ? `@/assets/volunteer/${recruit.value.file}` : null
+    file: primaryImage
   }
 
   try {
@@ -120,136 +341,337 @@ const submitRecruit = async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newRecruit)
     })
-    if (!response.ok) throw new Error('서버 응답 오류')
 
-    alert('봉사 모집글이 등록되었습니다!')
+    if (!response.ok) {
+      throw new Error('서버 응답 오류')
+    }
+
+    alert('봉사 모집글이 등록되었습니다.')
     router.push('/volunteer')
   } catch (error) {
     console.error(error)
-    alert('등록 중 오류가 발생했습니다.')
+    alert('등록 중 오류가 발생했습니다. 다시 시도해 주세요.')
+  } finally {
+    submitting.value = false
   }
 }
-
-const goBack = () => router.back()
 </script>
 
 <style scoped>
-/* 🎨 VolunteerReviewInsertView의 CSS 그대로 적용 */
-.insert-section {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  background-color: #f9fafb;
+.recruit-insert-page {
+  width: 100%;
   min-height: 100vh;
+  background: linear-gradient(135deg, #fff9f0 0%, #ffe8cc 100%);
   padding: 60px 20px;
 }
 
 .insert-container {
-  width: 680px;
-  background-color: #fff;
-  border-radius: 16px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-  padding: 50px 60px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
 }
 
-.insert-title {
-  font-size: 1.8rem;
+.back-btn {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #ffffff;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.back-btn:hover {
+  background: #f8f9fa;
+  border-color: #ff9a76;
+  color: #ff9a76;
+  transform: translateX(-5px);
+}
+
+.back-icon {
+  font-size: 18px;
+}
+
+.page-title {
+  font-size: 32px;
   font-weight: 700;
-  color: #333;
-  margin-bottom: 40px;
+  color: #2c3e50;
+  margin-bottom: 30px;
   text-align: center;
 }
 
 .insert-form {
-  width: 100%;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 30px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
-.form-group-row {
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.form-grid .form-group {
+  margin-bottom: 0;
+}
+
+.form-group.span-2 {
+  grid-column: 1 / -1;
+}
+
+.form-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.form-label.required::after {
+  content: ' *';
+  color: #ff6b6b;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background: #ffffff;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #ff9a76;
+}
+
+select.form-input {
+  appearance: none;
+  cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, #ff9a76 50%),
+    linear-gradient(135deg, #ff9a76 50%, transparent 50%);
+  background-position: calc(100% - 18px) calc(50% - 4px), calc(100% - 13px) calc(50% - 4px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.form-input:disabled {
+  background: #f5f5f5;
+  color: #a3a3a3;
+  cursor: not-allowed;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 200px;
+  line-height: 1.6;
+}
+
+.upload-description {
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 10px;
+}
+
+.upload-area {
+  border: 2px dashed #e0e0e0;
+  border-radius: 15px;
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #fff9f0;
+}
+
+.upload-area:hover {
+  border-color: #ff9a76;
+  background: #ffeeda;
+}
+
+.upload-placeholder {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.upload-icon {
+  font-size: 3rem;
+  color: #ff9a76;
+}
+
+.upload-text {
+  font-size: 0.95rem;
+  color: #6b5744;
+}
+
+.image-preview-container {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 16px;
 }
 
-.form-group.half {
-  flex: 1;
+.image-preview-item {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
 
-label {
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #444;
-  font-size: 15px;
-}
-
-input,
-textarea {
+.preview-image {
   width: 100%;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 15px;
-  background-color: #fff;
-  box-sizing: border-box;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  height: 140px;
+  object-fit: cover;
 }
 
-input:focus,
-textarea:focus {
-  border-color: #4caf50;
-  box-shadow: 0 0 5px rgba(76, 175, 80, 0.25);
-  outline: none;
+.remove-image-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 0, 0, 0.8);
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
 }
 
-textarea {
-  resize: none;
-  line-height: 1.6;
+.remove-image-btn:hover {
+  background: rgba(255, 0, 0, 1);
+  transform: scale(1.1);
 }
 
 .button-group {
   display: flex;
+  gap: 15px;
   justify-content: center;
-  gap: 16px;
-  margin-top: 35px;
+  margin-top: 40px;
 }
 
-.submit-btn,
-.cancel-btn {
-  padding: 12px 32px;
-  border-radius: 8px;
-  font-size: 15px;
+.cancel-btn,
+.submit-btn {
+  padding: 15px 40px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  border: none;
-  transition: all 0.2s ease;
-}
-
-.submit-btn {
-  background-color: #4caf50;
-  color: #fff;
-  box-shadow: 0 3px 6px rgba(76, 175, 80, 0.3);
-}
-
-.submit-btn:hover {
-  background-color: #43a047;
-  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.35);
+  transition: all 0.3s ease;
 }
 
 .cancel-btn {
-  background-color: #f1f1f1;
-  color: #333;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background: #f0f0f0;
+  color: #666666;
 }
 
 .cancel-btn:hover {
-  background-color: #e0e0e0;
+  background: #e0e0e0;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #ff9a76 0%, #ff7b54 100%);
+  color: #ffffff;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 123, 84, 0.3);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.info-box {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.info-box-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ff7b54;
+  margin: 0 0 20px 0;
+}
+
+.info-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.info-list li {
+  padding: 12px 0;
+  padding-left: 30px;
+  color: #666666;
+  line-height: 1.6;
+  position: relative;
+}
+
+.info-list li::before {
+  content: '-';
+  position: absolute;
+  left: 10px;
+  color: #ff9a76;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .insert-form {
+    padding: 24px;
+  }
+
+  .page-title {
+    font-size: 26px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .cancel-btn,
+  .submit-btn {
+    width: 100%;
+  }
+
+  .image-preview-container {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
 }
 </style>

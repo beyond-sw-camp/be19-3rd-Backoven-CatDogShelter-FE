@@ -65,11 +65,9 @@
 
         <!-- 승인 모달 -->
         <Approve
-          v-if="showModal"
-          :applicant="selected.applicant"
-          :id="selected.id"
-          :status="selected.status"
-          @close="showModal = false"
+          v-if="showModal && selected"
+          :applicant="selected"
+          @close="closeModal"
           @approve="handleApprove"
         />
 
@@ -154,67 +152,56 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Approve from '@/views/volunteer/shelterhead/Approve.vue'
+import db from '@/assets/data/db.json'
 
 const router = useRouter()
 
+const mypageData = db?.shelterHead?.mypage ?? {}
+
 const shelterInfo = ref({
-  name: '부천 유기견 보호소',
-  email: 'dain0404@gmail.com',
-  phone: '010-2244-4422',
-  location: '경기도 부천시',
-  joinDate: '2025-01-19'
+  ...(mypageData.shelterInfo ?? {
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    joinDate: ''
+  })
 })
 
-const stats = ref({ recruitments: 8, likes: 56 })
+const stats = ref({
+  ...(mypageData.stats ?? { recruitments: 0, likes: 0 })
+})
 
-const applicants = ref([
-  { id: 1, name: '홍길동', status: '승인대기', statusClass: 'pending' },
-  { id: 2, name: '김철수', status: '승인대기', statusClass: 'pending' },
-  { id: 3, name: '이다인', status: '승인대기', statusClass: 'pending' }
-])
+const applicants = ref([...(mypageData.applicants ?? [])])
 
-const volunteerRecords = ref([
-  { id: 1, name: '홍길동', date: '2025-10-10', status: '시간부여', statusClass: 'approved' },
-  { id: 2, name: '김철수', date: '2025-10-05', status: '시간부여', statusClass: 'approved' },
-  { id: 3, name: '이다인', date: '2025-10-28', status: '시간부여', statusClass: 'approved' }
-])
+const volunteerRecords = ref([...(mypageData.volunteerRecords ?? [])])
 
-const myRecruitments = ref([
-  { id: 1, title: '서울 보호소 청소', date: '2025-10-10', location: '서울 종로구' },
-  { id: 2, title: '강아지 산책 봉사', date: '2025-10-05', location: '서울 강남구' },
-  { id: 3, title: '보호소 급식 지원', date: '2025-09-28', location: '서울 중구' },
-  { id: 4, title: '입양 행사 도우미', date: '2025-09-20', location: '부산 해운대구' }
-])
+const myRecruitments = ref([...(mypageData.myRecruitments ?? [])])
 
-const myPosts = ref([
-  { id: 1, title: '서울 보호소 청소', date: '2025-10-10', likes: 45, comments: 18, views: 928 },
-  { id: 2, title: '강아지 산책 봉사', date: '2025-10-05', likes: 15, comments: 12, views: 306 },
-  { id: 3, title: '보호소 급식 지원', date: '2025-09-28', likes: 5, comments: 8, views: 100 }
-])
+const myPosts = ref([...(mypageData.myPosts ?? [])])
 
 const showModal = ref(false)
-const selected = ref({})
+const selected = ref(null)
 
 const openApprove = (applicant) => {
   selected.value = { ...applicant }
   showModal.value = true
 }
 
-// script setup 내부
+const closeModal = () => {
+  showModal.value = false
+  selected.value = null
+}
+
 const handleApprove = (updated) => {
   const target = applicants.value.find(a => a.id === updated.id)
   if (target) {
-    if (target.status === '승인완료') {
-      target.status = '승인대기'
-      target.statusClass = 'pending'
-    } else {
-      target.status = '승인완료'
-      target.statusClass = 'approved'
-    }
+    const isApproved = target.status === '승인완료'
+    target.status = isApproved ? '승인대기' : '승인완료'
+    target.statusClass = isApproved ? 'pending' : 'approved'
   }
-  showModal.value = false
+  closeModal()
 }
-
 
 function goToDetail(id) {
   console.log('모집글 상세:', id)

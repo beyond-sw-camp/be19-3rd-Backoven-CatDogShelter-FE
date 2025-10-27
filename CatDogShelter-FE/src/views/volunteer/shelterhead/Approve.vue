@@ -29,27 +29,43 @@
 </template>
 
 <script setup>
-import { defineEmits, defineProps, reactive } from 'vue'
+import { defineEmits, defineProps, reactive, watch } from 'vue'
 
 const emit = defineEmits(['close', 'approve'])
 const props = defineProps({
-  name: String,
-  id: Number,
-  status: String
+  applicant: {
+    type: Object,
+    required: true
+  }
 })
 
 const form = reactive({
-  name: props.name,
-  id: props.id,
-  status: props.status || '승인대기'
+  name: '',
+  id: '',
+  status: '승인대기'
 })
+
+watch(
+  () => props.applicant,
+  (value) => {
+    if (!value) {
+      form.name = ''
+      form.id = ''
+      form.status = '승인대기'
+      return
+    }
+    form.name = value.name ?? ''
+    form.id = value.id ?? ''
+    form.status = value.status ?? '승인대기'
+  },
+  { immediate: true }
+)
 
 const closeModal = () => emit('close')
 
-// ✅ 승인 상태를 승인완료로 바꿔서 상위로 emit
 const approve = () => {
-  form.status = '승인완료'
-  emit('approve', form)
+  form.status = form.status === '승인완료' ? '승인대기' : '승인완료'
+  emit('approve', { ...form })
 }
 </script>
 
