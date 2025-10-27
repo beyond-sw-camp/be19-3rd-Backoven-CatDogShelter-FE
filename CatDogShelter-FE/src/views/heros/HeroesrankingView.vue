@@ -442,10 +442,11 @@ onMounted(() => {
 }
 
 .time, .count {
-  font-size: 16px;
+  font-size: 18px; /* 강조 유지 */
   font-weight: 700;
-  color: #d97706;
+  color: #8B4513;
 }
+
 
 .label {
   font-size: 11px;
@@ -775,9 +776,6 @@ onMounted(() => {
   font-size: 24px;
 }
 
-.time, .count {
-  font-size: 18px; /* ↑ 주요 수치 강조 */
-}
 
 .section-title {
   font-size: 20px; /* 랭킹 섹션 제목 강조 */
@@ -806,8 +804,30 @@ margin-left: 20px;
   max-width: 90%;
   height: auto;
   display: inline-block;
-  filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.12));
+  filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.12));
+}
+/* 1등 */
+.rank-1 {
+  background: #FFF5F9;
+  border: 2px solid #f0d4da; /* 연한 분홍 보더 */
+  margin-bottom: 30px;
+  padding-top: 80px;
 }
 
+/* 2등 */
+.rank-2 {
+  background: #FFF5EE;
+  border: 1.8px solid #e8dcc8;
+}
 
+/* 3등 */
+.rank-3 {
+  background: #FFF5EE;
+  border: 1.8px solid #e8dcc8;
+}
+
+.calendar-icon {
+  width: 120px;
+  margin-right: 6px;
+}
 </style>
