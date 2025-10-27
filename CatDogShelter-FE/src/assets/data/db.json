@@ -1126,6 +1126,59 @@
           "content": "다음 주 후기도 기대할게요 ^^"
         }
       ]
+    },
+    {
+      "id": 16,
+      "companyName": "마포 보호소",
+      "title": "테스트제목",
+      "content": "테스트 내용",
+      "writer": "현재사용자",
+      "createdAt": "2025-10-27",
+      "likes": 0,
+      "comments": 0,
+      "views": 0,
+      "detailContent": "테스트 내용",
+      "files": [
+        "@/assets/volunteer/봉사후기1.jpeg"
+      ],
+      "commentList": []
+    }
+  ],
+  "applications": [
+    {
+      "id": 1,
+      "volunteerId": 13,
+      "userId": "user001",
+      "status": "승인대기",
+      "appliedAt": "2025-10-25"
+    },
+    {
+      "id": 2,
+      "volunteerId": 14,
+      "userId": "user001",
+      "status": "승인완료",
+      "appliedAt": "2025-10-24"
+    },
+    {
+      "id": 3,
+      "volunteerId": 15,
+      "userId": "user001",
+      "status": "승인대기",
+      "appliedAt": "2025-10-26"
+    },
+    {
+      "id": 4,
+      "volunteerId": 13,
+      "userId": "user002",
+      "status": "승인완료",
+      "appliedAt": "2025-10-23"
+    },
+    {
+      "id": 5,
+      "volunteerId": 14,
+      "userId": "user003",
+      "status": "승인대기",
+      "appliedAt": "2025-10-26"
     }
   ]
 }

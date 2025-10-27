@@ -185,7 +185,7 @@ const submitForm = async () => {
   
   try {
     // 모든 후기 데이터 가져오기
-    const response = await fetch('http://localhost:3000/review')
+    const response = await fetch('http://localhost:8080/review')
     const allReviews = await response.json()
     
     // 새 ID 생성
@@ -204,7 +204,7 @@ const submitForm = async () => {
       companyName: formData.value.companyName,
       title: formData.value.title,
       content: summary,
-      writer: '현재사용자', // 실제로는 로그인한 사용자
+      writer: '아자뵤', // 실제로는 로그인한 사용자
       createdAt: new Date().toISOString().split('T')[0],
       likes: 0,
       comments: 0,
@@ -217,7 +217,7 @@ const submitForm = async () => {
     }
     
     // JSON 서버에 POST 요청
-    const postResponse = await fetch('http://localhost:3000/review', {
+    const postResponse = await fetch('http://localhost:8080/review', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -262,9 +262,11 @@ const goBack = () => {
 .insert-container {
   max-width: 900px;
   margin: 0 auto;
+  position: relative;
 }
 
 .back-btn {
+  position: absolute;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -278,6 +280,7 @@ const goBack = () => {
   cursor: pointer;
   transition: all 0.3s ease;
   margin-bottom: 20px;
+  
 }
 
 .back-btn:hover {
