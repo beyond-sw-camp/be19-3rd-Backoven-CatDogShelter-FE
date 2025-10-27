@@ -18,7 +18,7 @@ import AdoptionProcessView from '@/views/footer/AdoptionProcessView.vue'
 import VolunteerGuideView from '@/views/footer/VolunteerGuideView.vue'
 import PostWriteView from '@/views/Post/PostWriteView.vue'
 import FaqView from '@/views/footer/FaqView.vue'
-import ShelterheadMypageView from '@/views/ShelterheadMypageView.vue'
+import ShelterheadMypageView from '@/views/volunteer/ShelterheadMypageView.vue'
 import LoginPlaceholderView from '@/views/LoginPlaceholderView.vue'
 
 const router = createRouter({
