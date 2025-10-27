@@ -21,8 +21,15 @@
 
       <!-- 상세 콘텐츠 -->
       <div v-else-if="review" class="detail-content">
+        <!-- 상단 우측 게시글 신고 버튼 -->
+        <div class="post-actions">
+          <button class="report-btn" @click="reportPost">
+            <span class="report-icon">🚨</span> 게시글 신고
+          </button>
+        </div>
+
         <!-- 카테고리 -->
-        <div class="category-badge">{{ review.category }}</div>
+        <div class="category-badge">{{ review.companyName }}</div>
 
         <!-- 제목 -->
         <h1 class="detail-title">{{ review.title }}</h1>
@@ -30,9 +37,22 @@
         <!-- 메타 정보 -->
         <div class="meta-info">
           <div class="author-info">
-            <span class="author-icon">👤</span>
-            <span class="author-name">{{ review.author }}</span>
-            <span class="date">{{ review.date }}</span>
+            <div class="author-wrapper">
+              <span class="author-icon">👤</span>
+              <span class="author-name" @click.stop="toggleAuthorMenu">
+                {{ review.writer }}
+              </span>
+              <!-- 작성자 이름 토글 메뉴 -->
+              <div v-if="showAuthorMenu" class="author-menu" @click.stop>
+                <button class="author-menu-item" @click="viewProfileInfo">
+                  <span class="menu-icon">👤</span> 회원정보보기
+                </button>
+                <button class="author-menu-item" @click="sendMessage">
+                  <span class="menu-icon">✉️</span> 쪽지보내기
+                </button>
+              </div>
+            </div>
+            <span class="date">{{ review.createdAt }}</span>
           </div>
           <div class="stats-info">
             <span class="stat-item">
@@ -50,9 +70,9 @@
           </div>
         </div>
 
-        <!-- 이미지 -->
-        <div class="content-image" v-if="review.image">
-          <img :src="review.image" :alt="review.title" />
+        <!-- 대표 이미지 (files 배열의 첫 번째 이미지) -->
+        <div class="content-image" v-if="review.files && review.files.length > 0">
+          <img :src="getImageUrl(review.files[0])" :alt="review.title" />
         </div>
 
         <!-- 본문 -->
@@ -60,19 +80,19 @@
           <p style="white-space: pre-line;">{{ review.detailContent || review.content }}</p>
         </div>
 
-        <!-- 상세 이미지들 -->
-        <div v-if="review.detailImages && review.detailImages.length > 0" class="detail-images">
+        <!-- 상세 이미지들 (files 배열의 나머지 이미지들) -->
+        <div v-if="review.files && review.files.length > 1" class="detail-images">
           <img 
-            v-for="(img, index) in review.detailImages" 
+            v-for="(img, index) in review.files.slice(1)" 
             :key="index"
-            :src="img" 
-            :alt="`상세 이미지 ${index + 1}`"
+            :src="getImageUrl(img)" 
+            :alt="`상세 이미지 ${index + 2}`"
             class="detail-image"
           />
         </div>
 
-        <!-- 좋아요 버튼 -->
-        <div class="like-section">
+        <!-- 좋아요 & 공유하기 버튼 -->
+        <div class="action-section">
           <button 
             class="like-btn" 
             :class="{ liked: isLiked }"
@@ -80,6 +100,10 @@
           >
             <span class="like-icon">{{ isLiked ? '❤️' : '♡' }}</span>
             좋아요 {{ review.likes }}
+          </button>
+          <button class="share-btn" @click="openShareModal">
+            <span class="share-icon">🔗</span>
+            공유하기
           </button>
         </div>
 
@@ -94,16 +118,29 @@
               :key="comment.id"
               class="comment-item"
             >
-              <div class="comment-avatar">{{ comment.author.charAt(0) }}</div>
+              <div class="comment-avatar">{{ comment.writer.charAt(0) }}</div>
               <div class="comment-content">
                 <div class="comment-header">
-                  <span class="comment-author">{{ comment.author }}</span>
-                  <span class="comment-date">{{ comment.date }}</span>
+                  <div class="comment-author-wrapper">
+                    <span class="comment-author" @click.stop="toggleCommentAuthorMenu(comment.id)">
+                      {{ comment.writer }}
+                    </span>
+                    <!-- 댓글 작성자 토글 메뉴 -->
+                    <div v-if="activeCommentMenu === comment.id" class="author-menu comment-menu" @click.stop>
+                      <button class="author-menu-item" @click="viewCommentProfileInfo(comment)">
+                        <span class="menu-icon">👤</span> 회원정보보기
+                      </button>
+                      <button class="author-menu-item" @click="sendCommentMessage(comment)">
+                        <span class="menu-icon">✉️</span> 쪽지보내기
+                      </button>
+                    </div>
+                  </div>
+                  <span class="comment-date">{{ comment.createdAt }}</span>
+                  <button class="comment-report-btn" @click="reportComment(comment.id)">
+                    <span class="report-icon">🚨</span> 신고
+                  </button>
                 </div>
-                <p class="comment-text">{{ comment.text }}</p>
-                <button class="reply-btn" @click="replyToComment(comment.id)">
-                  💬 답글쓰기
-                </button>
+                <p class="comment-text">{{ comment.content }}</p>
               </div>
             </div>
           </div>
@@ -143,15 +180,55 @@
         </div>
       </div>
     </div>
+
+    <!-- 공유하기 모달 -->
+    <teleport to="body">
+      <div v-if="showShareModal" class="modal-overlay" @click.self="closeShareModal">
+        <div class="share-modal">
+          <div class="modal-header">
+            <h3 class="modal-title">댕냥터 게시글 공유하기</h3>
+            <button class="modal-close" @click="closeShareModal">×</button>
+          </div>
+          <div class="modal-body">
+            <p class="modal-description">가족을 기다리는 댕냥이의 이야기를 함께 퍼뜨려주세요 :_)</p>
+            <div class="share-url-box">
+              <input 
+                type="text" 
+                class="share-url-input" 
+                :value="shareUrl" 
+                readonly
+                ref="shareUrlInput"
+              />
+              <button class="copy-btn" @click="copyUrl">
+                <span class="copy-icon">📋</span>
+              </button>
+            </div>
+            <button class="link-copy-btn" @click="copyUrl">
+              링크 복사
+            </button>
+            <button class="cancel-btn" @click="closeShareModal">
+              취소
+            </button>
+          </div>
+        </div>
+      </div>
+    </teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
+
+// 이미지 경로를 실제 이미지 URL로 변환하는 함수
+const getImageUrl = (filePath) => {
+  if (!filePath) return ''
+  const fileName = filePath.split('/').pop()
+  return `/volunteer/${fileName}`
+}
 
 // 게시글 ID
 const reviewId = computed(() => parseInt(route.params.id))
@@ -173,6 +250,41 @@ const comments = ref([])
 // 이전/다음 글
 const prevPost = ref(null)
 const nextPost = ref(null)
+
+// 작성자 토글 메뉴
+const showAuthorMenu = ref(false)
+const activeCommentMenu = ref(null)
+
+// 공유하기 모달
+const showShareModal = ref(false)
+const shareUrlInput = ref(null)
+const shareUrl = computed(() => {
+  return `https://catdogshelter.com/volunteer/review/${reviewId.value}`
+})
+
+// 외부 클릭 감지를 위한 함수
+const handleClickOutside = (event) => {
+  const authorMenus = document.querySelectorAll('.author-menu')
+  let clickedInside = false
+  
+  authorMenus.forEach(menu => {
+    if (menu.contains(event.target)) {
+      clickedInside = true
+    }
+  })
+  
+  const authorNames = document.querySelectorAll('.author-name, .comment-author')
+  authorNames.forEach(name => {
+    if (name.contains(event.target)) {
+      clickedInside = true
+    }
+  })
+  
+  if (!clickedInside) {
+    showAuthorMenu.value = false
+    activeCommentMenu.value = null
+  }
+}
 
 // JSON Server에서 데이터 가져오기
 const fetchReviewDetail = async () => {
@@ -235,6 +347,12 @@ const fetchReviewDetail = async () => {
 // 컴포넌트 마운트 시 데이터 가져오기
 onMounted(() => {
   fetchReviewDetail()
+  document.addEventListener('click', handleClickOutside)
+})
+
+// 컴포넌트 언마운트 시 이벤트 리스너 제거
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
 })
 
 // id가 변경되면 데이터 다시 가져오기
@@ -255,34 +373,52 @@ function toggleLike() {
   }
 }
 
-function submitComment() {
+// 댓글 작성 (JSON Server에 실제 등록)
+async function submitComment() {
   if (!newComment.value.trim()) {
     alert('댓글 내용을 입력해주세요.')
     return
   }
 
-  const comment = {
-    id: comments.value.length + 1,
-    author: '현재 사용자', // 실제로는 로그인한 사용자 정보
-    date: new Date().toLocaleString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    }),
-    text: newComment.value
+  try {
+    // 새 댓글 객체 생성
+    const commentData = {
+      id: Date.now(), // 임시 ID (실제로는 서버에서 생성)
+      writer: '박정원', // 실제로는 로그인한 사용자 정보
+      content: newComment.value,
+      createdAt: new Date().toISOString().split('T')[0] + ' ' + 
+                 new Date().toTimeString().split(' ')[0].substring(0, 5)
+    }
+
+    // 기존 댓글 목록에 새 댓글 추가
+    const updatedCommentList = [...comments.value, commentData]
+    
+    // JSON Server에 PATCH 요청으로 댓글 목록 업데이트
+    const response = await fetch(`http://localhost:8080/review/${reviewId.value}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        commentList: updatedCommentList,
+        comments: updatedCommentList.length // 댓글 수도 업데이트
+      })
+    })
+
+    if (!response.ok) {
+      throw new Error('댓글 등록에 실패했습니다.')
+    }
+
+    // 로컬 상태 업데이트
+    comments.value = updatedCommentList
+    review.value.comments = updatedCommentList.length
+    newComment.value = ''
+    
+    alert('댓글이 등록되었습니다.')
+  } catch (err) {
+    console.error('댓글 등록 실패:', err)
+    alert('댓글 등록에 실패했습니다. 다시 시도해주세요.')
   }
-
-  comments.value.push(comment)
-  review.value.comments++
-  newComment.value = ''
-  alert('댓글이 등록되었습니다.')
-}
-
-function replyToComment(commentId) {
-  console.log('답글 쓰기:', commentId)
-  // 답글 기능 구현
 }
 
 function goToPrevPost() {
@@ -294,6 +430,87 @@ function goToPrevPost() {
 function goToNextPost() {
   if (nextPost.value) {
     router.push(`/volunteer/review/${nextPost.value.id}`)
+  }
+}
+
+// 작성자 토글 메뉴
+function toggleAuthorMenu() {
+  showAuthorMenu.value = !showAuthorMenu.value
+  activeCommentMenu.value = null
+}
+
+function toggleCommentAuthorMenu(commentId) {
+  if (activeCommentMenu.value === commentId) {
+    activeCommentMenu.value = null
+  } else {
+    activeCommentMenu.value = commentId
+    showAuthorMenu.value = false
+  }
+}
+
+function viewProfile() {
+  console.log('프로필 보기')
+  showAuthorMenu.value = false
+}
+
+function viewProfileInfo() {
+  console.log('회원정보 보기')
+  showAuthorMenu.value = false
+}
+
+function sendMessage() {
+  console.log('쪽지 보내기')
+  showAuthorMenu.value = false
+}
+
+function viewCommentProfile(comment) {
+  console.log('댓글 작성자 프로필 보기:', comment.writer)
+  activeCommentMenu.value = null
+}
+
+function viewCommentProfileInfo(comment) {
+  console.log('댓글 작성자 회원정보 보기:', comment.writer)
+  activeCommentMenu.value = null
+}
+
+function sendCommentMessage(comment) {
+  console.log('댓글 작성자에게 쪽지 보내기:', comment.writer)
+  activeCommentMenu.value = null
+}
+
+// 신고 기능
+function reportPost() {
+  if (confirm('이 게시글을 신고하시겠습니까?')) {
+    alert('게시글이 신고되었습니다. 관리자가 확인 후 조치하겠습니다.')
+  }
+}
+
+function reportComment(commentId) {
+  if (confirm('이 댓글을 신고하시겠습니까?')) {
+    alert('댓글이 신고되었습니다. 관리자가 확인 후 조치하겠습니다.')
+  }
+}
+
+// 공유하기 모달
+function openShareModal() {
+  showShareModal.value = true
+}
+
+function closeShareModal() {
+  showShareModal.value = false
+}
+
+async function copyUrl() {
+  try {
+    await navigator.clipboard.writeText(shareUrl.value)
+    alert('링크가 복사되었습니다!')
+  } catch (err) {
+    // 클립보드 API 실패 시 대체 방법
+    if (shareUrlInput.value) {
+      shareUrlInput.value.$el.select()
+      document.execCommand('copy')
+      alert('링크가 복사되었습니다!')
+    }
   }
 }
 </script>
@@ -378,19 +595,19 @@ function goToNextPost() {
 }
 
 .error-text {
-  font-size: 1.2rem;
-  color: #d32f2f;
+  font-size: 1.1rem;
+  color: #e74c3c;
   font-weight: 600;
   margin: 0;
 }
 
 .retry-btn {
-  padding: 12px 32px;
+  padding: 10px 24px;
   background: linear-gradient(135deg, #f0b762 0%, #e8a54d 100%);
   color: white;
   border: none;
-  border-radius: 12px;
-  font-size: 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
@@ -398,44 +615,7 @@ function goToNextPost() {
 
 .retry-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(240, 183, 98, 0.4);
-}
-
-/* 상세 이미지들 */
-.detail-images {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
-  margin: 20px 0;
-}
-
-.detail-image {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 12px;
-}
-
-/* 뒤로가기 버튼 */
-.back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background: white;
-  border: 1px solid #e8e0d5;
-  border-radius: 12px;
-  color: #6b5744;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  margin-bottom: 24px;
-}
-
-.back-btn:hover {
-  background: #f5f0e8;
-  border-color: #d4c4b0;
+  box-shadow: 0 4px 15px rgba(240, 183, 98, 0.4);
 }
 
 .back-icon {
@@ -448,6 +628,38 @@ function goToNextPost() {
   border-radius: 20px;
   padding: 40px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+/* 게시글 신고 버튼 */
+.post-actions {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+}
+
+.report-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #fff;
+  border: 1px solid #e8e0d5;
+  border-radius: 8px;
+  color: #e74c3c;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.report-btn:hover {
+  background: #ffebee;
+  border-color: #e74c3c;
+}
+
+.report-icon {
+  font-size: 0.9rem;
 }
 
 /* 카테고리 */
@@ -469,6 +681,7 @@ function goToNextPost() {
   color: #3d2f1f;
   margin: 0 0 20px 0;
   line-height: 1.4;
+  padding-right: 100px;
 }
 
 /* 메타 정보 */
@@ -489,6 +702,13 @@ function goToNextPost() {
   color: #6b5744;
 }
 
+.author-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .author-icon {
   font-size: 1rem;
 }
@@ -496,6 +716,62 @@ function goToNextPost() {
 .author-name {
   font-weight: 600;
   color: #3d2f1f;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.author-name:hover {
+  background: #f5f0e8;
+}
+
+/* 작성자 토글 메뉴 */
+.author-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  background: white;
+  border: 1px solid #e8e0d5;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  min-width: 160px;
+  overflow: hidden;
+}
+
+.comment-menu {
+  left: auto;
+  right: 0;
+}
+
+.author-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: white;
+  border: none;
+  border-bottom: 1px solid #f5f0e8;
+  color: #3d2f1f;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.author-menu-item:last-child {
+  border-bottom: none;
+}
+
+.author-menu-item:hover {
+  background: #f5f0e8;
+}
+
+.menu-icon {
+  font-size: 1rem;
 }
 
 .date {
@@ -533,6 +809,19 @@ function goToNextPost() {
   display: block;
 }
 
+.detail-images {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.detail-image {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+}
+
 /* 본문 */
 .content-body {
   font-size: 1rem;
@@ -545,16 +834,20 @@ function goToNextPost() {
   margin: 0 0 16px 0;
 }
 
-/* 좋아요 섹션 */
-.like-section {
-  text-align: center;
+/* 좋아요 & 공유하기 섹션 */
+.action-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
   padding: 24px 0;
   border-top: 1px solid #f5f0e8;
   border-bottom: 1px solid #f5f0e8;
   margin-bottom: 32px;
 }
 
-.like-btn {
+.like-btn,
+.share-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -574,13 +867,19 @@ function goToNextPost() {
   background: #fef9f0;
 }
 
+.share-btn:hover {
+  border-color: #f0b762;
+  background: #fef9f0;
+}
+
 .like-btn.liked {
   background: #ffe8e8;
   border-color: #ff6b6b;
   color: #ff6b6b;
 }
 
-.like-icon {
+.like-icon,
+.share-icon {
   font-size: 1.3rem;
 }
 
@@ -639,10 +938,22 @@ function goToNextPost() {
   margin-bottom: 8px;
 }
 
+.comment-author-wrapper {
+  position: relative;
+}
+
 .comment-author {
   font-weight: 600;
   color: #3d2f1f;
   font-size: 0.95rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.comment-author:hover {
+  background: #f5f0e8;
 }
 
 .comment-date {
@@ -650,27 +961,31 @@ function goToNextPost() {
   color: #8b7355;
 }
 
+.comment-report-btn {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid #e8e0d5;
+  border-radius: 6px;
+  color: #e74c3c;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.comment-report-btn:hover {
+  background: #ffebee;
+  border-color: #e74c3c;
+}
+
 .comment-text {
   font-size: 0.95rem;
   color: #3d2f1f;
   line-height: 1.6;
   margin: 0 0 8px 0;
-}
-
-.reply-btn {
-  padding: 4px 12px;
-  background: transparent;
-  border: 1px solid #e8e0d5;
-  border-radius: 12px;
-  color: #6b5744;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.reply-btn:hover {
-  background: #f5f0e8;
-  border-color: #d4c4b0;
 }
 
 /* 댓글 입력 */
@@ -774,6 +1089,148 @@ function goToNextPost() {
   white-space: nowrap;
 }
 
+/* 공유하기 모달 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.share-modal {
+  background: white;
+  border-radius: 20px;
+  padding: 0;
+  max-width: 440px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid #f5f0e8;
+}
+
+.modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #3d2f1f;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #8b7355;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.modal-close:hover {
+  background: #f5f0e8;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-description {
+  font-size: 0.95rem;
+  color: #6b5744;
+  margin: 0 0 20px 0;
+  line-height: 1.6;
+}
+
+.share-url-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  background: #f5f0e8;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.share-url-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #e8e0d5;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: white;
+  color: #3d2f1f;
+}
+
+.copy-btn {
+  padding: 8px 16px;
+  background: #f0b762;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.copy-btn:hover {
+  background: #e8a54d;
+}
+
+.copy-icon {
+  font-size: 1.2rem;
+}
+
+.link-copy-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #f0b762 0%, #e8a54d 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-bottom: 10px;
+}
+
+.link-copy-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(240, 183, 98, 0.4);
+}
+
+.cancel-btn {
+  width: 100%;
+  padding: 14px;
+  background: white;
+  border: 1px solid #e8e0d5;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #6b5744;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.cancel-btn:hover {
+  background: #f5f0e8;
+}
+
 /* 반응형 */
 @media (max-width: 768px) {
   .review-detail-page {
@@ -786,6 +1243,12 @@ function goToNextPost() {
 
   .detail-title {
     font-size: 1.5rem;
+    padding-right: 0;
+  }
+
+  .post-actions {
+    position: static;
+    margin-bottom: 16px;
   }
 
   .meta-info {
@@ -801,6 +1264,16 @@ function goToNextPost() {
   .nav-btn.next {
     text-align: left;
     align-items: flex-start;
+  }
+
+  .action-section {
+    flex-direction: column;
+  }
+
+  .like-btn,
+  .share-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 </style>

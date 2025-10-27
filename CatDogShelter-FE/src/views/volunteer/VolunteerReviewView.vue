@@ -10,32 +10,30 @@
           </div>
 
           <div class="search-filter">
-            <select class="sort-select" v-model="sortType">
-              <option value="latest">검색 조건</option>
-              <option value="latest">최신순</option>
-              <option value="popular">인기순</option>
+            <select class="sort-select" v-model="searchFilter">
+              <option value="">검색 조건</option>
+              <option value="title">제목</option>
+              <option value="content">내용</option>
+              <option value="writer">작성자</option>
             </select>
             <input 
               type="text" 
               class="search-input" 
-              placeholder="제목으로 검색..." 
+              placeholder="검색어를 입력하세요..." 
               v-model="searchQuery"
+              @keyup.enter="handleSearch"
             />
-            <button class="search-btn">검색</button>
+            <button class="search-btn" @click="handleSearch">검색</button>
           </div>
 
           <div class="category-tabs">
-            <button 
-              class="category-tab"
-              :class="{ active: category === 'all' }"
-              @click="category = 'all'"
-            >
-              총 {{ reviews.length }} 개의 게시글
+            <button class="category-tab active">
+              총 {{ filteredReviews.length }} 개의 게시글
             </button>
-            <select class="category-select" v-model="detailCategory">
-              <option value="all">정렬 조건</option>
+            <select class="category-select" v-model="sortType" @change="applySorting">
+              <option value="all">전체</option>
+              <option value="views">조회순</option>
               <option value="latest">최신순</option>
-              <option value="popular">인기순</option>
             </select>
           </div>
 
@@ -51,25 +49,30 @@
             <button class="retry-btn" @click="fetchReviews">다시 시도</button>
           </div>
 
+          <!-- 검색 결과 없음 -->
+          <div v-else-if="filteredReviews.length === 0" class="empty-container">
+            <p class="empty-text">검색 결과가 없습니다.</p>
+          </div>
+
           <!-- 데이터 표시 -->
           <ul v-else class="review-list">
             <li 
-              v-for="review in reviews" 
+              v-for="review in paginatedReviews" 
               :key="review.id" 
               class="review-item"
               @click="goToDetail(review.id)"
             >
               <div class="review-item-header">
-                <img :src="review.image" class="review-thumb" alt="후기 이미지" />
+                <img :src="getImageUrl(review.files && review.files[0])" class="review-thumb" alt="후기 이미지" />
                 <div class="review-item-content">
                   <div class="review-item-top">
-                    <span class="review-category">{{ review.category }}</span>
+                    <span class="review-category">{{ review.companyName }}</span>
                     <h4 class="review-item-title">{{ review.title }}</h4>
                   </div>
                   <p class="review-item-desc">{{ review.content }}</p>
                   <div class="review-item-meta">
-                    <span class="review-author">{{ review.author }}</span>
-                    <span class="review-date">{{ review.date }}</span>
+                    <span class="review-author">{{ review.writer }}</span>
+                    <span class="review-date">{{ review.createdAt }}</span>
                   </div>
                   <div class="review-item-stats">
                     <span class="stat-item">
@@ -87,11 +90,30 @@
             </li>
           </ul>
 
-          <div class="pagination">
-            <button class="page-nav">이전</button>
-            <button class="page-num active">1</button>
-            <button class="page-num">2</button>
-            <button class="page-nav">다음</button>
+          <div class="pagination" v-if="totalPages > 0">
+            <button 
+              class="page-nav" 
+              @click="changePage(currentPage - 1)" 
+              :disabled="currentPage === 1"
+            >
+              이전
+            </button>
+            <button 
+              v-for="page in displayedPages" 
+              :key="page"
+              class="page-num"
+              :class="{ active: page === currentPage }"
+              @click="changePage(page)"
+            >
+              {{ page }}
+            </button>
+            <button 
+              class="page-nav" 
+              @click="changePage(currentPage + 1)"
+              :disabled="currentPage === totalPages"
+            >
+              다음
+            </button>
           </div>
         </div>
       </div>
@@ -147,17 +169,105 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
+// 이미지 경로를 실제 이미지 URL로 변환하는 함수
+const getImageUrl = (filePath) => {
+  if (!filePath) return '/placeholder-image.jpg'
+  const fileName = filePath.split('/').pop()
+  return `/volunteer/${fileName}`
+}
+
 const searchQuery = ref('')
-const sortType = ref('latest')
-const category = ref('all')
-const detailCategory = ref('all')
+const searchFilter = ref('') // '', 'title', 'content', 'writer'
+const sortType = ref('all')
 const loading = ref(true)
 const error = ref(null)
+const hasSearched = ref(false)
+
+// 페이지네이션
+const currentPage = ref(1)
+const itemsPerPage = 5
 
 // 데이터 (빈 배열로 시작)
 const reviews = ref([])
 const popularReviews = ref([])
 const recentComments = ref([])
+
+// 검색 및 필터링된 리뷰
+const filteredReviews = computed(() => {
+  let result = [...reviews.value]
+  
+  // 검색 버튼을 눌렀을 때
+  if (hasSearched.value && searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim()
+    
+    // 검색 조건이 선택되지 않았을 때
+    if (!searchFilter.value) {
+      return [] // 아무것도 안나오게
+    }
+    
+    // 검색 조건에 따라 필터링
+    result = result.filter(review => {
+      if (searchFilter.value === 'title') {
+        return review.title.toLowerCase().includes(query)
+      } else if (searchFilter.value === 'content') {
+        return review.content.toLowerCase().includes(query)
+      } else if (searchFilter.value === 'writer') {
+        return review.writer.toLowerCase().includes(query)
+      }
+      return false
+    })
+  } else if (hasSearched.value && !searchQuery.value.trim() && searchFilter.value) {
+    // 검색 조건만 선택하고 검색어가 없으면
+    return [] // 아무것도 안나오게
+  } else if (!hasSearched.value || (!searchQuery.value.trim() && !searchFilter.value)) {
+    // 아무 검색조건이 없을 때는 전체 표시
+    result = [...reviews.value]
+  }
+  
+  return result
+})
+
+// 정렬 적용
+const sortedReviews = computed(() => {
+  let result = [...filteredReviews.value]
+  
+  if (sortType.value === 'views') {
+    result.sort((a, b) => b.views - a.views)
+  } else if (sortType.value === 'latest') {
+    result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+  }
+  
+  return result
+})
+
+// 페이지네이션 적용
+const totalPages = computed(() => {
+  return Math.ceil(sortedReviews.value.length / itemsPerPage)
+})
+
+const paginatedReviews = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  const end = start + itemsPerPage
+  return sortedReviews.value.slice(start, end)
+})
+
+// 표시할 페이지 번호들
+const displayedPages = computed(() => {
+  const pages = []
+  const maxDisplayed = 5
+  let startPage = Math.max(1, currentPage.value - Math.floor(maxDisplayed / 2))
+  let endPage = Math.min(totalPages.value, startPage + maxDisplayed - 1)
+  
+  if (endPage - startPage < maxDisplayed - 1) {
+    startPage = Math.max(1, endPage - maxDisplayed + 1)
+  }
+  
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i)
+  }
+  
+  return pages
+})
 
 // JSON Server에서 데이터 가져오기
 const fetchReviews = async () => {
@@ -203,12 +313,12 @@ const fetchReviews = async () => {
     
     // 날짜순으로 정렬하고 최근 5개만
     recentComments.value = allComments
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 5)
       .map(comment => ({
-        text: comment.text,
+        text: comment.content,
         post: comment.post.length > 20 ? comment.post.substring(0, 20) + '...' : comment.post,
-        date: getRelativeTime(comment.date),
+        date: getRelativeTime(comment.createdAt),
         postId: comment.postId
       }))
     
@@ -219,6 +329,25 @@ const fetchReviews = async () => {
     error.value = err.message
   } finally {
     loading.value = false
+  }
+}
+
+// 검색 처리
+const handleSearch = () => {
+  hasSearched.value = true
+  currentPage.value = 1 // 검색 시 첫 페이지로
+}
+
+// 정렬 적용
+const applySorting = () => {
+  currentPage.value = 1 // 정렬 변경 시 첫 페이지로
+}
+
+// 페이지 변경
+const changePage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
 
@@ -361,7 +490,7 @@ function goToCommentPost(postId) {
 
 .error-text {
   font-size: 1.1rem;
-  color: #d32f2f;
+  color: #e74c3c;
   font-weight: 600;
   margin: 0;
 }
@@ -383,16 +512,31 @@ function goToCommentPost(postId) {
   box-shadow: 0 4px 15px rgba(240, 183, 98, 0.4);
 }
 
+/* 빈 결과 */
+.empty-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: 40px;
+}
+
+.empty-text {
+  font-size: 1.1rem;
+  color: #8b7355;
+  font-weight: 600;
+}
+
 /* 검색 필터 */
 .search-filter {
   display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 .sort-select,
 .category-select {
-  padding: 10px 12px;
+  padding: 10px 16px;
   border: 1px solid #e8e0d5;
   border-radius: 10px;
   font-size: 0.85rem;
@@ -449,7 +593,7 @@ function goToCommentPost(postId) {
   border: none;
   font-size: 0.9rem;
   color: #6b5744;
-  cursor: pointer;
+  cursor: default;
   font-weight: 600;
 }
 
@@ -590,6 +734,11 @@ function goToCommentPost(postId) {
   transition: all 0.3s;
 }
 
+.page-nav:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .page-num.active {
   background: #f0b762;
   border-color: #f0b762;
@@ -597,7 +746,7 @@ function goToCommentPost(postId) {
   font-weight: 600;
 }
 
-.page-nav:hover,
+.page-nav:hover:not(:disabled),
 .page-num:hover {
   border-color: #f0b762;
 }
