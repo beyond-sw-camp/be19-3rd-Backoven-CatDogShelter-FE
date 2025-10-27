@@ -10,8 +10,6 @@
       <!-- ===== 상단 검색바: 검색 기준 드롭다운 + 인풋 ===== -->
       <section class="top-search-bar">
         <div class="top-search-row">
-          <label class="top-search-label" for="searchKeyword">제목</label>
-
           <!-- 검색 기준 드롭다운 -->
           <select
             v-model="searchField"
@@ -37,16 +35,18 @@
         </div>
       </section>
 
-      <!-- ===== 필터 영역 (동물종류 / 실종상태 / 성별 / 장소 / 품종 / 색상 / 검색버튼) ===== -->
+      <!-- ===== 필터 영역 ===== -->
       <section class="filter-shell">
         <div class="filter-bar">
+          <!-- 필터 헤더 라인 -->
           <div class="filter-head">
             <button
               class="filter-toggle"
               type="button"
               @click="filterOpen = !filterOpen"
             >
-              <span>필터</span>
+              <span class="filter-icon">🔍</span>
+              <span class="filter-text">필터</span>
               <span class="arrow" :class="{ open: filterOpen }">⌄</span>
             </button>
 
@@ -56,50 +56,66 @@
             </button>
           </div>
 
+          <!-- 필터 바디 -->
           <transition name="fade">
             <div v-if="filterOpen" class="filter-body">
-              <!-- 1줄 필터 라인 -->
+              <!-- 인라인 필터들 -->
               <div class="filter-row">
-                <select v-model="filters.animalType" class="filter-select short">
-                  <option value="">동물 종류</option>
-                  <option value="CAT">고양이</option>
-                  <option value="DOG">강아지</option>
-                  <option value="ETC">기타</option>
-                </select>
+                <!-- 동물 종류 -->
+                <div class="filter-group">
+                  <label class="filter-label">동물 종류</label>
+                  <select v-model="filters.animalType" class="chip-select">
+                    <option value="">전체</option>
+                    <option value="CAT">고양이</option>
+                    <option value="DOG">강아지</option>
+                    <option value="ETC">기타</option>
+                  </select>
+                </div>
 
-                <select v-model="filters.isFound" class="filter-select short">
-                  <option value="">실종 상태</option>
-                  <option value="MISSING">실종</option>
-                  <option value="FOUND">발견</option>
-                </select>
+                <!-- 실종 상태 -->
+                <div class="filter-group">
+                  <label class="filter-label">실종 상태</label>
+                  <select v-model="filters.isFound" class="chip-select">
+                    <option value="">전체</option>
+                    <option value="MISSING">실종</option>
+                    <option value="FOUND">발견</option>
+                  </select>
+                </div>
 
-                <select v-model="filters.sex" class="filter-select short">
-                  <option value="">성별</option>
-                  <option value="MALE">남아</option>
-                  <option value="FEMALE">여아</option>
-                  <option value="UNKNOWN">모름</option>
-                </select>
+           
 
-                <input
-                  v-model="filters.location"
-                  class="filter-input long"
-                  type="text"
-                  placeholder="실종 장소를 입력해주세요"
-                />
+                <!-- 실종 장소 -->
+                <div class="filter-group wide">
+                  <label class="filter-label">실종 장소</label>
+                  <input
+                    v-model="filters.location"
+                    class="chip-input"
+                    type="text"
+                    placeholder="장소를 입력해주세요"
+                  />
+                </div>
 
-                <input
-                  v-model="filters.breed"
-                  class="filter-input long"
-                  type="text"
-                  placeholder="품종을 입력해주세요"
-                />
+                <!-- 품종 -->
+                <div class="filter-group wide">
+                  <label class="filter-label">품종</label>
+                  <input
+                    v-model="filters.breed"
+                    class="chip-input"
+                    type="text"
+                    placeholder="품종을 입력해주세요"
+                  />
+                </div>
 
-                <input
-                  v-model="filters.color"
-                  class="filter-input long"
-                  type="text"
-                  placeholder="색상을 입력해주세요"
-                />
+                <!-- 색상 -->
+                <div class="filter-group wide">
+                  <label class="filter-label">색상</label>
+                  <input
+                    v-model="filters.color"
+                    class="chip-input"
+                    type="text"
+                    placeholder="색상을 입력해주세요"
+                  />
+                </div>
               </div>
 
               <!-- 검색 버튼 라인 -->
@@ -127,7 +143,7 @@
             >
               <option value="LATEST">최신순</option>
               <option value="VIEW">조회순</option>
-              <option value="LIKE">공감순</option>
+              <option value="LIKE">좋아요순</option>
             </select>
           </label>
         </div>
@@ -141,7 +157,7 @@
           class="post-card"
           @click="goDetail(post.id)"
         >
-          <!-- 왼쪽: 썸네일 (지금은 이미지 없으니까 더미) -->
+          <!-- 왼쪽: 썸네일 -->
           <div class="thumb-wrap">
             <img
               class="thumb-img"
@@ -168,7 +184,7 @@
             <!-- 제목 -->
             <h2 class="post-title">{{ post.title }}</h2>
 
-            <!-- 상세정보 (현재 백엔드에서 안 주는 필드는 임시 placeholder) -->
+            <!-- 상세정보 -->
             <ul class="info-grid">
               <li>
                 <span class="info-label">품종 :</span>
@@ -285,7 +301,7 @@ export default {
       posts: [],
       totalCount: 0,
 
-      // 페이지 정보 (지금 API엔 totalCount / totalPages 안받았으니까 기본값으로 둠)
+      // 페이지 정보
       page: 1,
       pageSize: 10,
       totalPages: 1,
@@ -313,7 +329,7 @@ export default {
 
   computed: {
     placeholderByField() {
-      if (this.searchField === 'title') return '검색어를 입력해주세요'
+      if (this.searchField === 'title') return '제목을 입력해주세요'
       if (this.searchField === 'comment') return '댓글 내용을 입력해주세요'
       if (this.searchField === 'writer') return '작성자를 입력해주세요'
       return '검색어를 입력해주세요'
@@ -336,10 +352,6 @@ export default {
     async fetchPosts(targetPage) {
       const pageToLoad = targetPage || this.page
 
-      // 현재 백엔드 응답 구조: 배열만 내려옴
-      // GET localhost:8000/post-service/missing-posts/query/posts
-      // querystring은 지금 설계 주도권 너한테 있으니까
-      // 일단 page랑 keyword 정도만 붙여서 호출해줄게.
       const params = new URLSearchParams({
         page: pageToLoad,
         size: this.pageSize,
@@ -361,7 +373,7 @@ export default {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
-              // Authorization: `Bearer ${token}` 필요하면 넣어
+              // Authorization: `Bearer ${token}` 필요하면 나중에 붙여
             },
           }
         )
@@ -372,14 +384,10 @@ export default {
 
         const data = await res.json()
 
-        // data = [ {id, status, title, createdAt, view, userName, likeCount, userRating}, ... ]
-        // 아직 totalCount, totalPages가 없으니까
-        // 일단 length로 대체
         this.posts = Array.isArray(data) ? data : []
         this.totalCount = this.posts.length
 
         this.page = pageToLoad
-        // 페이징은 아직 없다고 가정: 그냥 1페이지 고정
         this.totalPages = 1
       } catch (err) {
         console.error('실종 게시글 조회 실패:', err)
@@ -389,13 +397,11 @@ export default {
     },
 
     goDetail(postId) {
-      // 상세로 라우팅 (라우터에 /missing/:id 이런식으로 맞춰줘)
       this.$router.push(`/missing/${postId}`)
     },
 
     onReportMissing() {
-      // 글쓰기 이동
-      this.$router.push('/missing/new')
+      this.$router.push('/missing/write')
     },
   },
 }
@@ -404,8 +410,7 @@ export default {
 <style scoped>
 /* ================= 공통 색상 토큰 ================= */
 :root {
-  --bg-page: #f5efe6;          /* 전체 배경 톤 */
-  --bg-header-bar: #efe3cc;    /* 페이지 맨 위 얇은 라인 영역이라면 여기에 사용 가능 */
+  --bg-page: #efe8dd;          /* 전체 배경 톤 */
   --panel-bg: #ffffff;
   --panel-soft-bg: #fffdf8;    /* 카드 안배경 톤온톤 */
   --line-soft: rgba(0, 0, 0, 0.08);
@@ -435,7 +440,9 @@ export default {
   min-height: 100vh;
   padding: 24px 0 80px;
   color: var(--brown-text);
-  font-family: "Pretendard", system-ui, -apple-system, BlinkMacSystemFont, "Noto Sans KR", sans-serif;
+  font-family: "Pretendard", "Noto Sans KR", system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "Noto Sans", sans-serif;
 }
 
 .missing-inner {
@@ -462,11 +469,11 @@ export default {
 
 /* ===== 상단 검색바 ===== */
 .top-search-bar {
-  background: var(--panel-bg);
+  background: #f2efef;
   border: 1px solid var(--line-soft);
   border-radius: 6px;
   padding: 12px 16px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   font-size: 13px;
 }
 .top-search-row {
@@ -475,12 +482,6 @@ export default {
   align-items: center;
   column-gap: 12px;
   row-gap: 8px;
-}
-.top-search-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--brown-text);
-  white-space: nowrap;
 }
 
 /* 검색 기준 셀렉트 */
@@ -526,40 +527,63 @@ export default {
   color: var(--input-placeholder);
 }
 
-/* ===== 필터 바 ===== */
+/* ===== 필터 영역 (리뉴얼) ===== */
 .filter-shell {
   margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--brown-text);
 }
+
 .filter-bar {
   background: var(--panel-bg);
-  border: 1px solid var(--line-soft);
-  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
   overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.03);
 }
+
 .filter-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f8f1e5;
-  border-bottom: 1px solid var(--line-soft);
+  background: #faf9f6;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   padding: 10px 16px;
   font-size: 13px;
 }
+
 .filter-toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  appearance: none;
   background: transparent;
   border: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 13px;
+  line-height: 1;
   color: var(--brown-text);
-  cursor: pointer;
   font-weight: 500;
+  cursor: pointer;
 }
+
+.filter-icon {
+  font-size: 13px;
+  line-height: 1;
+  color: var(--brown-text);
+}
+
+.filter-text {
+  color: var(--brown-text);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
 .filter-toggle .arrow {
   font-size: 11px;
-  transition: transform 0.2s ease;
   line-height: 1;
+  color: var(--meta-text);
+  transition: transform 0.2s ease;
 }
 .filter-toggle .arrow.open {
   transform: rotate(180deg);
@@ -570,7 +594,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 6px;
-  background-color: var(--accent-btn-bg);
+  background-color: rgba(255, 0, 0,0.8);
   color: var(--accent-btn-text);
   font-size: 12px;
   font-weight: 500;
@@ -584,56 +608,89 @@ export default {
   line-height: 1;
 }
 
-/* 필터 body */
 .filter-body {
-  padding: 12px 16px;
-  background: var(--panel-bg);
-  font-size: 13px;
+  background: #fff;
+  padding: 12px 16px 16px;
+  font-size: 12px;
+  color: var(--brown-text);
 }
 
+/* 필터들 한 줄 */
 .filter-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 10px;
+  align-items: flex-start;
+  row-gap: 12px;
+  column-gap: 16px;
+  margin-bottom: 16px;
 }
 
-.filter-select.short {
-  flex: 0 0 160px;
+/* 개별 묶음 */
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 110px;
+  flex: 0 0 auto;
 }
-.filter-input.long {
-  flex: 1;
-  min-width: 180px;
+.filter-group.wide {
+  min-width: 160px;
+  flex: 1 1 180px;
 }
 
-.filter-select,
-.filter-input {
-  background: var(--input-bg);
-  border: 1px solid var(--input-border);
-  border-radius: 4px;
-  padding: 8px 10px;
+/* 상단 작은 라벨 */
+.filter-label {
+  font-size: 11px;
+  color: var(--meta-text);
+  line-height: 1.4;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 칩형 컨트롤 */
+.chip-select,
+.chip-input {
+  background: #f8f8f6;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
   font-size: 12px;
+  line-height: 1.4;
   color: var(--brown-text);
+  padding: 7px 8px;
   outline: none;
+  min-width: 70px;
 }
-.filter-select::placeholder,
-.filter-input::placeholder {
+.chip-select:focus,
+.chip-input:focus {
+  border-color: rgba(0,0,0,0.4);
+  background: #fff;
+}
+.chip-input::placeholder {
   color: var(--input-placeholder);
 }
 
-/* 검색 버튼 */
+/* 검색 버튼 라인 */
 .filter-search-row {
-  text-align: right;
+  width: 100%;
 }
 .filter-search-btn {
+  width: 100%;
   background: var(--brown-text);
-  color: #fff;
-  border: 0;
-  border-radius: 4px;
-  font-size: 12px;
+  color: black;
+  border: 0.5px solid black;
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: 500;
-  padding: 7px 12px;
+  padding: 10px 12px;
   cursor: pointer;
+  line-height: 1.2;
+  text-align: center;
+  letter-spacing: -0.02em;
+  box-shadow: 0 2px 3px rgba(0,0,0,0.08);
+}
+.filter-search-btn:active {
+  transform: translateY(1px);
 }
 
 /* 필터 열고닫기 트랜지션 */
@@ -933,6 +990,22 @@ export default {
 
   .info-grid {
     grid-template-columns: 1fr;
+  }
+
+  .filter-row {
+    flex-direction: column;
+  }
+
+  .filter-group,
+  .filter-group.wide {
+    width: 100%;
+    min-width: 100%;
+    flex: 1 1 auto;
+  }
+
+  .filter-search-btn {
+    font-size: 14px;
+    padding: 12px;
   }
 }
 </style>

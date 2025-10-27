@@ -18,8 +18,7 @@ import AdoptionProcessView from '@/views/footer/AdoptionProcessView.vue'
 import VolunteerGuideView from '@/views/footer/VolunteerGuideView.vue'
 import PostWriteView from '@/views/Post/PostWriteView.vue'
 import FaqView from '@/views/footer/FaqView.vue'
-
-import ShelterheadMypageView from '@/views/volunteer/shelterhead/ShelterheadMypageView.vue'
+import ShelterheadMypageView from '@/views/ShelterheadMypageView.vue'
 import LoginPlaceholderView from '@/views/LoginPlaceholderView.vue'
 
 const router = createRouter({
@@ -35,17 +34,17 @@ const router = createRouter({
                       {
                         path: 'detail/:id', // 봉사모집 상세 라우팅
                         name: 'VolunteerDetail',
-                        component: () => import('@/views/volunteer/recruit/VolunteerDetailView.vue')
+                        component: () => import('@/views/volunteer/VolunteerDetailView.vue')
                       },
                       {
                         path: 'review/:id', // 봉사후기 상세 라우팅
                         name: 'VolunteerReviewDetail',
-                        component: () => import('@/views/volunteer/review/VolunteerReviewDetailView.vue')
+                        component: () => import('@/views/volunteer/VolunteerReviewDetailView.vue')
                       },
                       {
                         path: 'review/insert', // 봉사후기 상세 라우팅
                         name: 'VolunteerReviewInsert',
-                        component: () => import('@/views/volunteer/review/VolunteerReviewInsertView.vue')
+                        component: () => import('@/views/volunteer/VolunteerReviewInsertView.vue')
                       }
                     ]
         },
@@ -76,11 +75,7 @@ const router = createRouter({
 
         { path: '/post.write', redirect: { name: 'post.write' } },
 
-        {
-          path: '/heroes',
-          name: 'Heroes',
-          component: () => import('@/views/heros/HeroesRanking.vue')
-        },
+        { path: '/heroes', name: 'heroes', component: HeroesView },
         { path: '/about', component: AboutView },
         { path: '/terms', component: TermsView },
         { path: '/privacy', component: PrivacyView },
@@ -95,7 +90,7 @@ const router = createRouter({
                       { 
                         path: 'recruitinsert',          // 봉사모집 게시글 작성 라우팅
                         name: 'VolunteerRecruitInsert',
-                        component: () => import('@/views/volunteer/recruit/VolunteerRecruitInsertView.vue')
+                        component: () => import('@/views/volunteer/VolunteerRecruitInsertView.vue')
                       }
                     ]
         },
