@@ -1,6 +1,6 @@
 <template>
     <div>
-test
+로그인 준비중
     </div>
 </template>
 
@@ -8,6 +8,6 @@ test
 
 </script>
 
-<style  scoped>
+<style scoped>
 
 </style>
