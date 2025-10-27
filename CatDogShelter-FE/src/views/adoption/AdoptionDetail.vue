@@ -7,7 +7,7 @@
         ← 목록으로
       </button>
 
-      <!-- 🔥 상단 정보 -->
+      <!-- 상단 정보 -->
       <div class="top-info">
         <div class="header-row">
           <div class="tag-area">
@@ -23,7 +23,7 @@
           <div class="author-info">
             <span class="icon">👤</span>
             <span class="name">{{ post.writerName }}</span>
-            <span class="badge">{{ post.userRating || "당일 보호센터" }}</span>
+            <span class="badge">{{ post.userRating || "보호소장" }}</span>
             <span class="date">{{ formatDate(post.createdAt) }}</span>
           </div>
 
@@ -35,19 +35,31 @@
         </div>
       </div>
 
-      <!-- 🖼 이미지 -->
-      <div class="image-section">
-       <!-- <div class="image-box"> -->
-    <img
-  v-for="file in post.files"
-  :key="file.id"
-  :src="`http://localhost:8000${file.fileUrl}`"
-  alt="adoption image"
-  class="post-image"
-/>
-        <!-- </div> -->
+      <!-- 이미지 -->
+<div class="image-section" v-if="post.files && post.files.length">
+  <swiper
+    :navigation="true"
+    :pagination="{ clickable: true }"
+    class="detail-swiper"
+  >
+    <swiper-slide
+      v-for="file in post.files"
+      :key="file.id"
+    >
+      <img
+        :src="`http://localhost:8000/post-service/adoption-post/image/${file.fileRename}`"
+        alt="post image"
+        class="post-image"
+      />
+    </swiper-slide>
+  </swiper>
 
-      </div>
+  <!-- ▶ 페이지 번호 표시 -->
+  <div class="page-indicator">
+    {{ activeIndex + 1 }} / {{ post.files.length }}
+  </div>
+</div>
+
 
       <!-- 🐾 동물 정보 -->
       <section class="animal-info">
@@ -119,16 +131,16 @@
         </div>
       </section>
 
-      <!-- 📝 본문 -->
+      <!-- 본문 -->
       <div class="content-text">{{ post.content }}</div>
 
-      <!-- 👍 버튼 -->
+      <!-- 버튼 -->
       <div class="action-bar">
         <button class="action-btn like">♡ 좋아요 {{ post.recommendCount }}</button>
         <button class="action-btn share">🔗 공유하기</button>
       </div>
 
-      <!-- 💬 댓글 -->
+      <!-- 댓글 -->
       <section class="comment-area">
         <h3 class="comment-header">댓글 <span class="comment-count">{{ comments.length }}</span></h3>
 
@@ -159,7 +171,16 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { Swiper, SwiperSlide } from "swiper/vue";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
+const activeIndex = ref(0);
+
+function onSlideChange(swiper) {
+  activeIndex.value = swiper.activeIndex;
+}
 const route = useRoute();
 const post = ref({});
 const comments = ref([]);
@@ -206,7 +227,7 @@ function formatDate(dateString) {
 .detail-box {
   background: #fff;
   width: 100%;
-  max-width: 700px;
+  max-width: 800px;
   padding: 40px 50px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
@@ -317,13 +338,79 @@ function formatDate(dateString) {
   color: #999;
 }
 
-/* 이미지 */
+/* 이미지 영역 전체 */
 .image-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
   position: relative;
   margin: 25px 0;
-  border-radius: 8px;
+}
+
+/* 슬라이더 중앙 정렬 */
+.detail-swiper {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  justify-content: center;
   overflow: hidden;
 }
+
+/* 각 슬라이드도 중앙 정렬 */
+.swiper-slide {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+}
+
+/* PC에서도 항상 중앙 + 비율 유지 */
+.post-image {
+  width: auto;
+  max-width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+/* ✅ 아래 쪽 페이지 표시 */
+.page-indicator {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 18px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* 화살표 버튼 */
+.swiper-button-prev,
+.swiper-button-next {
+  width: 42px;
+  height: 42px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 50%;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+  background: #fff;
+}
+
+
+/* 모바일 화면 조정 */
+@media (max-width: 768px) {
+  .post-image {
+    max-height: 350px;
+  }
+}
+
 
 .pet-image {
   width: 100%;
@@ -661,6 +748,64 @@ function formatDate(dateString) {
   border-radius: 8px;
   display: block;
   margin-bottom: 12px;
+}
+.detail-swiper {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.post-image {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  display: block;
+}
+
+/* 화살표 버튼 스타일 */
+.swiper-button-prev,
+.swiper-button-next {
+  width: 42px;
+  height: 42px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 50%;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+  background: #fff;
+}
+
+/* 아래 인디케이터 */
+.page-indicator {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.detail-swiper {
+  display: flex;
+  justify-content: center;
+}
+
+.swiper-slide {
+  display: flex;
+  justify-content: center;
+}
+
+.post-image {
+  width: auto;
+  max-width: 100%;
+  max-height: 500px;
+  object-fit: contain;
 }
 
 }

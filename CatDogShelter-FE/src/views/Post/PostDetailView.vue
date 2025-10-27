@@ -33,6 +33,7 @@
         좋아요 {{ post.stats.likes }}
       </button>
       <button class="chip" @click="share">공유하기</button>
+      <button class="chip danger" @click="reportPost">신고하기</button>
     </div>
 
     <nav class="post-nav">
@@ -66,6 +67,7 @@
             <!-- 우하단 삭제 버튼 -->
             <div class="c-row-actions">
               <button class="c-del" type="button" @click="removeComment(c.id)">삭제</button>
+              <button class="c-report" type="button"@click="openReport({ targetType: 'comment', targetId: c.id })">신고</button>
             </div>
           </div>
         </li>
@@ -93,6 +95,7 @@
 import { reactive, ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getDummyDetail } from './detail/dummies.js'
+import { openReport } from '@/components/report'
 
 const route = useRoute()
 const router = useRouter()
@@ -103,6 +106,8 @@ const state = reactive({ post: null, isLiked: false })
 const newComment = ref('')
 const nickname = ref('')
 const storageKey = computed(() => `post:detail:${id.value}`)
+const post   = computed(() => state.post)
+const isLiked = computed(() => state.isLiked)
 
 function load(){
   // 1) 사용자 저장 상세 우선
@@ -188,11 +193,15 @@ function confirmDelete() {
   router.push({ name: 'post' })
 }
 
+function reportPost(){
+  if(!post.value?.id) return
+  openReport({targetType: 'post', targetId: post.value.id})
+}
+
 onMounted(load)
 watch(id, load)
 
-const post   = computed(() => state.post)
-const isLiked = computed(() => state.isLiked)
+
 </script>
 
 <style scoped>
@@ -221,6 +230,8 @@ const isLiked = computed(() => state.isLiked)
 }
 .chip.on{background:#b87445;color:#fff;border-color:#b87445}
 
+
+
 .post-nav{display:flex;justify-content:space-between;margin-top:18px}
 
 /* 댓글 */
@@ -234,8 +245,20 @@ const isLiked = computed(() => state.isLiked)
 .c-head{display:flex;gap:8px;align-items:center;color:#6b7280;font-size:12px;margin-bottom:4px}
 .c-author{color:#3c3425;font-weight:700}
 .c-text{margin:0}
-.c-row-actions{display:flex;justify-content:flex-end;margin-top:6px}
+ .chip.danger{
+   border-color:#f2b8b8;
+   background:#fff5f5;
+   color:#a83b3b;
+}
+ .chip.danger:hover{ background:#ffeaea }
+.c-row-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+
 .c-del{padding:6px 10px;border-radius:999px;border:1px solid #eadfcd;background:#fff;color:#6b5b4a;cursor:pointer}
+ .c-report{
+   padding:6px 10px;border-radius:999px;border:1px solid #f2b8b8;
+   background:#fff5f5;color:#a83b3b;cursor:pointer
+ }
+ .c-report:hover{ background:#ffeaea }
 .c-del:hover{background:#f9f3ea}
 
 .c-form{margin-top:12px;display:grid;gap:8px}
