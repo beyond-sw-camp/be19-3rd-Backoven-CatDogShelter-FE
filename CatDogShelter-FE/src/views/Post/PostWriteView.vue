@@ -3,7 +3,7 @@
     <RouterLink class="back" :to="{ name:'post' }">← 목록으로</RouterLink>
     <h1 class="title">자유게시글 작성</h1>
 
-    <form class="form" @submit.prevent="submit">
+    <form ref="formEl" class="form" @submit.prevent="submit">
       <!-- 제목 -->
       <label class="field">
         <span class="label">제목 <b class="req">*</b></span>
@@ -83,7 +83,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-
+const formEl = ref(null)
 const fileEl = ref(null)
 const images = ref([]) // dataURL 배열
 const form = ref({
@@ -152,47 +152,41 @@ function today() {
 
 function cancel(){ router.push({ name:'post' }) }
 
-// PostWriteView.vue <script setup> 안에서 기존 submit()만 교체
 function submit () {
-  // 간단 검증
-  if (!form.value.title.trim() || !form.value.body.trim()) {
-    alert('제목과 내용을 입력해 주세요.')
-    return
-  }
-  if (!form.value.category) {
-    alert('카테고리를 선택해 주세요.')
-    return
-  }
-
   // 기존 사용자 글 목록
   const listKey = 'post:items'
   const userList = JSON.parse(localStorage.getItem(listKey) || '[]')
 
   // 새 ID: (사용자 글 최대 id vs 더미 최댓값 33) 중 큰 값 + 1
+  const seqKey = 'post:seq'
+  const deletedIds = (JSON.parse(localStorage.getItem('post:deleted') || '[]') || [])
+                      .map(n => Number(n) || 0)
   const maxUserId = userList.reduce((m, p) => Math.max(m, Number(p.id) || 0), 0)
-  const id = Math.max(maxUserId, 33) + 1
+  const lastSeq   = Number(localStorage.getItem(seqKey) || '33')
+  const base      = Math.max(33, maxUserId, lastSeq, ...deletedIds)
+  const id        = base + 1
+  localStorage.setItem(seqKey, String(id))
 
-  // 날짜/시간
   const now = Date.now()
   const d = new Date(now)
   const pad = n => String(n).padStart(2, '0')
   const date = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`
 
-  // 목록용 아이템(목록 정렬을 위해 createdAt 포함)
+  // 목록용 아이템
   const listItem = {
     id,
     title: form.value.title.trim(),
-    author: form.value.author.trim() || '익명',
-    category: form.value.category,               // '강아지' | '고양이'
-    createdAt: now,                              // 최신 글이 위로 오도록
-    date,                                        // 표시용
+    author: form.value.author.trim(),
+    category: form.value.category || inferCategory(form.value.title),
+    createdAt: now,
+    date,
     views: 0,
     likes: 0,
     comments: 0,
-    thumb: images.value[0] || ''                 // 첫 번째 업로드 이미지를 썸네일로
+    thumb: images.value[0] || ''
   }
 
-  // 상세 페이지용 데이터
+  // 상세용 데이터
   const detail = {
     id,
     board: 'free',
@@ -202,7 +196,7 @@ function submit () {
     date,
     stats: { views: 0, likes: 0, comments: 0 },
     images: images.value.map((src, i) => ({ src, alt: `${listItem.title} ${i+1}` })),
-    content: form.value.body.split('\n').filter(Boolean), // 줄바꿈 단락화
+    content: form.value.body.split('\n').filter(Boolean),
     prev: null,
     next: null,
     comments: [],
@@ -214,10 +208,9 @@ function submit () {
   localStorage.setItem(listKey, JSON.stringify([listItem, ...userList]))
   localStorage.setItem(`post:detail:${id}`, JSON.stringify(detail))
 
-  // 완료 → 목록 이동
+  // 완료 → 목록
   router.push({ name: 'post', query: { page: 1 } })
 }
-
 </script>
 
 <style scoped>
