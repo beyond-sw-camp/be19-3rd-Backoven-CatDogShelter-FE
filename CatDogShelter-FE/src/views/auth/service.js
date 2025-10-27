@@ -1,20 +1,31 @@
-// src/views/auth/service.js
-const BASE_URL = '/api';
+import axios from 'axios'
 
-async function request(path, { method='GET', body, headers={}, auth=true } = {}) {
-  const token = localStorage.getItem('token')
-  const h = { 'Content-Type': 'application/json', ...headers }
-  if (auth && token) h.Authorization = `Bearer ${token}`
+const api = axios.create({
+  baseURL: 'http://localhost:8000',
+  withCredentials: true,
+})
 
-  const res = await fetch(BASE_URL + path, { method, headers: h, body: body ? JSON.stringify(body) : undefined })
-  const text = await res.text()
-  let data; try { data = text ? JSON.parse(text) : null } catch { data = null }
+// 쿠키만 사용 → 인터셉터에서 아무 것도 안 붙임
+api.interceptors.request.use((config) => config)
 
-  if (!res.ok) throw new Error((data && (data.message || data.error)) || res.statusText || `HTTP ${res.status}`)
-  return data
+export async function signupAPI(data) {
+  const res = await api.post('/user-service/user/regist', data)
+  return res.data
 }
 
-export const loginAPI  = (payload) => request('/auth/login',  { method:'POST', body: payload, auth:false })
-export const signupAPI = (payload) => request('/auth/signup', { method:'POST', body: payload, auth:false })
-export const meAPI     = ()        => request('/auth/me')
-export { request }
+export async function loginAPI({ email, password }) {
+  const body = {
+    userAccount: email,      // 백엔드 DTO 필드에 맞춤
+    userPassword: password,
+  };
+  return api.post('/user-service/user/login', body, {
+    withCredentials: true,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+export async function meAPI() {
+  return api.get('/user-service/user/me')
+}
+
+export default api
