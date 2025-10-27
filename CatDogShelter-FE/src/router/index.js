@@ -206,17 +206,50 @@ const router = createRouter({
 
     // 보호소장 마이페이지
     {
-      path: '/shelter-head/mypage',
+      path: '/shelter-head/mypage',                 // 보호소장 마이페이지 라우팅
       component: ShelterheadMypageView,
       children: [
         {
           // 봉사모집 글 작성
-          path: 'recruitinsert',
+          path: 'recruitinsert',          // 봉사모집 게시글 작성 라우팅
           name: 'VolunteerRecruitInsert',
           component: () =>
             import('@/views/volunteer/recruit/VolunteerRecruitInsertView.vue'),
         },
       ],
+    },
+
+    // ===== 여기부터는 네가 원래 아래에 쭉 적어놨던 중복 라우트들 =====
+    // 자유게시판
+    { path: '/post', name: 'post', component: PostView },
+    { path: '/post/write', name: 'post.write', component: PostWriteView },
+    { path: '/post/:id', name: 'post.detail', component: PostDetailView, props: true },
+
+    { path: '/post.write', redirect: { name: 'post.write' } },
+
+    {
+      path: '/heroes',
+      name: 'Heroes',
+      component: () => import('@/views/heros/Heroesranking.vue')
+    },
+    { path: '/about', component: AboutView },
+    { path: '/terms', component: TermsView },
+    { path: '/privacy', component: PrivacyView },
+    { path: '/community-guide', component: CommunityGuideView },
+    { path: '/adoption-process', component: AdoptionProcessView },
+    { path: '/volunteer-guide', component: VolunteerGuideView },
+    { path: '/faq', component: FaqView },
+
+    {
+      path: '/shelter-head/mypage',                 // 보호소장 마이페이지 라우팅 (중복 선언 존중)
+      component: ShelterheadMypageView,
+      children: [
+        {
+          path: 'recruitinsert',          // 봉사모집 게시글 작성 라우팅
+          name: 'VolunteerRecruitInsert',
+          component: () => import('@/views/volunteer/recruit/VolunteerRecruitInsertView.vue')
+        }
+      ]
     },
 
     // 로그인 테스트 화면
