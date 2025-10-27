@@ -1180,5 +1180,41 @@
       "status": "승인대기",
       "appliedAt": "2025-10-26"
     }
-  ]
+  ],
+  "shelterHead": {
+    "mypage": {
+      "shelterInfo": {
+        "name": "부천시 고양이 보호소",
+        "email": "dain0404@gmail.com",
+        "phone": "010-2244-4422",
+        "location": "경기도 부천시",
+        "joinDate": "2025-01-19"
+      },
+      "stats": {
+        "recruitments": 8,
+        "likes": 56
+      },
+      "applicants": [
+        { "id": 1, "name": "홍길동", "status": "승인대기", "statusClass": "pending" },
+        { "id": 2, "name": "김철수", "status": "승인대기", "statusClass": "pending" },
+        { "id": 3, "name": "박다혜", "status": "승인대기", "statusClass": "pending" }
+      ],
+      "volunteerRecords": [
+        { "id": 1, "name": "홍길동", "date": "2025-10-10", "status": "승인완료", "statusClass": "approved" },
+        { "id": 2, "name": "김철수", "date": "2025-10-05", "status": "승인완료", "statusClass": "approved" },
+        { "id": 3, "name": "박다혜", "date": "2025-10-28", "status": "승인완료", "statusClass": "approved" }
+      ],
+      "myRecruitments": [
+        { "id": 1, "title": "서울 보호소 가을 대청소", "date": "2025-10-10", "location": "서울 종로구" },
+        { "id": 2, "title": "강아지 산책 봉사", "date": "2025-10-05", "location": "서울 강남구" },
+        { "id": 3, "title": "보호소 급식 지원", "date": "2025-09-28", "location": "서울 중구" },
+        { "id": 4, "title": "입양 상담 도우미", "date": "2025-09-20", "location": "부천 원미구" }
+      ],
+      "myPosts": [
+        { "id": 1, "title": "서울 보호소 가을 대청소", "date": "2025-10-10", "likes": 45, "comments": 18, "views": 928 },
+        { "id": 2, "title": "강아지 산책 봉사", "date": "2025-10-05", "likes": 15, "comments": 12, "views": 306 },
+        { "id": 3, "title": "보호소 급식 지원", "date": "2025-09-28", "likes": 5, "comments": 8, "views": 100 }
+      ]
+    }
+  }
 }
