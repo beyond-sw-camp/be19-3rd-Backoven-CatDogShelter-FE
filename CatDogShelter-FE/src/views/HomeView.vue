@@ -386,12 +386,12 @@ onMounted(async () => {
 }
 
 .hero-inner {
-  max-width: 1280px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 80px 24px 140px;
+  padding: 80px 40px 140px;
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
+  flex-wrap: nowrap;
+  align-items: center;
   justify-content: space-between;
   position: relative;
   z-index: 1;
@@ -412,6 +412,7 @@ onMounted(async () => {
 
 .hero-title {
   font-size: clamp(2.4rem, 1.2rem + 2vw, 4rem);
+  color : #7a4417 !important;
   line-height: 1.25;
   font-weight: 600;
   letter-spacing: -0.03em;
@@ -449,6 +450,7 @@ onMounted(async () => {
 /* 오른쪽 아트 */
 .hero-art {
   position: relative;
+  padding: 0 30px 0 0 ;
   flex: 0 1 480px;
   min-width: 360px;
   max-width: 520px;
