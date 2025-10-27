@@ -1,30 +1,42 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
 
+// ===== 메인 / 게시판들 =====
 import HomeView from '@/views/HomeView.vue'
-import VolunteerView from '@/views/VolunteerView.vue'
+import VolunteerView from '@/views/volunteer/VolunteerView.vue'
 import DonationView from '@/views/DonationView.vue'
-import AdoptionView from '@/views/AdoptionView.vue'
+import DonationDetailView from '@/views/donation/DonationDetailView.vue'
+import MissingDetailView from '@/views/missing/MissingDetailView.vue'
+import AdoptionView from '@/views/adoption/AdoptionView.vue'
 import MissingView from '@/views/MissingView.vue'
 import SightingView from '@/views/SightingView.vue'
 import PostView from '@/views/Post/PostView.vue'
 import PostDetailView from '@/views/Post/PostDetailView.vue'
 import HeroesView from '@/views/HeroesView.vue'
+
+// ===== Footer 영역 페이지 =====
 import AboutView from '@/views/footer/AboutView.vue'
 import TermsView from '@/views/footer/TermsView.vue'
 import PrivacyView from '@/views/footer/PrivacyView.vue'
 import CommunityGuideView from '@/views/footer/CommunityGuideView.vue'
 import AdoptionProcessView from '@/views/footer/AdoptionProcessView.vue'
 import VolunteerGuideView from '@/views/footer/VolunteerGuideView.vue'
-import PostWriteView from '@/views/Post/PostWriteView.vue'
 import FaqView from '@/views/footer/FaqView.vue'
 import LoginView from '@/views/auth/login/index.vue'
 import SignupUserView from '@/views/auth/signup/user/index.vue'
 import SignupShelterView from '@/views/auth/signup/shelter/index.vue'
 
 
+// ===== 기타 뷰 =====
+import ShelterheadMypageView from '@/views/volunteer/shelterhead/ShelterheadMypageView.vue'
+import LoginPlaceholderView from '@/views/LoginPlaceholderView.vue'
+
+// ===== 실종 글 작성 =====
+import MissingPostWirte from '@/views/missing/MissingPostWirte.vue'
+
 const router = createRouter({
   history: createWebHistory(),
+
   routes: [
     { path: '/', name: 'home', component: HomeView },
 
@@ -35,6 +47,101 @@ const router = createRouter({
     { path: '/missing', name: 'missing', component: MissingView },
     { path: '/sighting', name: 'sighting', component: SightingView },
 
+    // 실종 신고 작성
+    {
+      path: '/missing/write',
+      name: 'missing.write',
+      component: MissingPostWirte,
+    },
+
+    // 목격 게시판
+    {
+      path: '/sighting',
+      name: 'sighting',
+      component: SightingView,
+    },
+
+    // 자유게시판 목록
+    {
+      path: '/post',
+      name: 'post',
+      component: PostView,
+    },
+
+    // 자유게시판 글쓰기
+    {
+      path: '/post/write',
+      name: 'post.write',
+      component: PostWriteView,
+    },
+
+    // 자유게시판 상세
+    {
+      path: '/post/:id',
+      name: 'post.detail',
+      component: PostDetailView,
+      props: true,
+    },
+
+    // 혹시 /post.write 로 들어온 애들 redirect
+    {
+      path: '/post.write',
+      redirect: { name: 'post.write' },
+    },
+
+    // 히어로즈
+    {
+      path: '/heroes',
+      name: 'heroes',
+      component: HeroesView,
+    },
+
+    // footer / 정책 / 안내
+    {
+      path: '/about',
+      component: AboutView,
+    },
+    {
+      path: '/terms',
+      component: TermsView,
+    },
+    {
+      path: '/privacy',
+      component: PrivacyView,
+    },
+    {
+      path: '/community-guide',
+      component: CommunityGuideView,
+    },
+    {
+      path: '/adoption-process',
+      component: AdoptionProcessView,
+    },
+    {
+      path: '/volunteer-guide',
+      component: VolunteerGuideView,
+    },
+    {
+      path: '/faq',
+      component: FaqView,
+    },
+
+    // 보호소장 마이페이지
+    {
+      path: '/shelter-head/mypage',                 // 보호소장 마이페이지 라우팅
+      component: ShelterheadMypageView,
+      children: [
+        {
+          // 봉사모집 글 작성
+          path: 'recruitinsert',          // 봉사모집 게시글 작성 라우팅
+          name: 'VolunteerRecruitInsert',
+          component: () =>
+            import('@/views/volunteer/recruit/VolunteerRecruitInsertView.vue'),
+        },
+      ],
+    },
+
+    // ===== 여기부터는 네가 원래 아래에 쭉 적어놨던 중복 라우트들 =====
     // 자유게시판
     { path: '/post', name: 'post', component: PostView },
     { path: '/post/write', name: 'post.write', component: PostWriteView },
@@ -55,7 +162,26 @@ const router = createRouter({
     { path: '/community-guide', component: CommunityGuideView },
     { path: '/adoption-process', component: AdoptionProcessView },
     { path: '/volunteer-guide', component: VolunteerGuideView },
-    { path: '/faq', component: FaqView }
+    { path: '/faq', component: FaqView },
+
+    {
+      path: '/shelter-head/mypage',                 // 보호소장 마이페이지 라우팅 (중복 선언 존중)
+      component: ShelterheadMypageView,
+      children: [
+        {
+          path: 'recruitinsert',          // 봉사모집 게시글 작성 라우팅
+          name: 'VolunteerRecruitInsert',
+          component: () => import('@/views/volunteer/recruit/VolunteerRecruitInsertView.vue')
+        }
+      ]
+    },
+
+    // 로그인 테스트 화면
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginPlaceholderView,
+    },
   ],
   scrollBehavior: () => ({ top: 0 })
 })

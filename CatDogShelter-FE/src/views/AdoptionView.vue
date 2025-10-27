@@ -1,5 +1,13 @@
 <template>
-  <div>
-    <h1></h1>
-  </div>
+    <div>
+test
+    </div>
 </template>
+
+<script setup>
+
+</script>
+
+<style  scoped>
+
+</style>
