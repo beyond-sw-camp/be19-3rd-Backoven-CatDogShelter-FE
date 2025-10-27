@@ -12,7 +12,6 @@ import MissingView from '@/views/MissingView.vue'
 import SightingView from '@/views/SightingView.vue'
 import PostView from '@/views/Post/PostView.vue'
 import PostDetailView from '@/views/Post/PostDetailView.vue'
-import PostWriteView from '@/views/Post/PostWriteView.vue'
 import HeroesView from '@/views/HeroesView.vue'
 
 // ===== Footer 영역 페이지 =====
@@ -23,6 +22,10 @@ import CommunityGuideView from '@/views/footer/CommunityGuideView.vue'
 import AdoptionProcessView from '@/views/footer/AdoptionProcessView.vue'
 import VolunteerGuideView from '@/views/footer/VolunteerGuideView.vue'
 import FaqView from '@/views/footer/FaqView.vue'
+import LoginView from '@/views/auth/login/index.vue'
+import SignupUserView from '@/views/auth/signup/user/index.vue'
+import SignupShelterView from '@/views/auth/signup/shelter/index.vue'
+
 
 // ===== 기타 뷰 =====
 import ShelterheadMypageView from '@/views/volunteer/shelterhead/ShelterheadMypageView.vue'
@@ -35,95 +38,14 @@ const router = createRouter({
   history: createWebHistory(),
 
   routes: [
-    // 홈
-    {
-      path: '/',
-      name: 'home',
-      component: HomeView,
-    },
+    { path: '/', name: 'home', component: HomeView },
 
-    // 봉사게시판 (목록 페이지)
-    {
-      path: '/volunteer',
-      component: VolunteerView,
-      children: [
-        {
-          // 봉사모집 상세
-          path: 'detail/:id',
-          name: 'VolunteerDetail',
-          component: () =>
-            import('@/views/volunteer/recruit/VolunteerDetailView.vue'),
-          props: true,
-        },
-        {
-          // 봉사후기 상세
-          path: 'review/:id',
-          name: 'VolunteerReviewDetail',
-          component: () =>
-            import('@/views/volunteer/review/VolunteerReviewDetailView.vue'),
-          props: true,
-        },
-        {
-          // 봉사후기 작성
-          path: 'review/insert',
-          name: 'VolunteerReviewInsert',
-          component: () =>
-            import('@/views/volunteer/review/VolunteerReviewInsertView.vue'),
-        },
-      ],
-    },
-
-    // 후원게시판 목록
-    {
-      path: '/donation',
-      name: 'donation',
-      component: DonationView,
-    },
-
-    // 후원게시판 상세
-    {
-      path: '/donation/:id',
-      name: 'donation-detail',
-      component: DonationDetailView,
-      props: true,
-    },
-
-    // 입양 게시판 목록
-    {
-      path: '/adoption',
-      name: 'adoption',
-      component: AdoptionView,
-    },
-
-    // 입양 상세
-    {
-      path: '/adoption-post/:id',
-      name: 'adoptionDetail',
-      component: () =>
-        import('@/views/adoption/AdoptionDetail.vue'),
-      props: true,
-    },
-
-    // 입양 글쓰기
-    {
-      path: '/adoption/write',
-      name: 'AdoptionWrite',
-      component: () =>
-        import('@/views/adoption/AdoptionWrite.vue'),
-    },
-
-    // 실종 게시판 목록
-    {
-      path: '/missing',
-      name: 'missing',
-      component: MissingView,
-    },
-    {
-      path: '/missing/:postId',
-      name: 'missing-detail',
-      component: MissingDetailView,
-      props: true, // 이거 켜두면 route param(postId)을 props로도 받을 수 있음
-    },
+    // 일반 탭들
+    { path: '/volunteer', name: 'volunteer', component: VolunteerView },
+    { path: '/donation', name: 'donation', component: DonationView },
+    { path: '/adoption', name: 'adoption', component: AdoptionView },
+    { path: '/missing', name: 'missing', component: MissingView },
+    { path: '/sighting', name: 'sighting', component: SightingView },
 
     // 실종 신고 작성
     {
@@ -224,14 +146,16 @@ const router = createRouter({
     { path: '/post', name: 'post', component: PostView },
     { path: '/post/write', name: 'post.write', component: PostWriteView },
     { path: '/post/:id', name: 'post.detail', component: PostDetailView, props: true },
-
     { path: '/post.write', redirect: { name: 'post.write' } },
 
-    {
-      path: '/heroes',
-      name: 'Heroes',
-      component: () => import('@/views/heros/Heroesranking.vue')
-    },
+    // ✅ 로그인 라우트
+        { path: '/login', name: 'login', component: LoginView },
+    { path: '/signup', name: 'signup.user', component: SignupUserView },
+    { path: '/signup/shelter',  name: 'signup.shelter', component: SignupShelterView },
+    { path: '/_signup', name: 'signup', redirect: { name: 'signup.user' } },
+    
+    // 푸터 탭들
+    { path: '/heroes', name: 'heroes', component: HeroesView },
     { path: '/about', component: AboutView },
     { path: '/terms', component: TermsView },
     { path: '/privacy', component: PrivacyView },
@@ -259,9 +183,7 @@ const router = createRouter({
       component: LoginPlaceholderView,
     },
   ],
-
-  // 라우트 이동 시 항상 화면 최상단
-  scrollBehavior: () => ({ top: 0 }),
+  scrollBehavior: () => ({ top: 0 })
 })
 
 export default router
