@@ -2,6 +2,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import VolunteerView from '@/views/volunteer/VolunteerView.vue'
+import DonationDetailView from '@/views/donation/DonationDetailView.vue'
 import DonationView from '@/views/DonationView.vue'
 import AdoptionView from '@/views/adoption/AdoptionView.vue'
 import MissingView from '@/views/MissingView.vue'
@@ -68,6 +69,13 @@ const router = createRouter({
       path: '/donation',
       name: 'donation',
       component: DonationView,
+    },
+
+    {
+      path: '/donation/:id',
+      name: 'donation-detail',
+      component: DonationDetailView,
+      props: true
     },
 
     // 입양 게시판 목록
