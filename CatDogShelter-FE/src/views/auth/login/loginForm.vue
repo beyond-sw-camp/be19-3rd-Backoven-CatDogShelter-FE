@@ -104,6 +104,7 @@ const emit = defineEmits(['success'])
       {{ signupHint }}
     </p>
     <div class="links">
+<<<<<<< HEAD
   <!-- 회원가입 -->
       <router-link :to="signupRoute" class="link main">{{ signupLabel }}</router-link>
 
@@ -124,6 +125,13 @@ const emit = defineEmits(['success'])
           class="link"
         >비밀번호 찾기</router-link>
       </p>
+=======
+      <router-link :to="signupRoute" class="link main">{{ signupLabel }}</router-link>
+      <span class="dot">·</span>
+      <router-link v-if="$router.hasRoute && $router.hasRoute('find.id')" :to="{ name:'find.id' }" class="link">아이디 찾기</router-link>
+      <span v-if="$router.hasRoute && $router.hasRoute('find.id')" class="dot">·</span>
+      <router-link v-if="$router.hasRoute && $router.hasRoute('find.password')" :to="{ name:'find.password' }" class="link">비밀번호 찾기</router-link>
+>>>>>>> devlop
     </div>
   </section>
 </template>
@@ -182,4 +190,5 @@ input:focus { border-color: #d1b57a; background: #fff; }
 .link.main { color: #c6932d; font-weight: 700; }
 .link:hover { text-decoration: underline; }
 .dot { margin: 0 6px; color:#bdbdbd; }
+</style>
 </style>
