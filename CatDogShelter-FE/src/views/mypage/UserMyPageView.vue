@@ -13,13 +13,11 @@
     <div v-else class="mypage-container">
       <section class="left-section" v-if="user">
         <article class="profile-card">
-          <div class="profile-ascii" v-if="user.profileAscii">{{ user.profileAscii }}</div>
-
           <div class="profile-headline">
             <div class="profile-image">{{ user.profileEmoji || '🐾' }}</div>
             <div class="profile-text">
               <h2 class="user-name">{{ user.userName }}</h2>
-              <span v-if="user.badgeLabel" class="profile-badge">{{ user.badgeLabel }}</span>
+              <span class="profile-badge">댕냥발자국</span>
             </div>
           </div>
 
@@ -146,7 +144,6 @@ const currentPage = ref(1)
 const applyData = data => {
   if (!data) return
   user.value = {
-    profileAscii: '',
     profileEmoji: '',
     badgeLabel: '',
     userName: '',
@@ -316,38 +313,35 @@ function logout() {
   gap: 24px;
 }
 
-.profile-ascii {
-  text-align: center;
-  color: #c19a6b;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  white-space: pre-line;
-}
-
 .profile-headline {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 16px;
 }
 
 .profile-image {
   width: 88px;
   height: 88px;
-  border-radius: 24px;
-  background: #f5eee0;
-  border: 1px solid #eadccd;
+  border-radius: 50%;
   font-size: 2rem;
+  background: transparent;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #6b5744;
+  align-self: center;
+  white-space: nowrap;
+  line-height: 1;
 }
 
 .profile-text {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   align-items: flex-start;
+  text-align: left;
 }
 
 .profile-badge {
