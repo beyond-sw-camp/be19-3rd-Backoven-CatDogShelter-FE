@@ -1184,30 +1184,30 @@
   "adoptionPosts": [
     {
       "_comment": "여기서부터 메인홈화면뿌려주기 json",
-      "id": 1,
-      "name": "코숏",
+      "id": 20,
+      "name": "리트리버",
       "breed": "믹스",
-      "age": 2,
+      "age": 0,
       "neutered": true,
-      "imgUrl": "/uploads/cat1.jpg",
+      "thumbnailUrl": "/uploads/adoption1.png",
       "createdAt": "2025-09-12T10:30:00"
     },
     {
-      "id": 2,
+      "id": 19,
       "name": "말티즈",
       "breed": "말티즈",
-      "age": 1,
+      "age": 2,
       "neutered": false,
-      "imgUrl": "/uploads/dog1.jpg",
+      "thumbnailUrl": "/uploads/adoption2.png",
       "createdAt": "2025-09-12T09:10:00"
     },
     {
-      "id": 3,
+      "id": 18,
       "name": "믹스견",
       "breed": "믹스",
-      "age": 3,
+      "age": 5,
       "neutered": true,
-      "imgUrl": "/uploads/dog2.jpg",
+      "thumbnailUrl": "/uploads/adoption3.png",
       "createdAt": "2025-09-11T20:00:00"
     }
   ],
