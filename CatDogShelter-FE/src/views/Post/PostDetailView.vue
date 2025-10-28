@@ -83,10 +83,10 @@
 
       <ul v-if="post.comments?.length" class="c-list">
         <li v-for="c in post.comments" :key="c.id" class="c-item">
-          <div class="avatar" aria-hidden="true">{{ c.author?.[0] ?? '익' }}</div>
+          <div class="avatar" aria-hidden="true">{{ c.author?.[0] || 'E' }}</div>
           <div class="c-box">
             <div class="c-head">
-              <strong class="c-author">{{ c.author }}</strong>
+              <strong class="c-author">{{ c.author || '이지윤' }}</strong>
               <span class="c-time">{{ c.createdAt }}</span>
             </div>
             <p class="c-text">{{ c.text }}</p>
@@ -194,7 +194,7 @@ function addComment() {
   const counterKey = 'post:anonCounter'
   const next = Number(localStorage.getItem(counterKey) || '0') + 1
   localStorage.setItem(counterKey, String(next))
-  const name = `익명${next}`
+  const DEFAULT_NICKNAME = '이지윤'
 
   const d = new Date()
   const ts = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
@@ -302,7 +302,8 @@ watch(id, load)
 .avatar{width:28px;height:28px;border-radius:50%;background:#f0e7d8;border:1px solid #eadfcd;display:grid;place-items:center;font-size:12px;color:#6b5b4a}
 .c-box{flex:1;background:#fff;border:1px solid #eee;border-radius:10px;padding:10px}
 .c-head{display:flex;gap:8px;align-items:center;color:#6b7280;font-size:12px;margin-bottom:4px}
-.c-author{color:#3c3425;font-weight:700}
+.c-author { font-weight:700; color:#3c3425; }
+.c-time { color:#6b7280; font-size:12px; }
 .c-text{margin:0}
 
 /* 댓글 신고(본문 아래) */

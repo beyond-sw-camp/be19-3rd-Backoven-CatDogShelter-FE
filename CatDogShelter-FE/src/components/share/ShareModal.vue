@@ -34,6 +34,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 const props = defineProps({
   modelValue: {
@@ -41,17 +42,25 @@ const props = defineProps({
     required: true
   },
   reviewId: {
-    type: Number,
-    required: true
+    type: [Number, String],
+    default: null
   }
 })
 
 const emit = defineEmits(['update:modelValue'])
 
 const shareUrlInput = ref(null)
+const route = useRoute()
+const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5173'
 
 const shareUrl = computed(() => {
-  return `https://catdogshelter.com/volunteer/review/${props.reviewId}`
+  if (route?.fullPath) {
+    return `${origin}${route.fullPath}`
+  }
+  if (props.reviewId != null) {
+    return `${origin}/volunteer/review/${props.reviewId}`
+  }
+  return origin
 })
 
 const closeModal = () => {
