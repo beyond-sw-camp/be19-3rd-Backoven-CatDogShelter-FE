@@ -23,7 +23,7 @@
       <div class="nav-right">
         <!-- 로그인 전 -->
         <button
-          v-if="!authed"
+          v-if="!isAuthed"
           class="auth-btn login-only"
           @click="goLogin"
         >
@@ -40,16 +40,13 @@
             
             <!-- 드롭다운 메뉴 -->
             <div class="dropdown-menu">
-              <RouterLink 
-                :to="userRole === 'shelter' ? '/shelter-head/mypage' : '/mypage'" 
-                class="dropdown-item"
-              >
+              <RouterLink to="/mypage/info" class="dropdown-item">
                 내 정보
               </RouterLink>
               <RouterLink to="/mypage/messages" class="dropdown-item">
                 쪽지보내기
               </RouterLink>
-              <RouterLink to="/volunteer" class="dropdown-item">
+              <RouterLink to="/mypage/volunteer" class="dropdown-item">
                 내 봉사활동
               </RouterLink>
             </div>
@@ -65,22 +62,11 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuth } from '@/views/auth/useAuth'
 
 const router = useRouter()
-const { authed, logout } = useAuth()
-
-// ✅ userRole을 reactive하게 관리
-const userRole = ref(localStorage.getItem('userRole') || 'user')
-
-// ✅ localStorage 변경 감지
-watch(authed, (newValue) => {
-  if (newValue) {
-    userRole.value = localStorage.getItem('userRole') || 'user'
-  }
-})
+const { isAuthed, logout } = useAuth()
 
 function goLogin() {
   router.push({ name: 'login' })
@@ -243,7 +229,7 @@ function doLogout() {
   background-color: #e6cf9c;
 }
 
-/* 드롭다운 화살표 */
+/* 드롭다운 화살표 (선택사항) */
 .dropdown-menu::before {
   content: '';
   position: absolute;
