@@ -26,8 +26,8 @@
           </div>
 
           <button class="edit-btn" @click="editProfile">내 정보 수정</button>
+          <button class="message-btn" @click="goToMessages">내 쪽지</button>
           <button class="logout-btn" @click="logout">로그아웃</button>
-          <button class="manage-btn" @click="goToRecruitInsert">봉사모집 게시글 작성하기</button>
         </div>
 
         <!-- 신청 내역 -->
@@ -209,8 +209,8 @@ function goToDetail(id) {
 function goToPost(id) {
   console.log('게시글 상세:', id)
 }
-function goToRecruitInsert() {
-  router.push('/shelter-head/mypage/recruitinsert')
+function goToMessages() {
+  router.push('/shelter-head/messages')
 }
 function editProfile() {
   console.log('내 정보 수정')
@@ -335,8 +335,8 @@ function logout() {
 }
 
 .edit-btn,
-.logout-btn,
-.manage-btn {
+.message-btn,
+.logout-btn {
   width: 100%;
   padding: 12px;
   border: none;
@@ -360,24 +360,25 @@ function logout() {
 }
 
 .logout-btn {
-  background: white;
-  border: 2px solid #e8e0d5;
-  color: #8b7355;
+  background: #f8f6f2;
+  border: 1px solid #e0d4c2;
+  color: #6b5744;
 }
 
 .logout-btn:hover {
-  background: #f5f0e8;
+  background: #ebe2d4;
 }
 
-.manage-btn {
-  background: linear-gradient(135deg, #f0b762 0%, #e8a54d 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(240, 183, 98, 0.3);
+.message-btn {
+  background: #fff3da;
+  border: 1px solid #f2c98d;
+  color: #a46b1f;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-.manage-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(240, 183, 98, 0.4);
+.message-btn:hover {
+  background: #ffe6b8;
+  border-color: #e7b86c;
 }
 
 /* 신청 내역 & 봉사시간 관리 카드 */
