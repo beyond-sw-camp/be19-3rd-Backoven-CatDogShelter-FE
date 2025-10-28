@@ -1,5 +1,6 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuth } from '@/views/auth/useAuth'
 
 // ===== Auth =====
 import LoginView from '@/views/auth/login/index.vue'
@@ -19,7 +20,7 @@ import PostDetailView from '@/views/Post/PostDetailView.vue'
 import PostWriteView from '@/views/Post/PostWriteView.vue'
 import HeroesrankingView from '@/views/heros/HeroesrankingView.vue'
 import DonationWrite from '@/views/donation/DonationWrite.vue'
-// ===== Footer 영역 페이지 =====
+
 
 // ===== Footer pages =====
 
@@ -30,6 +31,7 @@ import CommunityGuideView from '@/views/footer/CommunityGuideView.vue'
 import AdoptionProcessView from '@/views/footer/AdoptionProcessView.vue'
 import VolunteerGuideView from '@/views/footer/VolunteerGuideView.vue'
 import FaqView from '@/views/footer/FaqView.vue'
+import AdminPageView from '@/views/AdminPageView.vue'
 
 // ===== Misc views =====
 import ShelterheadMypageView from '@/views/volunteer/shelterhead/ShelterheadMypageView.vue'
@@ -41,6 +43,11 @@ import LoginPlaceholderView from '@/views/LoginPlaceholderView.vue'
 // ===== Missing post writer =====
 import MissingPostWirte from '@/views/missing/MissingPostWirte.vue'
 import MissingDetailView from '@/views/missing/MissingDetailView.vue'
+
+// ===== User MyPage =====
+import UserMyPageView from '@/views/mypage/UserMyPageView.vue'
+import UserEdit from '@/views/mypage/UserEdit.vue'
+import UserMessages from '@/views/mypage/UserMessages.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -225,6 +232,40 @@ const router = createRouter({
       path: '/faq',
       component: FaqView,
     },
+
+    // ✅ User MyPage
+    {
+      path: '/mypage',
+      component: UserMyPageView,
+      beforeEnter: (to, from, next) => {
+        const { isAuthed } = useAuth()
+        if (!isAuthed.value) {
+          alert("로그인이 필요합니다.")
+          return next('/login')
+        }
+        next()
+      }
+    },
+    {
+      path: '/mypage/edit',
+      name: 'mypage-edit',
+      component: UserEdit,
+      meta: { requiresAuth: true, role: 'user' }
+    },
+    {
+      path: '/mypage/messages',
+      name: 'mypage-messages',
+      component: UserMessages,
+      meta: { requiresAuth: true }
+    },
+
+    // // ✅ Shelter MyPage
+    // {
+    //   path: '/shelter-head/mypage',
+    //   name: 'shelter-mypage',
+    //   component: ShelterheadMypageView,
+    //   meta: { requiresAuth: true, role: 'shelter' }
+    // },
 
     // shelter head mypage
     {
