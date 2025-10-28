@@ -333,6 +333,13 @@ const router = createRouter({
         }
       ]
     },
+        {
+      path: '/admin',
+      name: 'admin',
+      component: AdminPageView,
+      meta: { requiresAdmin: true },
+    },
+
 
     //   // login test screen (kept for reference)
     //   {
@@ -348,6 +355,15 @@ const router = createRouter({
   ],
   // always scroll to top on route change
   scrollBehavior: () => ({ top: 0 }),
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.meta?.requiresAdmin) {
+    const role = localStorage.getItem('role')
+    if (role === 'ADMIN') return next()
+    return next({ name: 'login' })
+  }
+  next()
 })
 
 export default router
