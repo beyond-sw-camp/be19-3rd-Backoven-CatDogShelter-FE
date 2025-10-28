@@ -1,9 +1,9 @@
 <template>
   <article v-if="post" class="post-detail">
-    <!-- 상단 바: 좌측 '목록으로', 우측 '게시글 삭제' -->
+    <!-- 상단 바: 좌측 '목록으로', 우측 '신고하기'(이전 삭제 자리) -->
     <div class="topbar">
       <RouterLink class="back" :to="{ name: 'post', query: { page: 1 } }">← 목록으로</RouterLink>
-      <button class="delete-post" type="button" @click="confirmDelete">게시글 삭제</button>
+      <button class="report-top" type="button" @click="reportPost">게시글 신고</button>
     </div>
 
     <h1 class="title">{{ post.title }}</h1>
@@ -24,6 +24,7 @@
       <p v-for="(p,i) in post.content" :key="i">{{ p }}</p>
     </div>
 
+    <!-- 좋아요 / 공유: 중앙 정렬 + 위아래 여백 -->
     <div class="actions">
       <button class="chip" :class="{ on: isLiked }" @click="toggleLike">
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
@@ -33,22 +34,9 @@
         좋아요 {{ post.stats.likes }}
       </button>
       <button class="chip" @click="share">공유하기</button>
-      <button class="chip danger" @click="reportPost">신고하기</button>
     </div>
 
-    <nav class="post-nav">
-      <!-- 왼쪽: -1 (이전글) -->
-      <RouterLink
-        v-if="post.prev"
-        :to="{ name:'post.detail', params:{ id: post.prev.id } }"
-      >← {{ post.prev.title }}</RouterLink>
-
-      <!-- 오른쪽: +1 (다음글) -->
-      <RouterLink
-        v-if="post.next"
-        :to="{ name:'post.detail', params:{ id: post.next.id } }"
-      >{{ post.next.title }} →</RouterLink>
-    </nav>
+    <!-- (요청) 이전/다음 화살표 네비게이션 제거 -->
 
     <!-- 댓글 -->
     <section class="comments">
@@ -64,19 +52,16 @@
             </div>
             <p class="c-text">{{ c.text }}</p>
 
-            <!-- 우하단 삭제 버튼 -->
             <div class="c-row-actions">
               <button class="c-del" type="button" @click="removeComment(c.id)">삭제</button>
-              <button class="c-report" type="button"@click="openReport({ targetType: 'comment', targetId: c.id })">신고</button>
+              <button class="c-report" type="button" @click="openReport({ targetType: 'comment', targetId: c.id })">신고</button>
             </div>
           </div>
         </li>
       </ul>
 
+      <!-- 닉네임 입력 제거: 자동 '익명N' 부여 -->
       <form class="c-form" @submit.prevent="addComment">
-        <div class="row">
-          <input v-model="nickname" type="text" class="nick" placeholder="닉네임 (선택)" maxlength="20" />
-        </div>
         <textarea v-model="newComment" class="input" placeholder="댓글을 입력하세요" rows="3" required />
         <div class="c-actions">
           <button type="submit" class="submit">댓글 작성</button>
@@ -101,11 +86,13 @@ const route = useRoute()
 const router = useRouter()
 const id = computed(() => Number(route.params.id))
 
-
 const state = reactive({ post: null, isLiked: false })
 const newComment = ref('')
-const nickname = ref('')
+const anonSeq = ref(0) // 익명 번호 시퀀스
+
 const storageKey = computed(() => `post:detail:${id.value}`)
+const seqKey = computed(() => `post:anonSeq:${id.value}`)
+
 const post   = computed(() => state.post)
 const isLiked = computed(() => state.isLiked)
 
@@ -116,7 +103,7 @@ function load(){
   if (savedDetail && savedDetail.title) {
     base = savedDetail
   } else {
-    const d = getDummyDetail(id.value)   
+    const d = getDummyDetail(id.value)
     if (d) base = structuredClone ? structuredClone(d) : JSON.parse(JSON.stringify(d))
   }
   if (!base) { state.post = null; return }
@@ -129,7 +116,17 @@ function load(){
     if (typeof saved.isLiked === 'boolean') state.isLiked = saved.isLiked
     base.stats.comments = base.comments.length
   }
+
   state.post = base
+
+  // 3) 익명 시퀀스 초기화(댓글에 이미 '익명N'이 있으면 그 중 최대값부터)
+  let maxInComments = 0
+  for (const c of state.post.comments || []) {
+    const m = /^익명(\d+)$/.exec(c.author || '')
+    if (m) maxInComments = Math.max(maxInComments, Number(m[1]))
+  }
+  const savedSeq = Number(localStorage.getItem(seqKey.value) || '0')
+  anonSeq.value = Math.max(maxInComments, savedSeq)
 }
 function persist(){
   if (!state.post) return
@@ -138,6 +135,7 @@ function persist(){
     isLiked: state.isLiked,
     comments: state.post.comments
   }))
+  localStorage.setItem(seqKey.value, String(anonSeq.value))
 }
 function toggleLike(){
   if (!state.post) return
@@ -145,10 +143,22 @@ function toggleLike(){
   state.isLiked = !state.isLiked
   persist()
 }
+async function share(){
+  const url = location.href
+  try{
+    if (navigator.share) {
+      await navigator.share({ title: post.value?.title || '게시글', url })
+    } else {
+      await navigator.clipboard.writeText(url)
+      alert('링크가 클립보드에 복사되었습니다.')
+    }
+  }catch{}
+}
 function addComment(){
   const text = newComment.value.trim()
   if (!text || !state.post) return
-  const name = nickname.value.trim() || '익명'
+  // 자동 닉네임: 익명1, 익명2, ...
+  const name = `익명${++anonSeq.value}`
   const d = new Date()
   const ts = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
   state.post.comments.push({ id: Date.now(), author: name, text, createdAt: ts })
@@ -157,40 +167,12 @@ function addComment(){
   persist()
 }
 
-// 댓글 삭제
 function removeComment(cid) {
   if (!state.post) return
   if (!confirm('댓글을 삭제하시겠습니까?')) return
   state.post.comments = state.post.comments.filter(c => c.id !== cid)
   state.post.stats.comments = state.post.comments.length
   persist()
-}
-
-// 게시글 삭제
-function confirmDelete() {
-  if (!state.post) return
-  if (!confirm('게시글을 삭제하시겠습니까?')) return
-  const pid = state.post.id
-
-  // 삭제 목록에 기록해 목록에서 숨김
-  const delKey = 'post:deleted'
-  const delArr = JSON.parse(localStorage.getItem(delKey) || '[]')
-  if (!delArr.includes(pid)) {
-    delArr.push(pid)
-    localStorage.setItem(delKey, JSON.stringify(delArr))
-  }
-
-  // 사용자 작성 글이면 목록 저장소에서 제거
-  const listKey = 'post:items'
-  const list = JSON.parse(localStorage.getItem(listKey) || '[]')
-  const next = list.filter(p => p.id !== pid)
-  if (next.length !== list.length) localStorage.setItem(listKey, JSON.stringify(next))
-
-  // 상세/상태 저장 제거
-  localStorage.removeItem(`post:detail:${pid}`)
-
-  alert('삭제되었습니다.')
-  router.push({ name: 'post' })
 }
 
 function reportPost(){
@@ -200,20 +182,19 @@ function reportPost(){
 
 onMounted(load)
 watch(id, load)
-
-
 </script>
 
 <style scoped>
 .post-detail{max-width:880px;margin:24px auto;padding:22px 24px;background:#fff;border-radius:14px;box-shadow:0 12px 22px rgba(0,0,0,.06)}
-/* 상단 바: 좌우 배치로 확실히 우측 정렬 */
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .back{color:#6b5b4a}
-.delete-post{
-  padding:6px 10px;border-radius:999px;border:1px solid #e6b6a8;
-  background:#fff5f3;color:#a23b2a;font-weight:700;cursor:pointer
+
+/* 상단 오른쪽 '신고하기' (이전 삭제 버튼 자리) */
+.report-top{
+  padding:6px 10px;border-radius:999px;border:1px solid #f2b8b8;
+  background:#fff5f5;color:#a83b3b;font-weight:700;cursor:pointer
 }
-.delete-post:hover{background:#ffe9e6}
+.report-top:hover{ background:#ffeaea }
 
 .title{margin:8px 0 4px;font-size:24px;font-weight:800}
 .meta{display:flex;gap:8px;color:#6b7280;font-size:14px;align-items:center}
@@ -222,17 +203,17 @@ watch(id, load)
 .body{margin-top:18px;line-height:1.7}
 .gallery{display:grid;gap:12px;justify-items:center;margin-bottom:12px}
 
-.actions{display:flex;gap:10px;margin:14px 0 8px}
+/* 좋아요/공유 중앙 정렬 + 여백 */
+.actions{
+  display:flex;justify-content:center;gap:12px;
+  margin:24px 0 20px;
+}
 .chip{
   display:inline-flex;align-items:center;gap:6px;
-  padding:8px 12px;border-radius:999px;border:1px solid #eadfcd;background:#fff;color:#5a4a38;
+  padding:10px 16px;border-radius:999px;border:1px solid #eadfcd;background:#fff;color:#5a4a38;
   box-shadow:0 2px 6px rgba(0,0,0,.05); font-weight:700;
 }
 .chip.on{background:#b87445;color:#fff;border-color:#b87445}
-
-
-
-.post-nav{display:flex;justify-content:space-between;margin-top:18px}
 
 /* 댓글 */
 .comments{margin-top:22px;background:#faf7f1;border:1px solid #eee;border-radius:12px;padding:16px}
@@ -245,25 +226,13 @@ watch(id, load)
 .c-head{display:flex;gap:8px;align-items:center;color:#6b7280;font-size:12px;margin-bottom:4px}
 .c-author{color:#3c3425;font-weight:700}
 .c-text{margin:0}
- .chip.danger{
-   border-color:#f2b8b8;
-   background:#fff5f5;
-   color:#a83b3b;
-}
- .chip.danger:hover{ background:#ffeaea }
 .c-row-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
-
 .c-del{padding:6px 10px;border-radius:999px;border:1px solid #eadfcd;background:#fff;color:#6b5b4a;cursor:pointer}
- .c-report{
-   padding:6px 10px;border-radius:999px;border:1px solid #f2b8b8;
-   background:#fff5f5;color:#a83b3b;cursor:pointer
- }
- .c-report:hover{ background:#ffeaea }
 .c-del:hover{background:#f9f3ea}
+.c-report{padding:6px 10px;border-radius:999px;border:1px solid #f2b8b8;background:#fff5f5;color:#a83b3b;cursor:pointer}
+.c-report:hover{ background:#ffeaea }
 
 .c-form{margin-top:12px;display:grid;gap:8px}
-.row{display:flex;gap:10px}
-.nick{width:220px;max-width:50%;padding:10px;border:1px solid #ddd;border-radius:8px;background:#fff}
 .input{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;background:#fff;resize:vertical}
 .c-actions{display:flex;justify-content:flex-end}
 .submit{padding:8px 14px;border-radius:10px;border:0;background:#e7c07d;color:#3c3425;font-weight:800}

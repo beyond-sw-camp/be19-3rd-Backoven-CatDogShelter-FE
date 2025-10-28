@@ -1,205 +1,275 @@
-<script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { login, useAuth } from '../useAuth'
-
-const role = ref('USER') // 'USER' | 'SHELTER_HEAD'
-const form = ref({ email: '', password: '' })
-const keep = ref(false)
-
-const { loading, error, authed } = useAuth()
-const router = useRouter()
-const hasSignup = computed(() => router.hasRoute('signup')) 
-
-const roleLabel = computed(() => role.value === 'USER' ? '일반회원' : '보호소장 회원')
-const signupRoute = computed(() =>
-  role.value === 'USER' ? { name: 'signup.user' } : { name: 'signup.shelter' }
-)
-const signupLabel = computed(() =>
-  role.value === 'USER' ? '일반회원 회원가입' : '보호소장 회원가입'
-)
-const signupHint = computed(() =>
-  role.value === 'USER'
-    ? '아직 회원이 아니신가요? 일반회원으로 가입해 주세요.'
-    : '보호소장님, 안냥보호센터와 함께해요. 보호소장 전용 회원가입으로 진행됩니다.'
-)
-
-/** ✅ 임시 관리자 우회 로그인 추가 */
-const submit = async () => {
-  // 1) 임시 관리자 계정이면 백엔드 호출 없이 바로 통과
-  if (form.value.email === 'admin' && form.value.password === 'Admin!2025demo') {
-    authed.value = true
-    // 로그인 상태 플래그
-    localStorage.setItem('authed', '1')
-    // 라우터 가드/헤더 분기용 역할 값
-    localStorage.setItem('role', 'ADMIN')        // router.beforeEach에서 사용
-    localStorage.setItem('userRole', 'admin')     // 헤더 드롭다운 분기용(있으면)
-    // 필요하면 더미 유저 정보 저장
-    localStorage.setItem('user', JSON.stringify({
-      account: 'admin',
-      name: '관리자',
-    }))
-    // 그냥 홈으로 (헤더의 “내 정보”는 /admin으로 향함)
-    await router.push({ name: 'home' })
-    return
-  }
-
-  // 2) 일반 로그인 플로우
-  const ok = await login({ ...form.value, role: role.value, keep: keep.value })
-  if (ok) {
-    router.push({ name: 'home' })
-  }
-}
-
-const emit = defineEmits(['success'])
-</script>
-
 <template>
-  <section class="card" role="dialog" aria-modal="true" aria-label="로그인">
-    <!-- 상단 로고 + 타이틀 -->
-    <header class="card-head">
-      <img class="logo" src="@/assets/logo.svg" alt="안냥보호센터" />
-      <h2 class="title">안냥보호센터 로그인</h2>
-      <p class="subtitle">더 좋은 입양문화를 만들어가는 길</p>
-    </header>
+  <article v-if="post" class="post-detail">
+    <!-- 상단: 좌측 '목록으로', 우측 '게시글 신고' -->
+    <div class="topbar">
+      <RouterLink class="back" :to="{ name: 'post', query: { page: 1 } }">← 목록으로</RouterLink>
 
-    <!-- 역할 탭 -->
-    <div class="seg">
-      <button
-        class="seg-btn"
-        :class="{ active: role==='USER' }"
-        type="button"
-        @click="role='USER'"
-        aria-pressed="role==='USER'"
-      >일반회원</button>
-      <button
-        class="seg-btn"
-        :class="{ active: role==='SHELTER_HEAD' }"
-        type="button"
-        @click="role='SHELTER_HEAD'"
-        aria-pressed="role==='SHELTER_HEAD'"
-      >보호소장 회원</button>
+      <div class="top-actions">
+        <button class="report-post" type="button" @click="reportPost">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+            <path d="M4 4v16M6 4h9l-1.5 3L18 10H6"
+                  fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <span>게시글 신고</span>
+        </button>
+      </div>
     </div>
 
-    <!-- 입력 폼 -->
-    <form class="form" @submit.prevent="submit" novalidate>
-      <label class="field">
-        <span class="label">아이디(또는 이메일)</span>
-        <input
-          v-model.trim="form.email"
-          type="text"
-          autocomplete="username"
-          required
-          placeholder="아이디를 입력하세요"
-        />
-      </label>
+    <h1 class="title">{{ post.title }}</h1>
 
-      <label class="field">
-        <span class="label">비밀번호</span>
-        <input
-          v-model.trim="form.password"
-          type="password"
-          autocomplete="current-password"
-          minlength="6"
-          required
-          placeholder="비밀번호를 입력하세요"
-        />
-      </label>
+    <div class="meta">
+      <span class="badge">{{ post.category }}</span>
+      <span class="author">{{ post.author.name }}</span>
+      <span class="dot">·</span>
+      <span class="date">{{ post.date }}</span>
+    </div>
 
-      <label class="keep">
-        <input type="checkbox" v-model="keep" />
-        <span>로그인 유지</span>
-      </label>
+    <!-- 조회/좋아요/댓글 카운트 라인 -->
+    <div class="stats-line">
+      <span class="stat">
+        <svg viewBox="0 0 24 24">
+          <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" fill="none" stroke="currentColor" stroke-width="2"/>
+          <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        {{ post.stats.views }}
+      </span>
+      <span class="stat">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 21s-7-4.35-9.5-8A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 7c-2.5 3.65-9.5 8-9.5 8z"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {{ post.stats.likes }}
+      </span>
+      <span class="stat">
+        <svg viewBox="0 0 24 24">
+          <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V6a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {{ post.stats.comments }}
+      </span>
+    </div>
 
-      <button class="submit" type="submit" :disabled="loading">
-        <span v-if="!loading">로그인</span>
-        <span v-else>로그인 중...</span>
+    <div class="body">
+      <div v-if="post.images && post.images.length" class="gallery">
+        <img v-for="(img,i) in post.images" :key="i" :src="img.src" :alt="img.alt" />
+      </div>
+      <p v-for="(p,i) in post.content" :key="i">{{ p }}</p>
+    </div>
+
+    <!-- 하단 액션: 좋아요/공유만 중앙 -->
+    <div class="actions">
+      <button class="chip" :class="{ on: isLiked }" @click="toggleLike">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+          <path d="M12 21s-7-4.35-9.5-8A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 7c-2.5 3.65-9.5 8-9.5 8z"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        좋아요 {{ post.stats.likes }}
       </button>
-
-      <p v-if="error" class="error" role="alert">{{ error }}</p>
-    </form>
-
-    <!-- 하단 링크 -->
-    <p class="hint" style="text-align:center; margin:10px 0 6px; color:#8a8a8a; font-size:12px;">
-      {{ signupHint }}
-    </p>
-    <div class="links">
-      <!-- 회원가입 -->
-      <router-link :to="signupRoute" class="link main">{{ signupLabel }}</router-link>
-
-      <!-- 아이디 / 비밀번호 찾기 (한 줄) -->
-      <p class="find-links">
-        <router-link
-          v-if="router.hasRoute && router.hasRoute('find.id')"
-          :to="{ name:'find.id' }"
-          class="link"
-        >아이디</router-link>
-        <span class="sep"> / </span>
-        <router-link
-          v-if="router.hasRoute
-                && (router.hasRoute('find.password.request') || router.hasRoute('find.password'))"
-          :to="router.hasRoute('find.password.request')
-                ? { name:'find.password.request' }
-                : { name:'find.password' }"
-          class="link"
-        >비밀번호 찾기</router-link>
-      </p>
+      <button class="chip" @click="share">공유하기</button>
     </div>
-  </section>
+
+    <!-- (요청으로 제거) 이전/다음 글 네비게이션 없음 -->
+
+    <!-- 댓글 -->
+    <section class="comments">
+      <h2 class="c-title">댓글 <span class="num">{{ post.stats.comments }}</span></h2>
+
+      <ul v-if="post.comments?.length" class="c-list">
+        <li v-for="c in post.comments" :key="c.id" class="c-item">
+          <div class="avatar" aria-hidden="true">{{ c.author?.[0] ?? '익' }}</div>
+          <div class="c-box">
+            <div class="c-head">
+              <strong class="c-author">{{ c.author }}</strong>
+              <span class="c-time">{{ c.createdAt }}</span>
+            </div>
+            <p class="c-text">{{ c.text }}</p>
+
+            <!-- 댓글 신고: 본문 아래로 이동, 삭제 기능 제거 -->
+            <button
+              class="c-report-under"
+              type="button"
+              @click="openReport({ targetType: 'comment', targetId: c.id })"
+            >
+              신고하기
+            </button>
+          </div>
+        </li>
+      </ul>
+
+      <!-- 닉네임 입력 제거, 익명 번호 자동 부여 -->
+      <form class="c-form" @submit.prevent="addComment">
+        <textarea v-model="newComment" class="input" placeholder="댓글을 입력하세요" rows="3" required />
+        <div class="c-actions">
+          <button type="submit" class="submit">댓글 작성</button>
+        </div>
+      </form>
+    </section>
+  </article>
+
+  <article v-else class="post-detail">
+    <p>존재하지 않는 게시글입니다.</p>
+    <RouterLink class="back" :to="{ name: 'post' }">목록으로</RouterLink>
+  </article>
 </template>
 
+<script setup>
+import { reactive, ref, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { getDummyDetail } from '@/views/post/detail/dummies.js'
+import { openReport } from '@/components/report'
+
+const route = useRoute()
+const router = useRouter()
+const id = computed(() => Number(route.params.id))
+
+const state = reactive({ post: null, isLiked: false })
+const newComment = ref('')
+
+const storageKey = computed(() => `post:detail:${id.value}`)
+const post   = computed(() => state.post)
+const isLiked = computed(() => state.isLiked)
+
+function load() {
+  // 1) 사용자 저장 상세 우선
+  const savedDetail = JSON.parse(localStorage.getItem(`post:detail:${id.value}`) || 'null')
+  let base = null
+  if (savedDetail && savedDetail.title) {
+    base = savedDetail
+  } else {
+    const d = getDummyDetail(id.value)
+    if (d) base = structuredClone ? structuredClone(d) : JSON.parse(JSON.stringify(d))
+  }
+  if (!base) { state.post = null; return }
+
+  // 2) 좋아요/댓글 최신 반영
+  const saved = JSON.parse(localStorage.getItem(storageKey.value) || 'null')
+  if (saved) {
+    if (typeof saved.likes === 'number') base.stats.likes = saved.likes
+    if (Array.isArray(saved.comments))   base.comments    = saved.comments
+    if (typeof saved.isLiked === 'boolean') state.isLiked = saved.isLiked
+    base.stats.comments = base.comments.length
+  }
+  state.post = base
+}
+
+function persist() {
+  if (!state.post) return
+  localStorage.setItem(storageKey.value, JSON.stringify({
+    likes: state.post.stats.likes,
+    isLiked: state.isLiked,
+    comments: state.post.comments
+  }))
+}
+
+function toggleLike() {
+  if (!state.post) return
+  state.isLiked ? state.post.stats.likes-- : state.post.stats.likes++
+  state.isLiked = !state.isLiked
+  persist()
+}
+
+function share() {
+  try {
+    if (navigator.share) {
+      navigator.share({ title: post.value?.title || '게시글', url: location.href })
+      return
+    }
+  } catch {}
+  navigator.clipboard?.writeText(location.href)
+  alert('링크가 복사되었습니다.')
+}
+
+// 댓글 추가(닉네임 없이 익명 번호 자동)
+function addComment() {
+  const text = newComment.value.trim()
+  if (!text || !state.post) return
+
+  const counterKey = 'post:anonCounter'
+  const next = Number(localStorage.getItem(counterKey) || '0') + 1
+  localStorage.setItem(counterKey, String(next))
+  const name = `익명${next}`
+
+  const d = new Date()
+  const ts = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+
+  state.post.comments.push({ id: Date.now(), author: name, text, createdAt: ts })
+  state.post.stats.comments = state.post.comments.length
+  newComment.value = ''
+  persist()
+}
+
+function reportPost(){
+  if(!post.value?.id) return
+  openReport({ targetType: 'post', targetId: post.value.id })
+}
+
+onMounted(load)
+watch(id, load)
+</script>
+
 <style scoped>
-.card {
-  --card-w: 520px;
-  --gutter: 24px;
-  --ctl-h: 42px;
-  width: var(--card-w);
-  max-width: 92vw;
-  background: #fff;
-  border-radius: 16px;
-  padding: 24px var(--gutter) 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+.post-detail{max-width:880px;margin:24px auto;padding:22px 24px;background:#fff;border-radius:14px;box-shadow:0 12px 22px rgba(0,0,0,.06)}
+/* 상단 바 */
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.back{color:#6b5b4a}
+
+/* 게시글 신고 버튼 */
+.top-actions{display:flex;align-items:center;gap:8px}
+.report-post{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 10px;border-radius:8px;
+  border:1px solid #e8e2d6;background:#fff;color:#6b5b4a;font-weight:700;
 }
-.card * { box-sizing: border-box; }
+.report-post:hover{background:#fff9f6;border-color:#f2b8b8;color:#a83b3b}
 
-.card-head { text-align: center; margin-bottom: 10px; }
-.logo { width: 56px; height: 56px; margin: 6px auto 4px; display: block; }
-.title { font-size: 18px; margin: 4px 0 2px; color: #333; }
-.subtitle { font-size: 12px; color: #8a8a8a; margin: 0; }
+.title{margin:8px 0 4px;font-size:24px;font-weight:800}
+.meta{display:flex;gap:8px;color:#6b7280;font-size:14px;align-items:center}
+.dot{opacity:.6}
+.badge{padding:2px 8px;border-radius:999px;background:#f6efe6;border:1px solid #eadfcd;color:#8a6a3f}
 
-.seg {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
-  background: #f2f2f2; padding: 4px; border-radius: 12px; margin: 10px 0 14px;
+/* 카운트 라인 */
+.stats-line{display:flex;gap:14px;margin:8px 0 0;color:#777;font-size:13px}
+.stat{display:inline-flex;align-items:center;gap:6px}
+.stat svg{width:16px;height:16px}
+
+.body{margin-top:18px;line-height:1.7}
+.gallery{display:grid;gap:12px;justify-items:center;margin-bottom:12px}
+
+/* 하단 액션: 중앙 정렬 */
+.actions{display:flex;justify-content:center;gap:10px;margin:16px 0 8px}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 12px;border-radius:999px;border:1px solid #eadfcd;background:#fff;color:#5a4a38;
+  box-shadow:0 2px 6px rgba(0,0,0,.05); font-weight:700;
 }
-.seg-btn { height: 36px; border-radius: 8px; background: transparent; border: 0; font-weight: 600; color: #777; cursor: pointer; }
-.seg-btn.active { background: #e7c98c; color: #2c2c2c; }
+.chip.on{background:#b87445;color:#fff;border-color:#b87445}
 
-.form { margin-top: 6px; }
-.field { display: block; margin-bottom: 10px; }
-.label { display: block; font-size: 12px; color: #666; margin-bottom: 6px; }
-input[type="text"], input[type="password"] {
-  width: 100%; height: var(--ctl-h);
-  padding: 0 14px;
-  border: 1px solid #e1e1e1;
-  border-radius: 8px;
-  background: #fafafa;
-  outline: none;
+/* 댓글 */
+.comments{margin-top:22px;background:#faf7f1;border:1px solid #eee;border-radius:12px;padding:16px}
+.c-title{margin:0 0 12px;font-size:15px}
+.c-title .num{color:#8a6a3f}
+.c-list{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.c-item{display:flex;gap:10px;align-items:flex-start}
+.avatar{width:28px;height:28px;border-radius:50%;background:#f0e7d8;border:1px solid #eadfcd;display:grid;place-items:center;font-size:12px;color:#6b5b4a}
+.c-box{flex:1;background:#fff;border:1px solid #eee;border-radius:10px;padding:10px}
+.c-head{display:flex;gap:8px;align-items:center;color:#6b7280;font-size:12px;margin-bottom:4px}
+.c-author{color:#3c3425;font-weight:700}
+.c-text{margin:0}
+
+/* 댓글 신고(본문 아래) */
+.c-report-under{
+  margin-top:8px;background:transparent;border:0;
+  color:#a83b3b;font-size:12px;padding:0;cursor:pointer
 }
-input:focus { border-color: #d1b57a; background: #fff; }
+.c-report-under:hover{text-decoration:underline}
 
-.keep { display:flex; align-items:center; gap:8px; margin: 6px 0 10px; color:#666; font-size: 13px; }
+/* 닉네임/삭제 등 이전 스타일 무력화 */
+.c-row-actions{display:none !important}
+.c-del{display:none !important}
 
-.submit {
-  width: 100%; height: var(--ctl-h); border-radius: 10px; border: 0;
-  background: #1c1c1c; color: #fff; font-weight: 700; cursor: pointer;
-}
-.submit:disabled { opacity: .6; cursor: default; }
-
-.hint { text-align:center; margin:10px 0 6px; color:#8a8a8a; font-size:12px; }
-
-.links { margin-top: 6px; text-align: center; color:#666; font-size: 13px; }
-.link { color:#666; text-decoration: none; }
-.link.main { color: #c6932d; font-weight: 700; }
-.link:hover { text-decoration: underline; }
-.dot { margin: 0 6px; color:#bdbdbd; }
+.c-form{margin-top:12px;display:grid;gap:8px}
+.input{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;background:#fff;resize:vertical}
+.c-actions{display:flex;justify-content:flex-end}
+.submit{padding:8px 14px;border-radius:10px;border:0;background:#e7c07d;color:#3c3425;font-weight:800}
 </style>
