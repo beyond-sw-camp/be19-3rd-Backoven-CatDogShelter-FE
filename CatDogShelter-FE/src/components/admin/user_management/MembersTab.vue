@@ -283,7 +283,7 @@
     });
 
     const onMovePage = (p) => {
-        if (roleFilter === 'user') {
+        if (roleFilter.value === 'user') {
             userPage.currentPage = p;
             userPage.pagination();
         } else {
@@ -293,7 +293,7 @@
     }
 
     const onPrevPage = () => {
-        if (roleFilter === 'user') {
+        if (roleFilter.value === 'user') {
             userPage.currentPage--;
             userPage.pagination();
         } else {
@@ -302,7 +302,7 @@
         }
     }
     const onNextPage = () => {
-        if (roleFilter === 'user') {
+        if (roleFilter.value === 'user') {
             userPage.currentPage++;
             userPage.pagination();
         } else {

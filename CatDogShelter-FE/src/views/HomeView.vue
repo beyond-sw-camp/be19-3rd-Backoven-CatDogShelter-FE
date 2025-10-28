@@ -63,7 +63,7 @@
               >
                 <div class="adoption-thumb">
                   <div class="thumb-fallback">사진</div>
-                  <!-- 나중에 <img :src="pet.imgUrl" :alt="pet.name" /> 로 교체 -->
+                  <!-- TODO: 나중에 <img :src="pet.imgUrl" :alt="pet.name" /> 로 교체 -->
                 </div>
                 <div class="adoption-info">
                   <h3 class="pet-name">{{ pet.name }}</h3>
@@ -92,11 +92,9 @@
                 class="post-row post-row-clickable"
                 @click="goVolunteerDetail(post.id)"
               >
-              
                 <span class="title">{{ post.title }}</span>
-           
-                 <span class="meta">
-                   👥 모집현황 {{ post.viewCount }}
+                <span class="meta">
+                  👥 모집현황 {{ post.viewCount }}
                 </span>
               </li>
             </ul>
@@ -192,7 +190,7 @@
             </ol>
           </div>
 
-          <!-- 실종 -->
+          <!-- ===== 실종: 댕냥이들을 찾아주세요 ===== -->
           <div class="side-card photo-board">
             <div class="board-header tight">
               <h3>댕냥이들을 찾아주세요</h3>
@@ -200,12 +198,46 @@
             </div>
 
             <div class="photo-list">
-              <div class="photo-fallback">사진</div>
-              <div class="photo-fallback">사진</div>
+              <!-- 실제 데이터 -->
+              <div
+                v-for="post in missingPreview"
+                :key="post.id"
+                class="photo-item"
+                @click="goMissingDetail(post.id)"
+              >
+                <div class="photo-thumb-wrap">
+                  <img
+                    v-if="post.thumbnailUrl && post.thumbnailUrl.trim() !== ''"
+                    class="photo-thumb"
+                    :src="post.thumbnailUrl"
+                    :alt="post.title || '실종 동물'"
+                  />
+                  <div v-else class="photo-fallback">사진</div>
+                </div>
+
+                <div class="photo-caption">
+                  <div class="caption-title">{{ post.title }}</div>
+                  <div class="caption-meta">
+                    {{ post.animalTypeLabel || '' }}
+                    <span
+                      v-if="post.animalTypeLabel && post.missingLocation"
+                    >·</span>
+                    {{ post.missingLocation || '' }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- 아무 글도 없을 때 -->
+              <div
+                v-if="missingPreview.length === 0"
+                class="photo-empty"
+              >
+                등록된 실종 제보가 없습니다.
+              </div>
             </div>
           </div>
 
-          <!-- 목격 -->
+          <!-- ===== 목격: 댕냥이들을 목격했어요 ===== -->
           <div class="side-card photo-board">
             <div class="board-header tight">
               <h3>댕냥이들을 목격했어요</h3>
@@ -213,8 +245,36 @@
             </div>
 
             <div class="photo-list">
-              <div class="photo-fallback">사진</div>
-              <div class="photo-fallback">사진</div>
+              <div
+                v-for="post in sightingPreview"
+                :key="post.id"
+                class="photo-item"
+                @click="goSightingDetail(post.id)"
+              >
+                <div class="photo-thumb-wrap">
+                  <img
+                    v-if="post.thumbnailUrl && post.thumbnailUrl.trim() !== ''"
+                    class="photo-thumb"
+                    :src="post.thumbnailUrl"
+                    :alt="post.title || '목격 제보'"
+                  />
+                  <div v-else class="photo-fallback">사진</div>
+                </div>
+
+                <div class="photo-caption">
+                  <div class="caption-title">{{ post.title }}</div>
+                  <div class="caption-meta">
+                    {{ post.missingLocation || post.location || '' }}
+                  </div>
+                </div>
+              </div>
+
+              <div
+                v-if="sightingPreview.length === 0"
+                class="photo-empty"
+              >
+                최근 목격 제보가 없습니다.
+              </div>
             </div>
           </div>
 
@@ -239,6 +299,9 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
+const API_BASE = "http://localhost:8080";
+
+// 로그인 상태
 const isLoggedIn = ref(false);
 const userName = ref("이다인");
 const userTitle = ref("댕냥 보호천사");
@@ -261,9 +324,18 @@ function goVolunteerDetail(id) {
 function goFreeDetail(id) {
   router.push(`/post/${id}`);
 }
-// 입양 디테일 페이지도 똑같이 구성한다면:
 function goAdoptionDetail(id) {
   router.push(`/adoption/detail/${id}`);
+}
+function goMissingDetail(id) {
+  router.push({
+    name: "missing-detail",
+    params: { postId: id },
+  });
+}
+function goSightingDetail(id) {
+  // 아직 라우터에 목격 상세가 없다면 이건 추후 연결
+  router.push(`/sighting/${id}`);
 }
 
 // ===== json-server 데이터 상태 =====
@@ -282,8 +354,8 @@ onMounted(async () => {
     isLoggedIn.value = true;
   }
 
-  // json-server에서 데이터 fetch
   try {
+    // 병렬 요청
     const [
       adoptionRes,
       volunteerRes,
@@ -293,13 +365,23 @@ onMounted(async () => {
       missingRes,
       sightingRes,
     ] = await Promise.all([
-      fetch("http://localhost:8080/adoptionPosts"),
-      fetch("http://localhost:8080/volunteerPosts"),
-      fetch("http://localhost:8080/freePosts"),
-      fetch("http://localhost:8080/heroList"),
-      fetch("http://localhost:8080/noticeList"),
-      fetch("http://localhost:8080/missingPreview"),
-      fetch("http://localhost:8080/sightingPreview"),
+      fetch(`${API_BASE}/adoptionPosts`),
+      fetch(`${API_BASE}/volunteerPosts`),
+      fetch(`${API_BASE}/freePosts`),
+      fetch(`${API_BASE}/heroList`),
+      fetch(`${API_BASE}/noticeList`),
+
+      // 최근 실종 제보 2건만 (createdAt desc)
+      fetch(
+        `${API_BASE}/missingPosts?_sort=createdAt&_order=desc&_limit=2`
+      ),
+
+      // 최근 목격 제보 2건만.
+      // 만약 아직 sightingPosts 리소스가 없다면 이 요청은 404 날 거라
+      // try/catch 아래에서 빈 배열로 처리해줄 거야.
+      fetch(
+        `${API_BASE}/sightingPosts?_sort=createdAt&_order=desc&_limit=2`
+      ).catch(() => null),
     ]);
 
     adoptionList.value = await adoptionRes.json();
@@ -307,8 +389,33 @@ onMounted(async () => {
     freeList.value = await freeRes.json();
     heroList.value = await heroRes.json();
     noticeList.value = await noticeRes.json();
-    missingPreview.value = await missingRes.json();
-    sightingPreview.value = await sightingRes.json();
+
+    // 실종 제보 미리보기
+    const missingRaw = await missingRes.json();
+    missingPreview.value = Array.isArray(missingRaw)
+      ? missingRaw.map(item => ({
+          id: item.id,
+          title: item.title || "",
+          thumbnailUrl: item.thumbnailUrl || "",
+          animalTypeLabel: item.animalTypeLabel || "",
+          missingLocation: item.missingLocation || "",
+        }))
+      : [];
+
+    // 목격 제보 미리보기 (존재하면)
+    if (sightingRes && sightingRes.ok) {
+      const sightingRaw = await sightingRes.json();
+      sightingPreview.value = Array.isArray(sightingRaw)
+        ? sightingRaw.map(item => ({
+            id: item.id,
+            title: item.title || "",
+            thumbnailUrl: item.thumbnailUrl || "",
+            missingLocation: item.missingLocation || item.location || "",
+          }))
+        : [];
+    } else {
+      sightingPreview.value = [];
+    }
 
     console.log("✅ 홈 데이터 로드 완료:", {
       adoptionList: adoptionList.value,
@@ -321,6 +428,9 @@ onMounted(async () => {
     });
   } catch (error) {
     console.error("❌ 홈 데이터 로드 실패:", error);
+    // 실패 시 안전하게 비워두기
+    missingPreview.value = [];
+    sightingPreview.value = [];
   }
 });
 </script>
@@ -860,7 +970,7 @@ onMounted(async () => {
 }
 .hero-name {
   text-align: left;
- padding : 0 0 0 10px;
+  padding: 0 0 0 10px;
 }
 .hero-hours {
    min-width: 2em; 
@@ -871,24 +981,96 @@ onMounted(async () => {
   white-space: nowrap;
 }
 
-/* 사진형 카드 (실종/목격) */
+/* ====== 실종/목격 사이드카드 ====== */
+
+/* 전체 카드 컨테이너 */
 .photo-board .photo-list {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  grid-template-columns: 1fr;
+  gap: 12px;
   margin-top: 12px;
 }
-.photo-fallback {
-  background-color: #e8d3b5;
+
+/* 개별 항목 카드 */
+.photo-item {
+  cursor: pointer;
+  background: #e3cfb8;
   border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.07);
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  column-gap: 12px;
+  align-items: center;
+  color: #2a1c10;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* 썸네일 래퍼 */
+.photo-thumb-wrap {
   width: 100%;
-  height: 90px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #5a412a;
+  height: 80px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* 썸네일 이미지 */
+.photo-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 썸네일 없을 때 fallback */
+.photo-fallback {
+  width: 100%;
+  height: 80px;
+  border-radius: 4px;
+  background: #d9c2a7;
+  color: #2a1c10;
+  border: 1px solid rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* 오른쪽 텍스트 */
+.photo-caption {
+  min-width: 0;
+}
+.caption-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2a1c10;
+  line-height: 1.4;
+  margin-bottom: 4px;
+  word-break: keep-all;
+}
+.caption-meta {
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(0,0,0,0.6);
+  word-break: keep-all;
+}
+
+/* 비어있을 때 */
+.photo-empty {
+  background: #efe8dd;
+  color: rgba(0,0,0,0.5);
+  border: 1px dashed rgba(0,0,0,0.2);
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 24px 12px;
+  text-align: center;
 }
 
 /* 공지 */
