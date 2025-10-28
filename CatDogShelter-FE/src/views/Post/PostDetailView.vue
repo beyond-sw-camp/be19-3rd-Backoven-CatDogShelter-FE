@@ -1,9 +1,19 @@
 <template>
   <article v-if="post" class="post-detail">
-    <!-- 상단 바: 좌측 '목록으로', 우측 '신고하기'(이전 삭제 자리) -->
+    <!-- 상단: 좌측 '목록으로', 우측 '게시글 신고' -->
     <div class="topbar">
       <RouterLink class="back" :to="{ name: 'post', query: { page: 1 } }">← 목록으로</RouterLink>
-      <button class="report-top" type="button" @click="reportPost">게시글 신고</button>
+
+      <div class="top-actions">
+        <button class="report-post" type="button" @click="reportPost">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+            <path d="M4 4v16M6 4h9l-1.5 3L18 10H6"
+                  fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <span>게시글 신고</span>
+        </button>
+      </div>
     </div>
 
     <h1 class="title">{{ post.title }}</h1>
@@ -13,9 +23,38 @@
       <span class="author">{{ post.author.name }}</span>
       <span class="dot">·</span>
       <span class="date">{{ post.date }}</span>
-      <span class="dot">·</span>
-      <span class="views">조회 {{ post.stats.views }}</span>
+
+      <!-- ✅ 여기 추가: 조회/좋아요/댓글 인라인 통계 -->
+      <div class="stats-inline" aria-label="조회/좋아요/댓글 통계">
+        <span class="stat">
+          <!-- eye (views) -->
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" fill="none" stroke="currentColor" stroke-width="2"/>
+            <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          {{ post.stats.views }}
+        </span>
+
+        <span class="stat">
+          <!-- heart (likes) -->
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 21s-7-4.35-9.5-8A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 7c-2.5 3.65-9.5 8-9.5 8z"
+                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          {{ post.stats.likes }}
+        </span>
+
+        <span class="stat">
+          <!-- comment -->
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 15a3 3 0 0 1-3 3H8l-5 4V6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3z"
+                  fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+          {{ post.stats.comments }}
+        </span>
+      </div>
     </div>
+
 
     <div class="body">
       <div v-if="post.images && post.images.length" class="gallery">
@@ -24,7 +63,7 @@
       <p v-for="(p,i) in post.content" :key="i">{{ p }}</p>
     </div>
 
-    <!-- 좋아요 / 공유: 중앙 정렬 + 위아래 여백 -->
+    <!-- 하단 액션: 좋아요/공유만 중앙 -->
     <div class="actions">
       <button class="chip" :class="{ on: isLiked }" @click="toggleLike">
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
@@ -36,7 +75,7 @@
       <button class="chip" @click="share">공유하기</button>
     </div>
 
-    <!-- (요청) 이전/다음 화살표 네비게이션 제거 -->
+    <!-- (요청으로 제거) 이전/다음 글 네비게이션 없음 -->
 
     <!-- 댓글 -->
     <section class="comments">
@@ -52,15 +91,19 @@
             </div>
             <p class="c-text">{{ c.text }}</p>
 
-            <div class="c-row-actions">
-              <button class="c-del" type="button" @click="removeComment(c.id)">삭제</button>
-              <button class="c-report" type="button" @click="openReport({ targetType: 'comment', targetId: c.id })">신고</button>
-            </div>
+            <!-- 댓글 신고: 본문 아래로 이동, 삭제 기능 제거 -->
+            <button
+              class="c-report-under"
+              type="button"
+              @click="openReport({ targetType: 'comment', targetId: c.id })"
+            >
+              신고하기
+            </button>
           </div>
         </li>
       </ul>
 
-      <!-- 닉네임 입력 제거: 자동 '익명N' 부여 -->
+      <!-- 닉네임 입력 제거, 익명 번호 자동 부여 -->
       <form class="c-form" @submit.prevent="addComment">
         <textarea v-model="newComment" class="input" placeholder="댓글을 입력하세요" rows="3" required />
         <div class="c-actions">
@@ -88,15 +131,12 @@ const id = computed(() => Number(route.params.id))
 
 const state = reactive({ post: null, isLiked: false })
 const newComment = ref('')
-const anonSeq = ref(0) // 익명 번호 시퀀스
 
 const storageKey = computed(() => `post:detail:${id.value}`)
-const seqKey = computed(() => `post:anonSeq:${id.value}`)
-
 const post   = computed(() => state.post)
 const isLiked = computed(() => state.isLiked)
 
-function load(){
+function load() {
   // 1) 사용자 저장 상세 우선
   const savedDetail = JSON.parse(localStorage.getItem(`post:detail:${id.value}`) || 'null')
   let base = null
@@ -116,68 +156,58 @@ function load(){
     if (typeof saved.isLiked === 'boolean') state.isLiked = saved.isLiked
     base.stats.comments = base.comments.length
   }
-
   state.post = base
-
-  // 3) 익명 시퀀스 초기화(댓글에 이미 '익명N'이 있으면 그 중 최대값부터)
-  let maxInComments = 0
-  for (const c of state.post.comments || []) {
-    const m = /^익명(\d+)$/.exec(c.author || '')
-    if (m) maxInComments = Math.max(maxInComments, Number(m[1]))
-  }
-  const savedSeq = Number(localStorage.getItem(seqKey.value) || '0')
-  anonSeq.value = Math.max(maxInComments, savedSeq)
 }
-function persist(){
+
+function persist() {
   if (!state.post) return
   localStorage.setItem(storageKey.value, JSON.stringify({
     likes: state.post.stats.likes,
     isLiked: state.isLiked,
     comments: state.post.comments
   }))
-  localStorage.setItem(seqKey.value, String(anonSeq.value))
 }
-function toggleLike(){
+
+function toggleLike() {
   if (!state.post) return
   state.isLiked ? state.post.stats.likes-- : state.post.stats.likes++
   state.isLiked = !state.isLiked
   persist()
 }
-async function share(){
-  const url = location.href
-  try{
+
+function share() {
+  try {
     if (navigator.share) {
-      await navigator.share({ title: post.value?.title || '게시글', url })
-    } else {
-      await navigator.clipboard.writeText(url)
-      alert('링크가 클립보드에 복사되었습니다.')
+      navigator.share({ title: post.value?.title || '게시글', url: location.href })
+      return
     }
-  }catch{}
+  } catch {}
+  navigator.clipboard?.writeText(location.href)
+  alert('링크가 복사되었습니다.')
 }
-function addComment(){
+
+// 댓글 추가(닉네임 없이 익명 번호 자동)
+function addComment() {
   const text = newComment.value.trim()
   if (!text || !state.post) return
-  // 자동 닉네임: 익명1, 익명2, ...
-  const name = `익명${++anonSeq.value}`
+
+  const counterKey = 'post:anonCounter'
+  const next = Number(localStorage.getItem(counterKey) || '0') + 1
+  localStorage.setItem(counterKey, String(next))
+  const name = `익명${next}`
+
   const d = new Date()
   const ts = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+
   state.post.comments.push({ id: Date.now(), author: name, text, createdAt: ts })
   state.post.stats.comments = state.post.comments.length
   newComment.value = ''
   persist()
 }
 
-function removeComment(cid) {
-  if (!state.post) return
-  if (!confirm('댓글을 삭제하시겠습니까?')) return
-  state.post.comments = state.post.comments.filter(c => c.id !== cid)
-  state.post.stats.comments = state.post.comments.length
-  persist()
-}
-
 function reportPost(){
   if(!post.value?.id) return
-  openReport({targetType: 'post', targetId: post.value.id})
+  openReport({ targetType: 'post', targetId: post.value.id })
 }
 
 onMounted(load)
@@ -186,37 +216,85 @@ watch(id, load)
 
 <style scoped>
 .post-detail{max-width:880px;margin:24px auto;padding:22px 24px;background:#fff;border-radius:14px;box-shadow:0 12px 22px rgba(0,0,0,.06)}
+/* 상단 바 */
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .back{color:#6b5b4a}
 
-/* 상단 오른쪽 '신고하기' (이전 삭제 버튼 자리) */
-.report-top{
-  padding:6px 10px;border-radius:999px;border:1px solid #f2b8b8;
-  background:#fff5f5;color:#a83b3b;font-weight:700;cursor:pointer
+
+/* 게시글 신고 버튼 */
+.top-actions{display:flex;align-items:center;gap:8px}
+.report-post{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 10px;border-radius:8px;
+  border:1px solid #e8e2d6;background:#fff;color:#6b5b4a;font-weight:700;
 }
-.report-top:hover{ background:#ffeaea }
+.report-post:hover{background:#fff9f6;border-color:#f2b8b8;color:#a83b3b}
 
 .title{margin:8px 0 4px;font-size:24px;font-weight:800}
-.meta{display:flex;gap:8px;color:#6b7280;font-size:14px;align-items:center}
-.dot{opacity:.6}
-.badge{padding:2px 8px;border-radius:999px;background:#f6efe6;border:1px solid #eadfcd;color:#8a6a3f}
+.meta{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+  font-size: 14px;
+  min-height: 34px;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 0.8px solid #E5E7EB;
+}
+
+.meta-left{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* 오른쪽 끝으로 밀기 */
+.stats-inline{
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;        /* <= 오른쪽 끝 정렬 포인트 */
+}
+
+.stat{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #8f8f8f;
+  font-size: 13px;
+}
+.stat svg{ width:16px; height:16px; }
+
+/* 헤더-본문 구분선 */
+.divider{
+  height: 1px;
+  background: #ececec;
+  margin-top: 12px;
+}
+
+@media (max-width: 640px){
+  .stats-inline{ gap: 10px; }
+  .stat{ font-size: 12px; }
+  .stat svg{ width:15px; height:15px; }
+}
+
+
 .body{margin-top:18px;line-height:1.7}
 .gallery{display:grid;gap:12px;justify-items:center;margin-bottom:12px}
 
-/* 좋아요/공유 중앙 정렬 + 여백 */
-.actions{
-  display:flex;justify-content:center;gap:12px;
-  margin:24px 0 20px;
-}
+/* 하단 액션: 중앙 정렬 */
+.actions{display:flex;justify-content:center;gap:10px;margin:16px 0 8px}
 .chip{
   display:inline-flex;align-items:center;gap:6px;
-  padding:10px 16px;border-radius:999px;border:1px solid #eadfcd;background:#fff;color:#5a4a38;
+  padding:8px 12px;border-radius:999px;border:1px solid #eadfcd;background:#fff;color:#5a4a38;
   box-shadow:0 2px 6px rgba(0,0,0,.05); font-weight:700;
 }
 .chip.on{background:#b87445;color:#fff;border-color:#b87445}
 
 /* 댓글 */
-.comments{margin-top:22px;background:#faf7f1;border:1px solid #eee;border-radius:12px;padding:16px}
+.comments{margin-top:22px;background:#F9FAFB;border:0px solid #eee;border-radius:12px;padding:16px;}
 .c-title{margin:0 0 12px;font-size:15px}
 .c-title .num{color:#8a6a3f}
 .c-list{list-style:none;margin:0;padding:0;display:grid;gap:12px}
@@ -226,11 +304,17 @@ watch(id, load)
 .c-head{display:flex;gap:8px;align-items:center;color:#6b7280;font-size:12px;margin-bottom:4px}
 .c-author{color:#3c3425;font-weight:700}
 .c-text{margin:0}
-.c-row-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
-.c-del{padding:6px 10px;border-radius:999px;border:1px solid #eadfcd;background:#fff;color:#6b5b4a;cursor:pointer}
-.c-del:hover{background:#f9f3ea}
-.c-report{padding:6px 10px;border-radius:999px;border:1px solid #f2b8b8;background:#fff5f5;color:#a83b3b;cursor:pointer}
-.c-report:hover{ background:#ffeaea }
+
+/* 댓글 신고(본문 아래) */
+.c-report-under{
+  margin-top:8px;background:transparent;border:0;
+  color:#a83b3b;font-size:12px;padding:0;cursor:pointer
+}
+.c-report-under:hover{text-decoration:underline}
+
+/* 닉네임/삭제 등 이전 스타일 무력화 */
+.c-row-actions{display:none !important}
+.c-del{display:none !important}
 
 .c-form{margin-top:12px;display:grid;gap:8px}
 .input{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;background:#fff;resize:vertical}
