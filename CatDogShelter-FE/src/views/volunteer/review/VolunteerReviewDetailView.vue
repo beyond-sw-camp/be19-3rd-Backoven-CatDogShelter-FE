@@ -181,44 +181,16 @@
       </div>
     </div>
 
+
     <!-- 공유하기 모달 -->
-    <teleport to="body">
-      <div v-if="showShareModal" class="modal-overlay" @click.self="closeShareModal">
-        <div class="share-modal">
-          <div class="modal-header">
-            <h3 class="modal-title">댕냥터 게시글 공유하기</h3>
-            <button class="modal-close" @click="closeShareModal">×</button>
-          </div>
-          <div class="modal-body">
-            <p class="modal-description">가족을 기다리는 댕냥이의 이야기를 함께 퍼뜨려주세요 :_)</p>
-            <div class="share-url-box">
-              <input 
-                type="text" 
-                class="share-url-input" 
-                :value="shareUrl" 
-                readonly
-                ref="shareUrlInput"
-              />
-              <button class="copy-btn" @click="copyUrl">
-                <span class="copy-icon">📋</span>
-              </button>
-            </div>
-            <button class="link-copy-btn" @click="copyUrl">
-              링크 복사
-            </button>
-            <button class="cancel-btn" @click="closeShareModal">
-              취소
-            </button>
-          </div>
-        </div>
-      </div>
-    </teleport>
+    <ShareModal v-model="showShareModal" :review-id="reviewId" />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import ShareModal from '@/components/share/ShareModal.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -257,10 +229,6 @@ const activeCommentMenu = ref(null)
 
 // 공유하기 모달
 const showShareModal = ref(false)
-const shareUrlInput = ref(null)
-const shareUrl = computed(() => {
-  return `https://catdogshelter.com/volunteer/review/${reviewId.value}`
-})
 
 // 외부 클릭 감지를 위한 함수
 const handleClickOutside = (event) => {
@@ -286,7 +254,6 @@ const handleClickOutside = (event) => {
   }
 }
 
-// JSON Server에서 데이터 가져오기
 const fetchReviewDetail = async () => {
   loading.value = true
   error.value = null
@@ -493,27 +460,10 @@ function reportComment(commentId) {
   }
 }
 
-// 공유하기 모달
+
+// 공유하기 모달 (ShareModal 컴포넌트로 분리)
 function openShareModal() {
   showShareModal.value = true
-}
-
-function closeShareModal() {
-  showShareModal.value = false
-}
-
-async function copyUrl() {
-  try {
-    await navigator.clipboard.writeText(shareUrl.value)
-    alert('링크가 복사되었습니다!')
-  } catch (err) {
-    // 클립보드 API 실패 시 대체 방법
-    if (shareUrlInput.value) {
-      shareUrlInput.value.$el.select()
-      document.execCommand('copy')
-      alert('링크가 복사되었습니다!')
-    }
-  }
 }
 </script>
 
@@ -1091,149 +1041,6 @@ async function copyUrl() {
   white-space: nowrap;
 }
 
-/* 공유하기 모달 */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.share-modal {
-  background: white;
-  border-radius: 20px;
-  padding: 0;
-  max-width: 440px;
-  width: 90%;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px 24px 16px;
-  border-bottom: 1px solid #f5f0e8;
-}
-
-.modal-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #3d2f1f;
-  margin: 0;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 2rem;
-  color: #8b7355;
-  cursor: pointer;
-  line-height: 1;
-  padding: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  transition: background 0.2s;
-}
-
-.modal-close:hover {
-  background: #f5f0e8;
-}
-
-.modal-body {
-  padding: 24px;
-}
-
-.modal-description {
-  font-size: 0.95rem;
-  color: #6b5744;
-  margin: 0 0 20px 0;
-  line-height: 1.6;
-}
-
-.share-url-box {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 16px;
-  background: #f5f0e8;
-  padding: 12px;
-  border-radius: 12px;
-}
-
-.share-url-input {
-  flex: 1;
-  padding: 8px 12px;
-  border: 1px solid #e8e0d5;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  background: white;
-  color: #3d2f1f;
-}
-
-.copy-btn {
-  padding: 8px 16px;
-  background: #f0b762;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.copy-btn:hover {
-  background: #e8a54d;
-}
-
-.copy-icon {
-  font-size: 1.2rem;
-}
-
-.link-copy-btn {
-  width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, #f0b762 0%, #e8a54d 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  margin-bottom: 10px;
-}
-
-.link-copy-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(240, 183, 98, 0.4);
-}
-
-.cancel-btn {
-  width: 100%;
-  padding: 14px;
-  background: white;
-  border: 1px solid #e8e0d5;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #6b5744;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.cancel-btn:hover {
-  background: #f5f0e8;
-}
-
-/* 반응형 */
 @media (max-width: 768px) {
   .review-detail-page {
     padding: 20px 16px;

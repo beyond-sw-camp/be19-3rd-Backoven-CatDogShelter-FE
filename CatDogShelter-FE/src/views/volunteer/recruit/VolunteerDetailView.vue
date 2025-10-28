@@ -43,28 +43,28 @@
               <h3 class="info-section-title">봉사 정보</h3>
               <div class="info-grid-detail">
                 <div class="info-item-detail">
-                  <span class="info-icon-detail">📅</span>
+                  <img class="info-icon-detail" :src="calendarIcon" alt="Calendar icon" />
                   <div class="info-text-detail">
                     <p class="info-label-detail">활동일</p>
                     <p class="info-value-detail">{{ volunteer.date }}</p>
                   </div>
                 </div>
                 <div class="info-item-detail">
-                  <span class="info-icon-detail">⏰</span>
+                  <img class="info-icon-detail" :src="clockIcon" alt="Clock icon" />
                   <div class="info-text-detail">
                     <p class="info-label-detail">봉사시간</p>
                     <p class="info-value-detail">{{ volunteer.time }}</p>
                   </div>
                 </div>
                 <div class="info-item-detail">
-                  <span class="info-icon-detail">📍</span>
+                  <img class="info-icon-detail" :src="locationIcon" alt="Location icon" />
                   <div class="info-text-detail">
                     <p class="info-label-detail">장소</p>
                     <p class="info-value-detail">{{ volunteer.location }}</p>
                   </div>
                 </div>
                 <div class="info-item-detail">
-                  <span class="info-icon-detail">👥</span>
+                  <img class="info-icon-detail" :src="peopleIcon" alt="People icon" />
                   <div class="info-text-detail">
                     <p class="info-label-detail">모집인원</p>
                     <p class="info-value-detail">{{ volunteer.participants }}</p>
@@ -101,14 +101,14 @@
                 <span class="apply-status-value" :class="volunteer.statusClass">{{ volunteer.status }}</span>
               </div>
               <div class="apply-date">
-                <span class="apply-date-icon">📅</span>
+                <img class="apply-date-icon" :src="calendarIcon" alt="Calendar icon" />
                 <div>
                   <p class="apply-date-label">활동일</p>
                   <p class="apply-date-value">{{ volunteer.date }}</p>
                 </div>
               </div>
               <div class="apply-participants">
-                <span class="participants-icon">👥</span>
+                <img class="participants-icon" :src="peopleIcon" alt="People icon" />
                 <div>
                   <p class="participants-label">모집 현황</p>
                   <p class="participants-value">{{ volunteer.participants }}</p>
@@ -146,6 +146,10 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import calendarIcon from '@/assets/달력아이콘.svg'
+import clockIcon from '@/assets/시계아이콘.svg'
+import locationIcon from '@/assets/위치아이콘.svg'
+import peopleIcon from '@/assets/인원아이콘.svg'
 
 const router = useRouter()
 const route = useRoute()
@@ -497,8 +501,17 @@ function goToDetail(id) {
   gap: 12px;
 }
 
+.info-icon-detail,
+.apply-date-icon,
+.participants-icon {
+  display: inline-block;
+  flex-shrink: 0;
+}
+
 .info-icon-detail {
-  font-size: 1.5rem;
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
 }
 
 .info-text-detail {
@@ -645,7 +658,9 @@ function goToDetail(id) {
 
 .apply-date-icon,
 .participants-icon {
-  font-size: 1.3rem;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 
 .apply-date-label,
