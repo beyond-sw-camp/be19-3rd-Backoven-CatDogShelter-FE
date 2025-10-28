@@ -233,6 +233,10 @@ const router = createRouter({
         },
       ],
     },
+
+    // src/router/index.js
+    { path: '/auth/find-id', name: 'find.id', component: () => import('@/views/auth/findIdView.vue') },
+
     
 
     // ===== duplicated routes (kept to match existing structure) =====

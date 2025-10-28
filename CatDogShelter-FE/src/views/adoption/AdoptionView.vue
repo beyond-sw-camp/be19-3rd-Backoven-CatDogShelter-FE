@@ -5,18 +5,32 @@
       <p class="board-sub">"새로운 가족을 기다리는 반려동물을 만나보세요 ૮  .    .  ა"</p>
     </section>
 
-    <AdoptionFilter
+  <AdoptionFilter
       v-model:animalType="filters.animalType"
       v-model:sortType="filters.sortType"
       v-model:keyword="filters.keyword"
-      v-model:sidoName="filters.sidoName"
-      v-model:sigunguName="filters.sigunguName"
+      v-model:vaccinated="filters.vaccinated"
+        v-model:neutered="filters.neutered"
       @update="loadPosts"
     />
 
+<!-- 부모 컴포넌트 -->
 <div class="controls">
-  <div class="post-count">
-    총 <strong>{{ totalCount }}</strong>개의 게시글
+  <div class="controls-left">
+
+    <div class="post-count">
+      총 <strong>{{ totalCount }}</strong>개의 게시글
+    </div>
+        <select
+      v-model="filters.sortType"
+      @change="loadPosts(1)"
+      class="sort-select"
+      aria-label="정렬"
+    >
+      <option value="">최신순</option>
+      <option value="view">조회순</option>
+      <option value="liked">추천순</option>
+    </select>
   </div>
 
   <button class="write-btn" @click="goWrite">게시글 등록</button>
@@ -59,14 +73,13 @@ const loading = ref(false);
 const totalCount = ref(0);
 const currentPage = ref(1);
 const totalPages = ref(1);
-
 const filters = reactive({
   keyword: '',
   sortType: '',
   animalType: '',
-  sidoName: '',
-  sigunguName: ''
-});
+  vaccinated: '', // ← 추가
+  neutered: ''    // ← 추가
+})
 
 async function loadPosts(page = currentPage.value) {
   loading.value = true;
@@ -144,10 +157,52 @@ onMounted(() => loadPosts(1));
 
 .controls {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin: 24px 0 20px 0;
+  width: 100%;
 }
+
+.controls-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;           /* 드롭다운과 카운트 사이 간격 */
+}
+
+.sort-select {
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid #e9e2d7;
+  background: #fff;
+  padding: 0 10px;
+  font-size: 14px;
+  color: #453e35;
+}
+
+.post-count {
+  font-size: 14px;
+  color: #666;
+}
+
+.write-btn {
+  margin-left: auto;   /* 등록 버튼을 오른쪽 끝으로 */
+  background: #d8bd89;
+  color: #3b342c;
+  font-weight: 600;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: .2s;
+}
+.write-btn:hover { background: #c7a670; }
+
+@media (max-width: 768px) {
+  .controls { flex-wrap: wrap; }
+  .write-btn { margin-left: 0; width: 100%; }
+}
+
 
 .post-count {
   font-size: 14px;
