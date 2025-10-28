@@ -110,12 +110,13 @@
 
         <div class="search-filter-area">
           <div class="search-input-wrapper">
-            <span class="search-icon">🔍</span>
+            <img class="search-icon" :src="searchIcon" alt="검색 아이콘" />
             <input 
               type="text" 
               placeholder="제목으로 검색..." 
               class="search-input"
               v-model="searchQuery"
+              @keyup.enter="handleSearch"
             />
           </div>
 
@@ -133,18 +134,12 @@
                   {{ sigungu.name }}
                 </option>
               </select>
-              <select class="filter-select" v-model="filters.startDate">
-                <option value="">모집일정</option>
-                <option value="today">오늘</option>
-                <option value="week">이번주</option>
-                <option value="month">이번달</option>
-              </select>
               <select class="filter-select" v-model="filters.deadline">
                 <option value="">모집상태</option>
                 <option value="모집중">모집중</option>
                 <option value="마감임박">마감임박</option>
               </select>
-              <button class="search-btn">검색</button>
+              <button class="search-btn" type="button" @click="handleSearch">검색</button>
             </div>
           </div>
 
@@ -224,6 +219,7 @@ import calendarIcon from '@/assets/달력아이콘.svg'
 import clockIcon from '@/assets/시계아이콘.svg'
 import locationIcon from '@/assets/위치아이콘.svg'
 import peopleIcon from '@/assets/인원아이콘.svg'
+import searchIcon from '@/assets/돋보기아이콘.svg'
 
 const router = useRouter()
 const searchQuery = ref('')
@@ -231,10 +227,12 @@ const currentPage = ref(1)
 const filters = ref({
   sido: '',
   sigungu: '',
-  startDate: '',
   deadline: '',
   sortOrder: 'latest'  // 기본값: 최신순
 })
+
+const appliedQuery = ref('')
+const appliedFilters = ref({ ...filters.value })
 
 // 시/도 목록 (parent가 null인 항목들)
 const sidoList = computed(() => {
@@ -331,57 +329,85 @@ onMounted(() => {
 const currentIndex = ref(0)
 const highlight = computed(() => highlights.value[currentIndex.value])
 
-// 정렬 옵션이 변경되면 우측 목록의 페이지만 초기화 (좌측 카드는 독립적)
-watch(() => filters.value.sortOrder, () => {
-  currentPage.value = 1
-})
-
 const itemsPerPage = 6
 const currentPageGroup = ref(0)
 const pagesPerGroup = 5
 
-const filteredList = computed(() => {
-  // 1. 지역 필터 적용
+function resetPagination() {
+  currentPage.value = 1
+  currentPageGroup.value = 0
+}
+
+const filteredAndSortedList = computed(() => {
   let filteredData = [...list.value]
-  
-  // 시/도 필터
-  if (filters.value.sido) {
-    filteredData = filteredData.filter(item => item.sido === filters.value.sido)
+  const normalizedQuery = appliedQuery.value ? appliedQuery.value.toLowerCase() : ''
+  const { sido, sigungu, deadline, sortOrder } = appliedFilters.value
+
+  if (normalizedQuery) {
+    filteredData = filteredData.filter(item =>
+      (item.title || '').toLowerCase().includes(normalizedQuery)
+    )
   }
-  
-  // 시/군/구 필터
-  if (filters.value.sigungu) {
-    filteredData = filteredData.filter(item => item.sigungu === filters.value.sigungu)
+
+  if (sido) {
+    filteredData = filteredData.filter(item => item.sido === sido)
   }
-  
-  // 2. 정렬 옵션에 따라 정렬
-  if (filters.value.sortOrder === 'oldest') {
-    // 오래된순 (createdAt 오름차순)
+
+  if (sigungu) {
+    filteredData = filteredData.filter(item => item.sigungu === sigungu)
+  }
+
+  if (deadline) {
+    filteredData = filteredData.filter(item => {
+      if (deadline === '모집중') {
+        return item.deadline === '모집중' || item.deadlineClass === 'recruiting'
+      }
+      if (deadline === '마감임박') {
+        return item.deadline === '마감임박' || item.deadlineClass === 'closing'
+      }
+      return true
+    })
+  }
+
+  if (sortOrder === 'oldest') {
     filteredData.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
   } else {
-    // 최신순 (createdAt 내림차순) - 기본값
     filteredData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
   }
-  
-  // 3. 페이지네이션 적용
+
+  return filteredData
+})
+
+const filteredList = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage
   const end = start + itemsPerPage
-  return filteredData.slice(start, end)
+  return filteredAndSortedList.value.slice(start, end)
 })
 
 const totalPages = computed(() => {
-  // 필터링된 전체 개수 기준으로 페이지 수 계산
-  let filteredData = [...list.value]
-  
-  if (filters.value.sido) {
-    filteredData = filteredData.filter(item => item.sido === filters.value.sido)
+  if (filteredAndSortedList.value.length === 0) {
+    return 0
   }
-  
-  if (filters.value.sigungu) {
-    filteredData = filteredData.filter(item => item.sigungu === filters.value.sigungu)
+  return Math.ceil(filteredAndSortedList.value.length / itemsPerPage)
+})
+
+watch(filteredAndSortedList, newList => {
+  const total = Math.ceil(newList.length / itemsPerPage)
+  if (total === 0) {
+    if (currentPage.value !== 1 || currentPageGroup.value !== 0) {
+      resetPagination()
+    }
+    return
   }
-  
-  return Math.ceil(filteredData.length / itemsPerPage)
+
+  if (currentPage.value > total) {
+    currentPage.value = total
+  }
+
+  const targetGroup = Math.floor((currentPage.value - 1) / pagesPerGroup)
+  if (currentPageGroup.value !== targetGroup) {
+    currentPageGroup.value = targetGroup
+  }
 })
 
 const visiblePages = computed(() => {
@@ -428,6 +454,14 @@ function goToNextGroup() {
 
 function goToPage(page) {
   currentPage.value = page
+}
+
+function handleSearch() {
+  const trimmed = searchQuery.value.trim()
+  searchQuery.value = trimmed
+  appliedQuery.value = trimmed
+  appliedFilters.value = { ...filters.value }
+  resetPagination()
 }
 
 function goToRecruitInsert() {
@@ -901,8 +935,9 @@ function applyVolunteer(id) {
   left: 16px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1rem;
-  color: #8b7355;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
 }
 
 .search-input {

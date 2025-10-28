@@ -15,7 +15,7 @@
 
             <div class="table-controls">
                 <div class="search-box">
-                    <span class="search-icon">🔍</span>
+                    <img class="search-icon" :src="searchIcon" alt="검색 아이콘" />
                     <input 
                         type="text" 
                         placeholder="검색" 
@@ -151,6 +151,7 @@
 
 <script setup>
     import { computed, watch, ref } from 'vue';
+    import searchIcon from '@/assets/돋보기아이콘.svg';
 
     const props = defineProps({
         // 테이블 제목
@@ -295,7 +296,10 @@
     }
 
     .search-icon {
-        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        pointer-events: none;
     }
 
     .search-box input {

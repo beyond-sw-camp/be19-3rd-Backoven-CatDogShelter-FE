@@ -1740,5 +1740,35 @@
         }
       ]
     }
+  },
+  "userMypage": {
+    "user": {
+      "profileAscii": "⋆｡⋆✩°｡⋆｡✧ ░(๑˃̵ᴗ˂̵)و ░ ✧｡⋆｡✩°⋆｡",
+      "profileEmoji": "(=^･ω･^=)♡",
+      "badgeLabel": "당신의 댕냥",
+      "userName": "이지윤",
+      "userAccount": "jiyoon0404@gmail.com",
+      "phone": "010-2244-4422",
+      "address": "서울특별시 강남구",
+      "createdAt": "2025-01-19"
+    },
+    "stats": {
+      "posts": 1,
+      "likes": 0
+    },
+    "heroInfo": {
+      "rank": 140,
+      "label": "이달의댕냥 히어로즈"
+    },
+    "myPosts": [
+      {
+        "id": 1,
+        "category": "입양게시판",
+        "title": "길고양이 임보 중입니다.",
+        "date": "2025-10-21",
+        "views": 0,
+        "likes": 0
+      }
+    ]
   }
 }

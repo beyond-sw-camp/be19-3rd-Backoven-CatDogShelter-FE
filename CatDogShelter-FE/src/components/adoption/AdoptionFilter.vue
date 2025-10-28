@@ -7,7 +7,7 @@
         <i class="caret">▾</i>
       </div>
       <div class="search-input">
-        <span class="icon">🔎</span>
+        <img class="icon" :src="searchIcon" alt="검색 아이콘" />
         <input
           v-model.trim="keyword"
           @keyup.enter="applyFilter"
@@ -19,7 +19,7 @@
     <!-- ── 하단 필터 바: 3 셀렉트 + 오른쪽 검색 버튼 ── -->
     <div class="filter-bar">
       <div class="filter-head">
-        <span class="emoji">🔎</span>
+        <img class="emoji" :src="searchIcon" alt="검색 아이콘" />
         <span class="title">필터</span>
         <span class="help">동물의 상태를 빠르게 선택해서 조회가 가능해요</span>
       </div>
@@ -65,6 +65,7 @@
 </template>
 
 <script setup>
+import searchIcon from '@/assets/돋보기아이콘.svg'
 const emit = defineEmits(['update'])
 
 /* 부모 v-model 연동 */
@@ -118,7 +119,20 @@ function applyFilter() { emit('update') }
   border: none; outline: none; background: transparent;
   font-size: 14px;
 }
-.icon { font-style: normal; opacity: .75; }
+.icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.emoji {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  pointer-events: none;
+}
 
 /* ── 하단 필터 바 ── */
 .filter-bar {
