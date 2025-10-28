@@ -288,6 +288,10 @@ const router = createRouter({
 
     // src/router/index.js
     { path: '/auth/find-id', name: 'find.id', component: () => import('@/views/auth/findIdView.vue') },
+    { path: '/auth/find-password',        name: 'find.password.request', component: () => import('@/views/auth/findPasswordRequestView.vue') },
+    { path: '/auth/find-password/verify', name: 'find.password.verify',  component: () => import('@/views/auth/findPasswordVerifyView.vue') },
+    { path: '/auth/find-password/reset',  name: 'find.password.reset',   component: () => import('@/views/auth/findPasswordResetView.vue') },
+
 
 
 
@@ -339,6 +343,8 @@ const router = createRouter({
     // ],
     // 404 → home
     { path: '/:pathMatch(.*)*', redirect: '/' },
+
+    
   ],
   // always scroll to top on route change
   scrollBehavior: () => ({ top: 0 }),
