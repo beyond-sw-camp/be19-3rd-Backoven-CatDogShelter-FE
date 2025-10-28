@@ -43,14 +43,14 @@
                   <div class="info-grid">
                     <div class="info-row">
                       <div class="info-item">
-                        <span class="info-icon">📅</span>
+                        <img class="info-icon" :src="calendarIcon" alt="달력 아이콘" />
                         <div class="info-text">
                           <p class="info-label">활동일</p>
                           <p class="info-value">{{ highlight.startDate }}</p>
                         </div>
                       </div>
                       <div class="info-item">
-                        <span class="info-icon">⏰</span>
+                        <img class="info-icon" :src="clockIcon" alt="시계 아이콘" />
                         <div class="info-text">
                           <p class="info-label">봉사시간</p>
                           <p class="info-value">{{ highlight.time }}</p>
@@ -59,14 +59,14 @@
                     </div>
                     <div class="info-row">
                       <div class="info-item">
-                        <span class="info-icon">📍</span>
+                        <img class="info-icon" :src="locationIcon" alt="위치 아이콘" />
                         <div class="info-text">
                           <p class="info-label">장소</p>
                           <p class="info-value">{{ highlight.detailAddress }}</p>
                         </div>
                       </div>
                       <div class="info-item">
-                        <span class="info-icon">👥</span>
+                        <img class="info-icon" :src="peopleIcon" alt="인원 아이콘" />
                         <div class="info-text">
                           <p class="info-label">모집인원</p>
                           <p class="info-value">{{ highlight.numberOfPeople }}</p>
@@ -166,20 +166,20 @@
               <h4 class="item-title">{{ item.title }}</h4>
             </div>
             <div class="list-item-right">
-              <div class="item-info-row">
+              <div class="item-info-row item-info-row--top">
                 <span class="item-info">
-                  <span class="info-icon-small">📅</span> {{ item.startDate }}
+                  <img class="info-icon-small" :src="calendarIcon" alt="달력 아이콘" /> {{ item.startDate }}
                 </span>
                 <span class="item-info">
-                  <span class="info-icon-small">👥</span> {{ item.numberOfPeople }}
+                  <img class="info-icon-small" :src="clockIcon" alt="시계 아이콘" /> {{ item.time }}
+                </span>
+                <span class="item-info">
+                  <img class="info-icon-small" :src="peopleIcon" alt="인원 아이콘" /> {{ item.numberOfPeople }}
                 </span>
               </div>
-              <div class="item-info-row">
-                <span class="item-info">
-                  <span class="info-icon-small">📍</span> {{ item.detailAddress }}
-                </span>
-                <span class="item-info">
-                  <span class="info-icon-small">⏰</span> {{ item.time }}
+              <div class="item-info-row item-info-row--location">
+                <span class="item-info item-info--location">
+                  <img class="info-icon-small" :src="locationIcon" alt="위치 아이콘" /> {{ item.detailAddress }}
                 </span>
               </div>
             </div>
@@ -220,6 +220,10 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import regionsData from '@/assets/data/regions.json'
+import calendarIcon from '@/assets/달력아이콘.svg'
+import clockIcon from '@/assets/시계아이콘.svg'
+import locationIcon from '@/assets/위치아이콘.svg'
+import peopleIcon from '@/assets/인원아이콘.svg'
 
 const router = useRouter()
 const searchQuery = ref('')
@@ -631,8 +635,15 @@ function applyVolunteer(id) {
   border-radius: 10px;
 }
 
+.info-icon,
+.info-icon-small {
+  display: inline-block;
+  object-fit: contain;
+}
+
 .info-icon {
-  font-size: 1.2rem;
+  width: 20px;
+  height: 20px;
 }
 
 .info-text {
@@ -1066,20 +1077,40 @@ function applyVolunteer(id) {
 
 .item-info-row {
   display: flex;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  width: 100%;
 }
 
 .item-info {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   font-size: 0.85rem;
   color: #6b5744;
   white-space: nowrap;
 }
 
+.item-info-row--top {
+  justify-content: flex-start;
+}
+
+.item-info-row--top .item-info {
+  flex: 0 1 auto;
+}
+
+.item-info-row--location {
+  margin-top: 6px;
+}
+
+.item-info--location {
+  flex: 1 1 100%;
+  white-space: normal;
+}
+
 .info-icon-small {
-  font-size: 0.9rem;
+  width: 16px;
+  height: 16px;
 }
 
 /* 페이지네이션 */
