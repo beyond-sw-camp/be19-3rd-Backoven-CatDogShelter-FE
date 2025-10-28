@@ -50,7 +50,7 @@
       <!-- ===== 게시판 헤더 (게시글 수 / 정렬 / 작성 버튼) ===== -->
       <section class="board-headbar">
         <div class="board-left">
-          <span class="board-count">총 {{ posts.length }}개의 게시글</span>
+          <span class="board-count">총 {{ allPosts.length }}개의 게시글</span>
 
           <div class="sort-row">
             <label for="sortSelect" class="sort-label">정렬 조건</label>
@@ -58,7 +58,7 @@
               id="sortSelect"
               class="sort-select"
               v-model="sortOption"
-              @change="applySort"
+              @change="applySortAndResetPage"
             >
               <option value="latest">최신순</option>
               <option value="view">조회순</option>
@@ -88,7 +88,7 @@
 
           <tbody>
             <tr
-              v-for="post in posts"
+              v-for="post in pagedPosts"
               :key="post.id"
               class="board-row"
               @click="goDetail(post.id)"
@@ -132,7 +132,7 @@
               <td>{{ post.createdAt }}</td>
             </tr>
 
-            <tr v-if="posts.length === 0">
+            <tr v-if="pagedPosts.length === 0">
               <td colspan="6" class="empty-row">
                 등록된 게시글이 없습니다.
               </td>
@@ -140,6 +140,35 @@
           </tbody>
         </table>
       </section>
+
+      <!-- ===== 페이지네이션 ===== -->
+     <nav class="pagination-wrap" v-if="pagedPosts.length > 0">
+  <button
+    class="page-btn"
+    :disabled="currentPage === 1"
+    @click="goPrevPage"
+  >
+    이전
+  </button>
+
+  <button
+    v-for="p in pageNumbersToShow"
+    :key="p"
+    class="page-btn"
+    :class="{ active: p === currentPage }"
+    @click="goPage(p)"
+  >
+    {{ p }}
+  </button>
+
+  <button
+    class="page-btn"
+    :disabled="currentPage === totalPages"
+    @click="goNextPage"
+  >
+    다음
+  </button>
+</nav>
 
       <!-- ===== 보호소 후원 안내 ===== -->
       <section class="donation-guide-box">
@@ -187,13 +216,17 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 // 보호소장 여부 (role 체크로 세팅 예정)
-const isShelterHead = ref(false)
+// const isShelterHead = ref(false)
 
 // 전체 원본 목록 (검색/정렬 전 데이터)
 const allPosts = ref([])
 
-// 화면에 실제로 렌더되는 목록
+// 검색/정렬까지 반영된 현재 결과 (페이지 나누기 전)
 const posts = ref([])
+
+// 페이지네이션 상태
+const currentPage = ref(1)
+const pageSize = ref(10) // 한 페이지에 보여줄 게시글 수
 
 // 상단 통계 데이터
 const stats = ref({
@@ -209,6 +242,7 @@ const keyword = ref('')
 // 정렬 상태 (latest | view | like)
 const sortOption = ref('latest')
 
+// 모달
 const showRoleModal = ref(false)
 
 const searchPlaceholder = computed(() => {
@@ -217,40 +251,75 @@ const searchPlaceholder = computed(() => {
   return '검색어를 입력하세요'
 })
 
-/**
- * 정렬 적용
- * sortOption.value 에 따라 posts.value를 정렬한다.
- * posts.value 자체를 정렬하므로 검색 후에도 그대로 동작.
- */
-function applySort() {
-  const arr = [...posts.value]
+/* ===== 페이지네이션 계산 ===== */
+const totalPages = computed(() => {
+  return Math.max(1, Math.ceil(posts.value.length / pageSize.value))
+})
+
+const pagedPosts = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  return posts.value.slice(start, start + pageSize.value)
+})
+
+// 페이지 번호 (간단히 1 ~ totalPages 전부 보여주기)
+const pageNumbersToShow = computed(() => {
+  const pages = []
+  for (let p = 1; p <= totalPages.value; p++) {
+    pages.push(p)
+  }
+  return pages
+})
+
+function goPage(p) {
+  currentPage.value = p
+}
+
+function goPrevPage() {
+  if (currentPage.value > 1) {
+    currentPage.value -= 1
+  }
+}
+
+function goNextPage() {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value += 1
+  }
+}
+
+/* ===== 정렬 로직 ===== */
+function sortArray(arr) {
+  const copy = [...arr]
 
   if (sortOption.value === 'latest') {
-    // createdAt 문자열을 Date로 변환 후 최신순
-    arr.sort((a, b) => {
+    // createdAt 문자열을 Date로 변환 후 최신순 정렬
+    copy.sort((a, b) => {
       const da = new Date(a.createdAt?.replace(' ', 'T'))
       const db = new Date(b.createdAt?.replace(' ', 'T'))
       return db - da
     })
   } else if (sortOption.value === 'view') {
-    arr.sort((a, b) => {
+    copy.sort((a, b) => {
       const va = Number(a.view ?? 0)
       const vb = Number(b.view ?? 0)
       return vb - va
     })
   } else if (sortOption.value === 'like') {
-    arr.sort((a, b) => {
+    copy.sort((a, b) => {
       const la = Number(a.likeCount ?? 0)
       const lb = Number(b.likeCount ?? 0)
       return lb - la
     })
   }
 
-  posts.value = arr
+  return copy
 }
 
-/**
- * 후원게시판 목록 불러오기
+function applySortAndResetPage() {
+  posts.value = sortArray(posts.value)
+  currentPage.value = 1
+}
+
+/* ===== 목록 불러오기 =====
  * GET http://localhost:8000/post-service/donation-posts/query/posts
  */
 async function fetchDonationPosts() {
@@ -267,13 +336,12 @@ async function fetchDonationPosts() {
     )
 
     if (!res.ok) {
-      console.error('[후원게시판 로드 실패]', res.status)
+      console.error('[ 로드 실패]', res.status)
       return
     }
 
     const data = await res.json()
 
-    // data가 배열이라고 가정
     const mapped = Array.isArray(data)
       ? data.map(item => ({
           id: item.id,
@@ -287,7 +355,9 @@ async function fetchDonationPosts() {
       : []
 
     allPosts.value = mapped
-    posts.value = mapped
+
+    // 검색/정렬 전 전체 -> 현재 posts에도 반영
+    posts.value = sortArray(mapped)
 
     // 통계 갱신
     stats.value = {
@@ -299,40 +369,40 @@ async function fetchDonationPosts() {
       )
     }
 
-    // 기본 정렬(최신순) 적용
-    applySort()
+    currentPage.value = 1
   } catch (err) {
     console.error('fetchDonationPosts Error:', err)
   }
 }
 
-/**
- * 검색
- */
+/* ===== 검색 ===== */
 function onSearch() {
   const k = keyword.value.trim()
 
   if (!k) {
-    posts.value = allPosts.value
+    // 검색어 없으면 전체로 복구
+    posts.value = sortArray(allPosts.value)
   } else {
-    posts.value = allPosts.value.filter(p => {
+    const filtered = allPosts.value.filter(p => {
       const field = searchField.value
       const target = p[field]
       if (target == null) return false
       return String(target).includes(k)
     })
+
+    posts.value = sortArray(filtered)
   }
 
-  applySort()
+  currentPage.value = 1
 }
 
-/**
- * 글쓰기 버튼
- */
+// 보호소장 여부 (나중에 JWT에서 role 꺼내서 true/false 주면 됨)
+const isShelterHead = ref(true) // 데모용. 보호소장이라고 가정해서 글쓰기 가능하게.
+
+// 글쓰기 버튼
 function handleWriteClick() {
   if (isShelterHead.value) {
-    // router.push({ name: 'donation-write' })
-    alert('작성 페이지로 이동 (라우트 연결 필요)')
+    router.push({ name: 'donation.write' })
   } else {
     showRoleModal.value = true
   }
@@ -342,10 +412,7 @@ function closeRoleModal() {
   showRoleModal.value = false
 }
 
-/**
- * 상세 페이지 이동
- * 라우터에서 name: 'donation-detail', path: '/donation/:id'
- */
+/* ===== 상세 페이지 이동 ===== */
 function goDetail(id) {
   router.push({ name: 'donation-detail', params: { id } })
 }
@@ -361,16 +428,12 @@ onMounted(() => {
   background-color: #efe8dd;
   color: #2a1c10;
   min-height: 100vh;
-
-  /* 바깥 배경 전체 영역만 담당 */
   padding: 24px 0px 100px;
-
   display: flex;
   flex-direction: column;
   font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
 }
 
-/* ✅ 가운데 컨테이너 */
 .donation-inner {
   width: 100%;
   max-width: 1150px;
@@ -462,7 +525,7 @@ onMounted(() => {
   color: #8a6237;
 }
 
-/* ===== 게시판 상단 (게시글수 / 정렬 / 작성버튼) ===== */
+/* ===== 게시판 상단 ===== */
 .board-headbar {
   background: #f8f1e5;
   border-radius: 8px;
@@ -473,7 +536,6 @@ onMounted(() => {
   flex-wrap: wrap;
   row-gap: 12px;
 }
-
 .board-left {
   display: flex;
   flex-wrap: wrap;
@@ -482,15 +544,12 @@ onMounted(() => {
   font-size: 14px;
   color: #4a3a2a;
 }
-
 .board-count {
   font-size: 14px;
   color: #4a3a2a;
   line-height: 1.4;
   white-space: nowrap;
 }
-
-/* 정렬 영역 */
 .sort-row {
   display: flex;
   align-items: center;
@@ -498,13 +557,11 @@ onMounted(() => {
   flex-wrap: nowrap;
   white-space: nowrap;
 }
-
 .sort-label {
   font-size: 14px;
   color: #4a3a2a;
   line-height: 1.4;
 }
-
 .sort-select {
   appearance: none;
   background-color: #fff;
@@ -516,8 +573,6 @@ onMounted(() => {
   color: #2a1c10;
   min-width: 90px;
   cursor: pointer;
-
-  /* 커스텀 드롭다운 화살표 */
   background-image:
     linear-gradient(45deg, transparent 50%, #6f4f2a 50%),
     linear-gradient(135deg, #6f4f2a 50%, transparent 50%);
@@ -527,7 +582,6 @@ onMounted(() => {
   background-size: 6px 6px, 6px 6px;
   background-repeat: no-repeat;
 }
-
 .write-btn {
   background: #8a6237;
   color: #fff;
@@ -586,12 +640,46 @@ onMounted(() => {
   line-height: 1.4;
   word-break: keep-all;
 }
-
 .empty-row {
   text-align: center;
   padding: 20px;
   color: #8a7a6b;
   font-size: 14px;
+}
+
+/* ===== 페이지네이션 ===== */
+.pagination-wrap {
+  background: #f3eee6;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.04);
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.page-btn {
+  min-width: 44px;
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid #d4c7ad;
+  background: #fff;
+  font-size: 14px;
+  line-height: 1.3;
+  color: #2a1c10;
+  cursor: pointer;
+  font-weight: 500;
+}
+.page-btn[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.page-btn.active {
+  background: #d9c488;
+  color: #2a1c10;
+  border-color: #d9c488;
+  font-weight: 600;
 }
 
 /* ===== 후원 안내 ===== */
@@ -691,7 +779,7 @@ onMounted(() => {
   font-weight: 500;
 }
 
-/* 반응형(모바일에서 양 옆 조금 더 붙이고 싶으면 여기 조정 가능) */
+/* 반응형 */
 @media (max-width: 768px) {
   .donation-inner {
     padding: 0 16px;

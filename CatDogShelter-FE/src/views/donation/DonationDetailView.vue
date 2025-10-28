@@ -37,23 +37,13 @@
 
       <!-- ===== 액션 버튼들 ===== -->
       <div class="action-row">
-        <button class="action-chip">
+        <button class="action-chip" @click="toggleLike">
           🤍 좋아요 {{ post.likeCount }}
         </button>
         <button class="action-chip">🔗 공유하기</button>
         <button class="action-chip report-chip">🚨 신고하기</button>
       </div>
 
-      <!-- ===== 관련 (이전/다음/카테고리 모음 등) ===== -->
-      <nav class="related-nav">
-        <RouterLink class="related-link" to="/donation">
-          ← 긴급 후원 요청 모아보기
-        </RouterLink>
-
-        <RouterLink class="related-link" to="/donation">
-          필요한 물품 후원 안내 더 보기 →
-        </RouterLink>
-      </nav>
 
       <!-- ===== 댓글 영역 ===== -->
       <section class="comment-block">
@@ -77,25 +67,37 @@
         </div>
 
         <!-- 댓글 리스트 -->
-        <ul class="comment-list" v-if="comments.length > 0">
-          <li
-            v-for="c in comments"
-            :key="c.id"
-            class="comment-item"
-          >
-            <div class="comment-meta">
-              <span class="comment-writer">{{ c.writer }}</span>
-              <span class="comment-date">{{ c.createdAt }}</span>
-            </div>
-            <p class="comment-content">{{ c.content }}</p>
-          </li>
-        </ul>
+      <ul class="comment-list">
+  <li v-for="c in comments" :key="c.id" class="comment-item">
+    <div class="comment-meta">
+      <span class="comment-writer">{{ c.writer }}</span>
+      <span class="comment-date">{{ c.createdAt }}</span>
+    </div>
 
-        <div v-else class="no-comment">아직 댓글이 없습니다.</div>
+    <p class="comment-content">{{ c.content }}</p>
+
+    <!-- 일단 수정/삭제 버튼은 항상 보이게 -->
+    <div class="comment-actions">
+      <button @click="updateComment(c.id, prompt('내용 수정', c.content) || c.content)">
+        수정
+      </button>
+      <button @click="deleteComment(c.id)">삭제</button>
+    </div>
+  </li>
+</ul>
+  <div v-if="comments.length === 0" class="comment-item">
+    <div class="comment-content" style="color:#8b7a67;font-size:14px;">
+      아직 댓글이 없습니다.
+    </div>
+  </div>
+
+
       </section>
     </section>
   </div>
 </template>
+
+
 
 <script>
 import { ref, computed, onMounted } from 'vue'
@@ -109,36 +111,44 @@ export default {
 
     const postId = route.params.id
 
-    // 게시글 데이터
+    // 임시 로그인/식별자 (나중에 토큰 기반으로 치환)
+    const dummyHeadId = 3   // 보호소장 id (삭제/권한용)
+    const dummyUserId = 16   // 실제 user 테이블에 존재하는 user_id
+
+    // ===== 게시글 상태 =====
     const post = ref({
       id: null,
       title: '',
       content: '',
-      shelterName: '', // 보호소명
+      shelterName: '',
       writer: '',
       createdAt: '',
       view: 0,
-      likeCount: 0
+      likeCount: 0,
+      // 서버가 이미지 리스트 돌려주면 여기에도 추가 가능 ex) images: []
     })
 
-    // 내 글 여부 -> 삭제 버튼 노출 컨트롤
+    // 내가 쓴 글인지 여부 (삭제 버튼 노출용)
     const isMyPost = ref(false)
 
-    // 댓글 상태
+    // ===== 댓글 상태 =====
     const comments = ref([])
     const newComment = ref('')
 
-    // 본문 줄바꿈 유지
-    const formattedContent = computed(() => {
-      return post.value.content.replace(/\n/g, '<br/>')
-    })
+    // ===== 본문 줄바꿈 처리 =====
+    const formattedContent = computed(() =>
+      post.value.content
+        ? post.value.content.replace(/\n/g, '<br/>')
+        : ''
+    )
 
-    // 목록으로 이동
+    // ===== 목록으로 이동 =====
     const goList = () => {
       router.push('/donation')
     }
 
-    // 단건 조회
+    // ===== 게시글 상세 불러오기 =====
+    // GET /post-service/donation-posts/query/posts/{postId}
     const fetchPost = async () => {
       try {
         const res = await fetch(
@@ -147,8 +157,8 @@ export default {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${sessionStorage.getItem('accessToken') || ''}`
-            }
+              Authorization: `Bearer ${sessionStorage.getItem('accessToken') || ''}`,
+            },
           }
         )
 
@@ -158,114 +168,228 @@ export default {
 
         const data = await res.json()
 
-        // ⚠️ 여기서 data의 실제 필드명을 백엔드 DTO에 맞춰 매핑해야 돼.
-        // 아래는 예시 매핑이야. 너네 백엔드 응답 구조에 맞춰 키 이름만 바꾸면 됨.
+        // 응답을 화면 모델로 매핑
         post.value = {
           id: data.id,
           title: data.title,
           content: data.content,          // 본문
-          shelterName: data.shelterName,  // 보호소명 (목록 첫 컬럼)
+          shelterName: data.shelterName,  // 보호소명
           writer: data.userName,          // 작성자
-          createdAt: data.createdAt,      // 작성일 "2025-09-10 19:10"
-          view: data.view,                // 조회수
-          likeCount: data.likeCount       // 좋아요 수
+          createdAt: data.createdAt,      // 작성일
+          view: data.view,
+          likeCount: data.likeCount,
+          // 만약 data.images 같은 게 있다면 여기에 붙이면 됨
         }
 
-        // 내 글인지 여부 세팅 (userId 비교 같은 거)
-        // isMyPost.value = data.writerUserId === myUserId
+        // TODO: 실제로는 data.headId === 내 headId 이런식으로 비교해야 함
+        isMyPost.value = true
       } catch (err) {
         console.error('[Error] 게시글 조회 실패:', err)
       }
     }
 
-    // 댓글 목록 조회
-    const fetchComments = async () => {
-      try {
-        const res = await fetch(
-          `http://localhost:8000/post-service/donation-posts/query/posts/${postId}/comments`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${sessionStorage.getItem('accessToken') || ''}`
-            }
-          }
-        )
-
-        if (!res.ok) {
-          throw new Error('댓글 조회 실패')
-        }
-
-        const list = await res.json()
-
-        // list 배열의 각 요소를 화면용으로 변환
-        comments.value = list.map(item => ({
-          id: item.id,
-          writer: item.userName,
-          createdAt: item.createdAt,
-          content: item.content
-        }))
-      } catch (err) {
-        console.error('[Error] 댓글 조회 실패:', err)
+    // ===== 댓글 목록 불러오기 =====
+    // GET /post-service/donation-posts/query/posts/{postId}/comments
+  const fetchComments = async () => {
+  try {
+    const res = await fetch(
+      `http://localhost:8000/post-service/donation-posts/query/posts/${postId}/comments`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${sessionStorage.getItem('accessToken') || ''}`,
+        },
       }
+    )
+
+    if (!res.ok) {
+      const errText = await res.text()
+      console.error('[댓글 조회 실패]', res.status, errText)
+      return
     }
 
-    // 댓글 작성
+    // 👇 전체 응답
+    const data = await res.json()
+    // data.comments 가 진짜 댓글 배열임
+    const arr = Array.isArray(data.comments) ? data.comments : []
+
+    comments.value = arr.map(item => ({
+      id: item.id,
+      writer: item.userName,        // "김하진"
+      createdAt: item.createdAt,    // "2025-10-28 07:38:58"
+      content: item.content,        // "test"
+      badge: item.userRating,       // "댕냥보호천사"
+      // userId가 안 오니까 일단 생략
+    }))
+
+    // (선택) 디버그 로그
+    console.log('[comments mapped]', comments.value)
+  } catch (err) {
+    console.error('[Error] 댓글 조회 중 예외:', err)
+  }
+}
+
+    // ===== 댓글 작성 =====
+    // POST /post-service/donation-posts/{postId}/comments
+    // body: { content, userId, headId }
     const submitComment = async () => {
-      if (!newComment.value) return
+      if (!newComment.value.trim()) return
+
+      const payload = {
+        content: newComment.value,
+        userId: dummyUserId,
+        headId: dummyHeadId,
+      }
 
       try {
         const res = await fetch(
-          `http://localhost:8000/post-service/donation-posts/query/posts/${postId}/comments`,
+          `http://localhost:8000/post-service/donation-posts/${postId}/comments`,
           {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${sessionStorage.getItem('accessToken') || ''}`
+              Authorization: `Bearer ${sessionStorage.getItem('accessToken') || ''}`,
             },
-            body: JSON.stringify({
-              content: newComment.value
-            })
+            body: JSON.stringify(payload),
           }
         )
 
         if (!res.ok) {
-          throw new Error('댓글 작성 실패')
+          const msg = await res.text()
+          console.error('[submitComment] fail body:', msg)
+          throw new Error(`댓글 작성 실패 ${res.status}: ${msg}`)
         }
 
+        // 성공했으니까 입력창 비우고
         newComment.value = ''
-        fetchComments()
+
+        // 최신 댓글 다시 불러오기
+        await fetchComments()
       } catch (err) {
         console.error('[Error] 댓글 작성 실패:', err)
+        alert('댓글 작성 중 오류가 발생했습니다.')
       }
     }
 
-    // 글 삭제
+    // ===== 댓글 수정 =====
+    // PUT /post-service/donation-posts/comments/{commentId}?userId=6
+    const updateComment = async (commentId, newContent) => {
+      try {
+        const res = await fetch(
+          `http://localhost:8000/post-service/donation-posts/comments/${commentId}?userId=${dummyUserId}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${sessionStorage.getItem('accessToken') || ''}`,
+            },
+            body: JSON.stringify({
+              content: newContent,
+            }),
+          }
+        )
+
+        if (!res.ok) {
+          const msg = await res.text()
+          throw new Error(`댓글 수정 실패 ${res.status}: ${msg}`)
+        }
+
+        await fetchComments()
+      } catch (err) {
+        console.error('[Error] 댓글 수정 실패:', err)
+        alert('댓글 수정 중 오류가 발생했습니다.')
+      }
+    }
+
+    // ===== 댓글 삭제 =====
+    // DELETE /post-service/donation-posts/comments/{commentId}?userId=6
+    const deleteComment = async (commentId) => {
+      const ok = confirm('이 댓글을 삭제할까요?')
+      if (!ok) return
+
+      try {
+        const res = await fetch(
+          `http://localhost:8000/post-service/donation-posts/comments/${commentId}?userId=${dummyUserId}`,
+          {
+            method: 'DELETE',
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem('accessToken') || ''}`,
+            },
+          }
+        )
+
+        if (!res.ok) {
+          const msg = await res.text()
+          throw new Error(`댓글 삭제 실패 ${res.status}: ${msg}`)
+        }
+
+        await fetchComments()
+      } catch (err) {
+        console.error('[Error] 댓글 삭제 실패:', err)
+        alert('댓글 삭제 중 오류가 발생했습니다.')
+      }
+    }
+
+    // ===== 게시글 삭제 =====
+    // DELETE /post-service/donation-posts/{postId}?headId=3
     const onDeletePost = async () => {
       const ok = confirm('정말 삭제하시겠습니까?')
       if (!ok) return
 
       try {
         const res = await fetch(
-          `http://localhost:8000/post-service/donation-posts/query/posts/${postId}`,
+          `http://localhost:8000/post-service/donation-posts/${postId}?headId=${dummyHeadId}`,
           {
             method: 'DELETE',
             headers: {
-              Authorization: `Bearer ${sessionStorage.getItem('accessToken') || ''}`
-            }
+              Authorization: `Bearer ${sessionStorage.getItem('accessToken') || ''}`,
+            },
           }
         )
 
         if (!res.ok) {
-          throw new Error('삭제 실패')
+          const msg = await res.text()
+          throw new Error(`삭제 실패 ${res.status}: ${msg}`)
         }
 
         router.push('/donation')
       } catch (err) {
         console.error('[Error] 게시글 삭제 실패:', err)
+        alert('게시글 삭제 중 오류가 발생했습니다.')
       }
     }
 
+    // ===== 좋아요 =====
+    // POST /post-service/donation-posts/{postId}/like?userId=3  (좋아요)
+    // DELETE /post-service/donation-posts/{postId}/like?userId=3 (취소)
+    // 일단은 누르면 좋아요 추가만
+    const toggleLike = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:8000/post-service/donation-posts/${postId}/like?userId=${dummyUserId}`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem('accessToken') || ''}`,
+            },
+          }
+        )
+
+        if (!res.ok) {
+          const msg = await res.text()
+          throw new Error(`좋아요 실패 ${res.status}: ${msg}`)
+        }
+
+        // 다시 게시글 상세 불러와서 likeCount 갱신
+        await fetchPost()
+      } catch (err) {
+        console.error('[Error] 좋아요 실패:', err)
+        alert('좋아요 처리 중 오류가 발생했습니다.')
+      }
+    }
+
+    // 마운트 시 최초 로드
     onMounted(() => {
       fetchPost()
       fetchComments()
@@ -277,11 +401,16 @@ export default {
       newComment,
       formattedContent,
       isMyPost,
+
       goList,
       submitComment,
-      onDeletePost
+      updateComment,
+      deleteComment,
+      onDeletePost,
+      toggleLike,
+      dummyUserId,
     }
-  }
+  },
 }
 </script>
 
@@ -348,10 +477,13 @@ export default {
 .meta-list {
   display: flex;
   flex-wrap: wrap;
+   align-items: center;
   gap: 8px 12px;
   font-size: 14px;
   color: #6a5642;
   line-height: 1.4;
+    list-style: none;
+  padding-left: 0;
 }
 
 .meta-category {
@@ -481,7 +613,11 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
 }
+
 
 .comment-item {
   background-color: #fffefc;
