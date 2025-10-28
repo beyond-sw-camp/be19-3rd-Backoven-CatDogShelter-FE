@@ -116,7 +116,7 @@
               </div>
             </div>
             
-            <button class="apply-btn-sidebar">
+            <button class="apply-btn-sidebar" @click="openModal">
               <span class="heart-icon">♡</span>
               봉사 신청하기
             </button>
@@ -141,12 +141,20 @@
       </div>
     </div>
   </section>
+    
+    <!-- 봉사 신청 모달 -->
+    <ApplyModal 
+      :isOpen="isModalOpen"
+      @close="closeModal"
+      @confirm="handleConfirm"
+    />
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import calendarIcon from '@/assets/달력아이콘.svg'
+import ApplyModal from '@/views/volunteer/recruit/ApplyModal.vue'
 import clockIcon from '@/assets/시계아이콘.svg'
 import locationIcon from '@/assets/위치아이콘.svg'
 import peopleIcon from '@/assets/인원아이콘.svg'
@@ -171,6 +179,8 @@ const volunteer = ref(null)
 const relatedVolunteers = ref([])
 const loading = ref(true)
 const error = ref(null)
+// 모달 상태
+const isModalOpen = ref(false)
 
 // JSON Server에서 데이터 가져오기
 const fetchVolunteerDetail = async () => {
@@ -268,6 +278,21 @@ function goBack() {
 
 function goToDetail(id) {
   router.push(`/volunteer/detail/${id}`)
+}
+
+function openModal() {
+  isModalOpen.value = true
+}
+
+function closeModal() {
+  isModalOpen.value = false
+}
+
+function handleConfirm() {
+  console.log('봉사 신청 완료!')
+  // TODO: 실제 API 호출 로직 추가
+  // 예: await applyVolunteer(volunteer.value.id)
+  alert('봉사 신청이 완료되었습니다!')
 }
 </script>
 

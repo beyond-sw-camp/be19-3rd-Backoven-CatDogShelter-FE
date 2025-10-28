@@ -29,15 +29,15 @@
 
       <!-- 탭 콘텐츠 또는 라우터 뷰 -->
       <transition name="fade" mode="out-in">
-        <router-view v-if="isDetailPage" />
-        <component v-else :is="currentComponent" />
+        <router-view v-if="isDetailPage" key="detail" />
+        <component v-else :is="currentComponent" :key="activeTabIndex" />
       </transition>
     </div>
   </main>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import VolunteerRecruitView from './recruit/VolunteerRecruitView.vue'
 import VolunteerReviewView from './review/VolunteerReviewView.vue'
@@ -55,15 +55,32 @@ const tabs = [
 const currentComponent = computed(() => tabs[activeTabIndex.value])
 
 // detail 페이지 또는 insert 페이지인지 확인
-const isDetailPage = computed(() => 
-  route.name === 'VolunteerDetail' || 
-  route.name === 'VolunteerReviewInsert' ||
-  route.name === 'VolunteerReviewDetail'
-)
+const isDetailPage = computed(() => {
+  const path = route.path
+  const isDetail = path.includes('/detail/') || 
+                   path.includes('/insert') || 
+                   (route.name === 'VolunteerDetail') ||
+                   (route.name === 'VolunteerReviewInsert') ||
+                   (route.name === 'VolunteerReviewDetail')
+  
+  console.log('Current path:', path)
+  console.log('Route name:', route.name)
+  console.log('isDetailPage:', isDetail)
+  console.log('activeTabIndex:', activeTabIndex.value)
+  
+  return isDetail
+})
 
 function changeTab(index) {
   activeTabIndex.value = index
 }
+
+// 라우트 변경 감지하여 메인 페이지로 돌아올 때 첫 번째 탭으로 리셋
+watch(() => route.path, (newPath) => {
+  if (newPath === '/volunteer') {
+    activeTabIndex.value = 0
+  }
+})
 </script>
 
 <style scoped>
