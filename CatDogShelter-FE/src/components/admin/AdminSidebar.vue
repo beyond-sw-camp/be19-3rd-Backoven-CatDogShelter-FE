@@ -1,7 +1,7 @@
 <template>
     <aside class="admin-sidebar">
         <div class="admin-profile">
-            <div class="profile-name">admin</div>
+            <div class="profile-name">ADMIN</div>
         </div>
 
         <nav class="admin-nav">

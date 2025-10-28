@@ -1,6 +1,6 @@
 <template>
     <div class="tab-content">
-        <StatCards :stats="stats" />
+        <!-- <StatCards :stats="stats" />
         
         <div class="content-row">
             <div class="chart-section">
@@ -36,7 +36,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <div class="posts-table-section">
             <div class="table-header">

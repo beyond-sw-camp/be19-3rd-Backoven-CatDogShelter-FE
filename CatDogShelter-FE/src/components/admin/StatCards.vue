@@ -6,7 +6,7 @@
                 <span class="stat-icon">{{ stat.icon }}</span>
             </div>
             <div class="stat-value">{{ stat.value }}</div>
-            <div :class="['stat-change', stat.changeType]">{{ stat.change }}</div>
+            <div v-if="stat.change" :class="['stat-change', stat.changeType]">{{ stat.change }}</div>
         </div>
     </div>
 </template>

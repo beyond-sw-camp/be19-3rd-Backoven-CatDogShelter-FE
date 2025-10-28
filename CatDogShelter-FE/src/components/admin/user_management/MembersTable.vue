@@ -78,7 +78,7 @@
                     <td>
                         <div class="action-buttons">
                             <!-- <button class="action-btn view" title="보기" @click="$emit('view', member)">👁️</button> -->
-                            <button class="action-btn edit" title="수정" @click="$emit('edit', member)">✏️</button>
+                            <!-- <button class="action-btn edit" title="수정" @click="$emit('edit', member)">✏️</button> -->
                             <!-- <button class="action-btn delete" title="삭제" @click="$emit('delete', member)">🗑️</button> -->
                         </div>
                     </td>

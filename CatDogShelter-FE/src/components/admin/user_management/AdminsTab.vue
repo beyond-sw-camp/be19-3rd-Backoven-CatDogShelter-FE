@@ -1,20 +1,5 @@
 <template>
     <div class="tab-content">
-        <StatCards :stats="stats" />
-        
-        <div class="chart-section">
-            <h3 class="chart-title">신규 유형별 분포</h3>
-            <p class="chart-subtitle">최근 30일 기준</p>
-            
-            <div class="distribution-list">
-                <div class="distribution-item" v-for="item in distributionData" :key="item.label">
-                    <div class="dist-bar" :style="{ width: item.percentage, background: item.color }"></div>
-                    <span class="dist-label">{{ item.label }}</span>
-                    <span class="dist-value">{{ item.value }}</span>
-                </div>
-            </div>
-        </div>
-
         <MembersTable
             title="관리자 목록"
             :userColumns="userColumns"
@@ -68,7 +53,7 @@
         return shelter.value.filter(s => s.status !== undefined)
     })
     const userColumns 
-        = ref(['회원 정보', '최근접속', '정지 해제일','상태', '작성 게시글/댓글 수', '관리자 임명']);
+        = ref(['회원 정보', '최근접속', '정지 해제일','상태', '작성 게시글/댓글 수']);
     const users = reactive([]);
     const userPage = reactive({
         totalCount: 0,     // 전체 데이터 개수
