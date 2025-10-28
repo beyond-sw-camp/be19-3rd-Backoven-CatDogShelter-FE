@@ -70,7 +70,7 @@ const emit = defineEmits(['success'])
           type="text"
           autocomplete="username"
           required
-          placeholder="아이디 또는 이메일을 입력하세요"
+          placeholder="아이디를 입력하세요"
         />
       </label>
 
@@ -104,14 +104,26 @@ const emit = defineEmits(['success'])
       {{ signupHint }}
     </p>
     <div class="links">
-      <!-- 하단 links 영역 일부 -->
+  <!-- 회원가입 -->
       <router-link :to="signupRoute" class="link main">{{ signupLabel }}</router-link>
-      <span class="dot">·</span>
-      <router-link :to="{ name:'find.id' }" class="link">아이디 찾기</router-link>
-      <span class="dot">·</span>
-      <router-link v-if="$router.hasRoute && $router.hasRoute('find.password')" 
-      :to="{ name:'find.password' }" class="link">비밀번호 찾기</router-link>
 
+      <!-- 아이디 / 비밀번호 찾기 (한 줄) -->
+      <p class="find-links">
+        <router-link
+          v-if="router.hasRoute && router.hasRoute('find.id')"
+          :to="{ name:'find.id' }"
+          class="link"
+        >아이디</router-link>
+        <span class="sep"> / </span>
+        <router-link
+          v-if="router.hasRoute
+                && (router.hasRoute('find.password.request') || router.hasRoute('find.password'))"
+          :to="router.hasRoute('find.password.request')
+                ? { name:'find.password.request' }
+                : { name:'find.password' }"
+          class="link"
+        >비밀번호 찾기</router-link>
+      </p>
     </div>
   </section>
 </template>

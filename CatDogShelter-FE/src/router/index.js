@@ -260,7 +260,22 @@ const router = createRouter({
         }
       ]
     },
+    {
+      path: '/auth/find-password',
+      name: 'find.password.request',
+      component: () => import('@/views/auth/findPasswordRequestView.vue'),
+    },
 
+    {
+      path: '/auth/find-password/verify',
+      name: 'find.password.verify',
+      component: () => import('@/views/auth/findPasswordVerifyView.vue'),
+    },
+    {
+      path: '/auth/find-password/reset',
+      name: 'find.password.reset',
+      component: () => import('@/views/auth/findPasswordResetView.vue'),
+    },
   //   // 로그인 테스트 화면
   //   {
   //     path: '/login',
