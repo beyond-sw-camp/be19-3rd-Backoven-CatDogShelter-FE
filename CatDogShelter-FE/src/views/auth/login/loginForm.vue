@@ -21,7 +21,7 @@ const signupLabel = computed(() =>
 const signupHint = computed(() =>
   role.value === 'USER'
     ? '아직 회원이 아니신가요? 일반회원으로 가입해 주세요.'
-    : '보호소장님, 안냥보호센터와 함께해요. 보호소장 전용 회원가입으로 진행됩니다.'
+    : '보호소장님, 댕냥쉼터와 함께해요. 보호소장 전용 회원가입으로 진행됩니다.'
 )
 
 /** ✅ 임시 관리자 우회 로그인 추가 */
@@ -67,8 +67,8 @@ const emit = defineEmits(['success'])
   <section class="card" role="dialog" aria-modal="true" aria-label="로그인">
     <!-- 상단 로고 + 타이틀 -->
     <header class="card-head">
-      <img class="logo" src="@/assets/logo.svg" alt="안냥보호센터" />
-      <h2 class="title">안냥보호센터 로그인</h2>
+      <img class="logo" src="@/assets/logo.svg" alt="댕냥쉼터" />
+      <h2 class="title">댕냥쉼터 로그인</h2>
       <p class="subtitle">더 좋은 입양문화를 만들어가는 길</p>
     </header>
 
