@@ -396,7 +396,7 @@ function goToCommentPost(postId) {
 }
 
 .review-container {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   gap: 30px;

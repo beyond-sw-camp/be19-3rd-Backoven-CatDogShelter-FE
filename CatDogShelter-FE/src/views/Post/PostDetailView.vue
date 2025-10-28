@@ -19,8 +19,23 @@
     <h1 class="title">{{ post.title }}</h1>
 
     <div class="meta">
+      <span class="author-wrap">
+        <button type="button" class="author-btn" @click="userMenuOpen = !userMenuOpen">
+          <img class="author-ico" src="@/assets/인원아이콘.svg" alt="" />
+          {{ post.author.name }}
+        </button>
+
+        <!-- 드롭다운 (아래 2번에서 만든 컴포넌트) -->
+        <UserQuickMenu
+          v-if="userMenuOpen"
+          class="author-menu"
+          :user="post.author"
+          @close="userMenuOpen = false"
+          @view-profile="goProfile"
+          @send-message="goMessage"
+        />
+      </span>
       <span class="badge">{{ post.category }}</span>
-      <span class="author">{{ post.author.name }}</span>
       <span class="dot">·</span>
       <span class="date">{{ post.date }}</span>
 
@@ -119,6 +134,8 @@
   </article>
 
   <ShareModal v-model="showShare" :share-url="shareUrl" />
+  <UserProfileModal v-model="showProfile" :user="selectedUser" />
+  <UserMessageModal v-model="showMessage" :user="selectedUser" />
 </template>
 
 <script setup>
@@ -127,13 +144,20 @@ import { useRoute, useRouter } from 'vue-router'
 import ShareModal from '@/components/share/ShareModal.vue'
 import { getDummyDetail } from './detail/dummies.js'
 import { openReport } from '@/components/report'
+import UserQuickMenu from '@/components/user/UserQuickMenu.vue'
+import { onBeforeUnmount } from 'vue' 
+import UserProfileModal from '@/components/user/UserProfileModal.vue'
+import UserMessageModal from '@/components/user/UserMessageModal.vue'
 
 const route = useRoute()
 const router = useRouter()
 const id = computed(() => Number(route.params.id))
-
+const userMenuOpen = ref(false)
 const state = reactive({ post: null, isLiked: false })
 const newComment = ref('')
+const showProfile = ref(false)
+const showMessage = ref(false)
+const selectedUser = ref(null)
 
 const storageKey = computed(() => `post:detail:${id.value}`)
 const post   = computed(() => state.post)
@@ -144,6 +168,22 @@ const shareUrl = computed(() => {
   return new URL(resolved.href, window.location.origin).toString()
 })
 const openShare = () => { showShare.value = true }
+const closeOnOutside = (e) => {
+  if (!e.target.closest('.author-wrap')) userMenuOpen.value = false
+}
+onMounted(() => document.addEventListener('click', closeOnOutside, true))
+onBeforeUnmount(() => document.removeEventListener('click', closeOnOutside, true))
+
+function goProfile(u){
+  selectedUser.value = u || post.value?.author
+  showProfile.value = true
+  userMenuOpen.value = false
+}
+function goMessage(u){
+  selectedUser.value = u || post.value?.author
+  showMessage.value = true
+  userMenuOpen.value = false
+}
 
 function load() {
   // 1) 사용자 저장 상세 우선
@@ -200,15 +240,16 @@ function addComment() {
   const text = newComment.value.trim()
   if (!text || !state.post) return
 
-  const counterKey = 'post:anonCounter'
-  const next = Number(localStorage.getItem(counterKey) || '0') + 1
-  localStorage.setItem(counterKey, String(next))
-  const DEFAULT_NICKNAME = '이지윤'
-
+  const DEFAULT_NICKNAME = '이지윤'   // 디폴트 닉네임
   const d = new Date()
   const ts = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
 
-  state.post.comments.push({ id: Date.now(), author: name, text, createdAt: ts })
+  state.post.comments.push({
+    id: Date.now(),
+    author: DEFAULT_NICKNAME,         // ← 여기!
+    text,
+    createdAt: ts
+  })
   state.post.stats.comments = state.post.comments.length
   newComment.value = ''
   persist()
@@ -330,4 +371,33 @@ watch(id, load)
 .input{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;background:#fff;resize:vertical}
 .c-actions{display:flex;justify-content:flex-end}
 .submit{padding:8px 14px;border-radius:10px;border:0;background:#e7c07d;color:#3c3425;font-weight:800}
+
+.author-wrap { position: relative; display: inline-block; }
+.author-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:4px 8px; border:0; background:transparent;
+  border-radius:8px; cursor:pointer; color:#1f2937; font-weight:700;
+}
+.author-btn:hover { background:#f7f4ee; }
+.author-ico { width:18px; height:18px; display:block; }
+.author-menu { position:absolute; top:32px; left:0; z-index:20; }
+
+/* 우측 끝 정렬되는 조회/좋아요/댓글 인라인 통계 */
+.stats-inline{
+  display:inline-flex; align-items:center; gap:14px;
+  margin-left:auto;                        /* 오른쪽 끝 정렬 */
+}
+.stat{ display:inline-flex; align-items:center; gap:6px; color:#8f8f8f; font-size:13px; }
+.stat svg{ width:16px; height:16px; }
+
+@media (max-width: 640px){
+  .stats-inline{ gap:10px; }
+  .stat{ font-size:12px; }
+  .stat svg{ width:15px; height:15px; }
+}
+
 </style>
+
+
+
+

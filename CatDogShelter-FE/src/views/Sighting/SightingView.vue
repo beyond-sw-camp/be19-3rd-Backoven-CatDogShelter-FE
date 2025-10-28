@@ -474,7 +474,7 @@ import searchIcon from '@/assets/돋보기아이콘.svg'
 .sighting-page {
   background-color: var(--bg-page);
   min-height: 100vh;
-  padding: 24px 0 80px;
+  padding: 40px 20px 80px;
   color: var(--brown-text);
   font-family: "Pretendard", "Noto Sans KR", system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
@@ -482,7 +482,7 @@ import searchIcon from '@/assets/돋보기아이콘.svg'
 }
 
 .sighting-inner {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
