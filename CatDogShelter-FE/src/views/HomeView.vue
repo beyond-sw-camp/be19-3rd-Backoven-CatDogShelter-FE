@@ -180,7 +180,7 @@
           <div class="side-card hero-card">
             <div class="hero-header">
               <h3>이달의 댕냥 히어로즈 🐾</h3>
-              <router-link to="/volunteer" class="more-link">더보기 ></router-link>
+              <router-link to="/heroes" class="more-link">더보기 ></router-link>
             </div>
 
             <ol class="hero-list">
