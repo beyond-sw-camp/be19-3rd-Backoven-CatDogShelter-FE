@@ -28,6 +28,7 @@ import CommunityGuideView from '@/views/footer/CommunityGuideView.vue'
 import AdoptionProcessView from '@/views/footer/AdoptionProcessView.vue'
 import VolunteerGuideView from '@/views/footer/VolunteerGuideView.vue'
 import FaqView from '@/views/footer/FaqView.vue'
+import AdminPageView from '@/views/AdminPageView.vue'
 
 // ===== Misc views =====
 import ShelterheadMypageView from '@/views/volunteer/shelterhead/ShelterheadMypageView.vue'
