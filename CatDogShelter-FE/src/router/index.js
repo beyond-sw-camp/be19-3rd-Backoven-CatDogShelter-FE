@@ -1,5 +1,6 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuth } from '@/views/auth/useAuth'
 
 // ===== Auth =====
 import LoginView from '@/views/auth/login/index.vue'
@@ -42,6 +43,7 @@ import LoginPlaceholderView from '@/views/LoginPlaceholderView.vue'
 // ===== 실종게시판=====
 // ===== Missing post writer =====
 import MissingPostWirte from '@/views/missing/MissingPostWirte.vue'
+import MissingDetailView from '@/views/missing/MissingDetailView.vue'
 
 // ===== User MyPage =====
 import UserMyPageView from '@/views/mypage/UserMyPageView.vue'
@@ -152,12 +154,12 @@ const router = createRouter({
       name: 'missing.write',
       component: MissingPostWirte,
     },
-    // {
-    //   path: '/missing/:id',
-    //   name: 'missing-detail',
-    //   component: MissingDetailView,
-    //   props: true,
-    // },
+    {
+      path: '/missing/:postId',
+      name: 'missing-detail',
+      component: MissingDetailView,
+      props: true,
+    },
 
     // Sighting board list
     {
@@ -230,7 +232,7 @@ const router = createRouter({
       path: '/faq',
       component: FaqView,
     },
-    
+
     // ✅ User MyPage
     {
       path: '/mypage',
@@ -331,19 +333,21 @@ const router = createRouter({
         }
       ]
     },
-    {
+        {
       path: '/admin',
       name: 'admin',
       component: AdminPageView,
       meta: { requiresAdmin: true },
     },
-  //   // login test screen (kept for reference)
-  //   {
-  //     path: '/login',
-  //     name: 'login',
-  //     component: LoginPlaceholderView,
-  //   },
-  // ],
+
+
+    //   // login test screen (kept for reference)
+    //   {
+    //     path: '/login',
+    //     name: 'login',
+    //     component: LoginPlaceholderView,
+    //   },
+    // ],
     // 404 → home
     { path: '/:pathMatch(.*)*', redirect: '/' },
 
@@ -351,9 +355,6 @@ const router = createRouter({
   ],
   // always scroll to top on route change
   scrollBehavior: () => ({ top: 0 }),
-
-
-  
 })
 
 router.beforeEach((to, from, next) => {
