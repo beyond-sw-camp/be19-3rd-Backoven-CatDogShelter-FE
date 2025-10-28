@@ -19,7 +19,7 @@ import SightingView from '@/views/SightingView.vue'
 import PostView from '@/views/Post/PostView.vue'
 import PostDetailView from '@/views/Post/PostDetailView.vue'
 import PostWriteView from '@/views/Post/PostWriteView.vue'
-import HeroesrankingView from '@/views/heros/Heroesranking.vue'
+import HeroesrankingView from '@/views/heros/HeroesrankingView.vue'
 
 // ===== Footer 영역 페이지 =====
 // ===== Footer pages =====
@@ -309,8 +309,6 @@ const router = createRouter({
       name: 'find.password.request',
       component: () => import('@/views/auth/findPasswordRequestView.vue'),
     },
-
-<<<<<<< HEAD
     {
       path: '/auth/find-password/verify',
       name: 'find.password.verify',
@@ -321,10 +319,14 @@ const router = createRouter({
       name: 'find.password.reset',
       component: () => import('@/views/auth/findPasswordResetView.vue'),
     },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: AdminPageView,
+      meta: { requiresAdmin: true },
+    },
+
   //   // 로그인 테스트 화면
-=======
-  //   // login test screen (kept for reference)
->>>>>>> devlop
   //   {
   //     path: '/login',
   //     name: 'login',
@@ -340,3 +342,13 @@ const router = createRouter({
   scrollBehavior: () => ({ top: 0 }),
 })
 
+router.beforeEach((to, from, next) => {
+  if (to.meta?.requiresAdmin) {
+    const role = localStorage.getItem('role')
+    if (role === 'ADMIN') return next()
+    return next({ name: 'login' })
+  }
+  next()
+})
+
+export default router

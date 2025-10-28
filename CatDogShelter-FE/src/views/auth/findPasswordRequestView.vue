@@ -1,7 +1,7 @@
- <script setup>
+<script setup>
 
- import { ref, onUnmounted } from 'vue'
- import { useRouter } from 'vue-router'
+import { ref, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
  const router = useRouter()
 
 const userAccount = ref('')   // 아이디
