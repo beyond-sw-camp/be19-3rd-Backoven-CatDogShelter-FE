@@ -161,8 +161,8 @@
           <div class="thumb-wrap">
             <img
               class="thumb-img"
-              :src="post.thumbnailUrl || defaultThumb"
-              alt=""
+  :src="validThumb(post.thumbnailUrl)"
+  alt=""
             />
           </div>
 
@@ -289,33 +289,35 @@
   </main>
 </template>
 
-<script>
+ <script>
+import noImage from '@/assets/dogcat/lostcat1.jpeg'
+
 import searchIcon from '@/assets/돋보기아이콘.svg'
   export default {
   name: 'MissingListView',
 
     data() {
+    console.log('DEBUG noImage url >>>', noImage)
       return {
         searchIcon,
         filterOpen: true,
 
-      // 목록
+      // 목록 (화면에 뿌릴 형태로 가공된 애들)
       posts: [],
       totalCount: 0,
 
-      // 페이지 정보
+      // 페이지 정보 (지금 백엔드는 페이지네이션 안 주니까 프론트에서 흉내만)
       page: 1,
-      pageSize: 10,
+      pageSize: 10, // 우리가 요청에 전달은 하고 있긴 한데, 응답은 그냥 전체 배열
       totalPages: 1,
 
-      // 검색 기준 (제목 / 댓글 / 작성자)
+      // 검색 기준 드롭다운
       searchField: 'title',
 
-      // 기본 썸네일 (임시)
-      defaultThumb:
-        'https://placekitten.com/200/200',
+      // 기본 썸네일
+      defaultThumb: noImage,
 
-      // 필터 값
+      // 필터 값들
       filters: {
         keyword: '',
         animalType: '',
@@ -324,7 +326,7 @@ import searchIcon from '@/assets/돋보기아이콘.svg'
         location: '',
         breed: '',
         color: '',
-        sort: 'LATEST',
+        sort: 'LATEST', // LATEST | VIEW | LIKE (백엔드가 받아주면 사용)
       },
     }
   },
@@ -351,9 +353,38 @@ import searchIcon from '@/assets/돋보기아이콘.svg'
   },
 
   methods: {
+    // 썸네일 URL 정리: 없으면 기본 이미지
+    validThumb(url) {
+      if (!url || url.trim() === '') {
+        return this.defaultThumb
+      }
+      return url
+    },
+
+    // 상세 페이지 이동
+    goDetail(id) {
+      // 라우터에서 실종 상세 라우트가 name: 'missing-detail', param 이름이 postId 라고 했었지?
+      // 현재 템플릿에서는 this.$router.push(`/missing/${postId}`) 이런 식도 있었는데
+      // name 기반으로 확실하게 보내자
+      this.$router.push({
+        name: 'missing-detail',
+        params: { postId: id },
+      })
+    },
+
+    // 실종 신고하기 버튼
+    onReportMissing() {
+      // 라우터에서 name: 'missing.write' 라고 했었잖아?
+      this.$router.push({ name: 'missing.write' })
+    },
+
+    // 게시글 목록 불러오기
+    // GET http://localhost:8000/post-service/missing-posts/query/posts
     async fetchPosts(targetPage) {
       const pageToLoad = targetPage || this.page
 
+      // 서버가 현재 이 파라미터들을 실제로 쓰는지/안쓰는지 상관없이,
+      // 일단은 붙여서 보내고 있어도 문제는 없음.
       const params = new URLSearchParams({
         page: pageToLoad,
         size: this.pageSize,
@@ -375,35 +406,76 @@ import searchIcon from '@/assets/돋보기아이콘.svg'
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
-              // Authorization: `Bearer ${token}` 필요하면 나중에 붙여
+              // Authorization: `Bearer ${token}` // 필요하면 나중에
             },
           }
         )
 
         if (!res.ok) {
+          console.error('[실종게시글 로드 실패 status]', res.status)
           throw new Error('게시글 로드 실패')
         }
 
         const data = await res.json()
+        console.log('[fetchPosts] raw data:', data)
 
-        this.posts = Array.isArray(data) ? data : []
+        // 현재 백엔드 응답 형태는 배열임 (너가 준 예시)
+        // [
+        //   {
+        //     "id": 10,
+        //     "status": false,
+        //     "title": "춘천에서 고양이를 잃어버렸습니다",
+        //     "createdAt": "2025-09-10 19:30",
+        //     "view": 13,
+        //     "userName": "서민재",
+        //     "likeCount": 0,
+        //     "userRating": "댕냥보호천사"
+        //   },
+        //   ...
+        // ]
+
+        const arr = Array.isArray(data) ? data : []
+
+        // 화면에서 쓰는 필드명으로 변환해 줄게.
+        // (template에서 post.?? 로 참조하는 것들 전부 채워주자)
+        this.posts = arr.map(item => ({
+          id: item.id,
+          status: item.status, // false => '실종중', true => '발견'
+          title: item.title,
+          createdAt: item.createdAt, // "2025-09-10 19:30"
+          view: item.view,
+          likeCount: item.likeCount ?? 0,
+          userName: item.userName,
+          userRating: item.userRating || '',
+
+          // 아직 백엔드에서 안 주지만 템플릿에서 쓰고 있는 필드들:
+          // 안전하게 기본값 채워서 렌더 에러 안 나게
+          thumbnailUrl: item.thumbnailUrl || '',    // 백엔드에 없으면 기본이미지 나가게
+          animalTypeLabel: item.animalTypeLabel || '', // 예: "고양이", "강아지"
+          breed: item.breed || '',
+          color: item.color || '',
+          age: item.age || '',
+          sexText: item.sexText || '',
+          featureDesc: item.featureDesc || '',
+          missingLocation: item.location || item.missingLocation || '',
+          contact: item.contact || '',
+          missingDate: item.missingDate || '',
+        }))
+
+        // 개수, 페이지 관련 값 갱신
         this.totalCount = this.posts.length
 
+        // 지금은 서버가 totalPages 주는 구조가 아니니까
+        // 그냥 프론트에서 1페이지만 있다고 가정
         this.page = pageToLoad
         this.totalPages = 1
       } catch (err) {
         console.error('실종 게시글 조회 실패:', err)
         this.posts = []
         this.totalCount = 0
+        this.page = 1
+        this.totalPages = 1
       }
-    },
-
-    goDetail(postId) {
-      this.$router.push(`/missing/${postId}`)
-    },
-
-    onReportMissing() {
-      this.$router.push('/missing/write')
     },
   },
 }
@@ -440,7 +512,7 @@ import searchIcon from '@/assets/돋보기아이콘.svg'
 .missing-page {
   background-color: var(--bg-page);
   min-height: 100vh;
-  padding: 24px 0 80px;
+  padding: 24px 80px 80px;
   color: var(--brown-text);
   font-family: "Pretendard", "Noto Sans KR", system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
@@ -448,7 +520,7 @@ import searchIcon from '@/assets/돋보기아이콘.svg'
 }
 
 .missing-inner {
-  max-width: 900px;
+  max-width: 1150px;
   margin: 0 auto;
 }
 

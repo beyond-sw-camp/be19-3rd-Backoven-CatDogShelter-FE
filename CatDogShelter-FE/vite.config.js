@@ -21,6 +21,10 @@ export default defineConfig({
         // 필요 시 WebSocket 사용하면 ws:true
         // ws: true,
       },
+      '/post-service': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
     },
   },
 })
