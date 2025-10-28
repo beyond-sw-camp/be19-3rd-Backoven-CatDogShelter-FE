@@ -1,5 +1,4 @@
 <template>
-
   <div class="page">
     <div class="form-box">
       <h2>입양 공고 작성</h2>
