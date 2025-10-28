@@ -3,20 +3,7 @@
     <div class="form-box">
       <h2>입양 공고 작성</h2>
 
-      <!-- JSON Server 상태 표시 -->
-      <div v-if="!serverChecked" class="info-message">
-        서버 연결 확인 중...
-      </div>
-      <div v-else-if="!isServerRunning" class="warning-message">
-        ⚠️ JSON Server가 실행되지 않았습니다.<br>
-        터미널에서 다음 명령어를 실행하세요:<br>
-        <code>json-server --watch db.json --port 3001</code>
-      </div>
-      <div v-else class="success-message-small">
-        ✓ JSON Server 연결됨 (포트: {{ serverPort }})
-      </div>
-
-      <form @submit.prevent="submitPost">
+  <form @submit.prevent="submitPost" novalidate>
 
         <!-- 제목 -->
         <div class="form-row">
@@ -86,6 +73,39 @@
               <option value="N">아니오</option>
             </select>
           </div>
+
+          <div>
+            <label>상태 *</label>
+            <select v-model="form.status" required>
+              <option value="PROTECTING">보호중</option>
+              <option value="ADOPTED">입양완료</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 지역 정보 -->
+        <h3 class="section-title">지역 정보</h3>
+        
+        <div class="grid">
+          <div>
+            <label>시/도 *</label>
+            <select v-model="form.sidoId" @change="loadSigungu" required>
+              <option value="">선택하세요</option>
+              <option v-for="sido in sidoList" :key="sido.sidoId" :value="sido.sidoId">
+                {{ sido.sidoName }}
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label>시/군/구 *</label>
+            <select v-model="form.sigunguId" required :disabled="!form.sidoId">
+              <option value="">{{ form.sidoId ? '선택하세요' : '시/도를 먼저 선택하세요' }}</option>
+              <option v-for="sigungu in sigunguList" :key="sigungu.sigunguId" :value="sigungu.sigunguId">
+                {{ sigungu.sigunguName }}
+              </option>
+            </select>
+          </div>
         </div>
 
         <!-- 상세 내용 -->
@@ -108,6 +128,7 @@
             @change="handleFileUpload"
             multiple 
             accept="image/*"
+            ref="fileInput"
           />
 
           <!-- 이미지 미리보기 -->
@@ -123,7 +144,7 @@
           </div>
         </div>
 
-        <button type="submit" class="submit-btn" :disabled="isSubmitting || !isServerRunning">
+        <button type="submit" class="submit-btn" :disabled="isSubmitting">
           {{ isSubmitting ? '등록 중...' : '입양 게시글 등록' }}
         </button>
       </form>
@@ -139,7 +160,7 @@
       <div v-if="showSuccessModal" class="modal-overlay" @click="closeModal">
         <div class="modal-content" @click.stop>
           <div class="modal-icon">✓</div>
-          <h3>입양 게시글 등록</h3>
+          <h3>입양 게시글 등록 완료</h3>
           <p>게시글이 성공적으로 등록되었습니다!</p>
           <button class="modal-btn" @click="goToList">입양 게시판으로 이동</button>
         </div>
@@ -164,12 +185,13 @@ const form = reactive({
   weight: "",
   vaccination: "Y",
   neutering: "Y",
+  status: "PROTECTING",
   content: "",
   userPhone: "",
-  userName: "박지수",
-  location: "서울특별시 종로구",
-  sigunguId: 1,
+  sidoId: "",
+  sigunguId: "",
   userId: 1,
+  headId: null
 })
 
 const files = ref([])
@@ -177,39 +199,120 @@ const previews = ref([])
 const isSubmitting = ref(false)
 const errorMessage = ref("")
 const showSuccessModal = ref(false)
-const isServerRunning = ref(false)
-const serverChecked = ref(false)
-const serverPort = ref(null)
+const fileInput = ref(null)
 
-// 여러 포트를 시도해서 JSON Server 찾기
-async function checkServer() {
-  const portsToTry = [3001, 3002, 3003, 3000, 4000]
-  
-  for (const port of portsToTry) {
-    try {
-      const res = await fetch(`http://localhost:${port}/adoptionPosts`, {
-        method: "GET"
-      })
-      
-      if (res.ok) {
-        isServerRunning.value = true
-        serverPort.value = port
-        console.log(`✓ JSON Server 연결 성공 (포트: ${port})`)
-        serverChecked.value = true
-        return
-      }
-    } catch (error) {
-      continue
-    }
+// ✅ 하드코딩된 지역 데이터 (API가 없을 경우)
+const sidoList = ref([
+  { sidoId: 1, sidoCode: '11', sidoName: '서울특별시' },
+  { sidoId: 2, sidoCode: '26', sidoName: '부산광역시' },
+  { sidoId: 3, sidoCode: '27', sidoName: '대구광역시' },
+  { sidoId: 4, sidoCode: '28', sidoName: '인천광역시' },
+  { sidoId: 5, sidoCode: '29', sidoName: '광주광역시' },
+  { sidoId: 6, sidoCode: '30', sidoName: '대전광역시' },
+  { sidoId: 7, sidoCode: '31', sidoName: '울산광역시' },
+  { sidoId: 8, sidoCode: '41', sidoName: '경기도' },
+  { sidoId: 9, sidoCode: '42', sidoName: '강원도' },
+  { sidoId: 10, sidoCode: '43', sidoName: '충청북도' }
+])
+
+const sigunguData = {
+  1: [ // 서울
+    { sigunguId: 1, sigunguCode: '11110', sigunguName: '종로구' },
+    { sigunguId: 2, sigunguCode: '11140', sigunguName: '중구' },
+    { sigunguId: 3, sigunguCode: '11170', sigunguName: '용산구' },
+    { sigunguId: 4, sigunguCode: '11200', sigunguName: '성동구' },
+    { sigunguId: 5, sigunguCode: '11215', sigunguName: '광진구' },
+    { sigunguId: 6, sigunguCode: '11230', sigunguName: '동대문구' },
+    { sigunguId: 7, sigunguCode: '11260', sigunguName: '중랑구' },
+    { sigunguId: 8, sigunguCode: '11290', sigunguName: '성북구' },
+    { sigunguId: 9, sigunguCode: '11305', sigunguName: '강북구' },
+    { sigunguId: 10, sigunguCode: '11320', sigunguName: '도봉구' }
+  ],
+  2: [ // 부산
+    { sigunguId: 11, sigunguCode: '26110', sigunguName: '중구' },
+    { sigunguId: 12, sigunguCode: '26140', sigunguName: '서구' },
+    { sigunguId: 13, sigunguCode: '26170', sigunguName: '동구' },
+    { sigunguId: 14, sigunguCode: '26200', sigunguName: '영도구' },
+    { sigunguId: 15, sigunguCode: '26230', sigunguName: '부산진구' }
+  ],
+  3: [ // 대구
+    { sigunguId: 16, sigunguCode: '27110', sigunguName: '중구' },
+    { sigunguId: 17, sigunguCode: '27140', sigunguName: '동구' },
+    { sigunguId: 18, sigunguCode: '27170', sigunguName: '서구' }
+  ],
+  4: [ // 인천
+    { sigunguId: 19, sigunguCode: '28110', sigunguName: '중구' },
+    { sigunguId: 20, sigunguCode: '28140', sigunguName: '동구' },
+    { sigunguId: 21, sigunguCode: '28170', sigunguName: '남구' }
+  ],
+  5: [ // 광주
+    { sigunguId: 22, sigunguCode: '29110', sigunguName: '동구' }
+  ],
+  6: [ // 대전
+    { sigunguId: 23, sigunguCode: '30110', sigunguName: '동구' }
+  ],
+  7: [ // 울산
+    { sigunguId: 24, sigunguCode: '31110', sigunguName: '중구' }
+  ],
+  8: [ // 경기
+    { sigunguId: 25, sigunguCode: '41110', sigunguName: '수원시' },
+    { sigunguId: 26, sigunguCode: '41111', sigunguName: '수원시 장안구' },
+    { sigunguId: 27, sigunguCode: '41113', sigunguName: '수원시 권선구' }
+  ],
+  9: [ // 강원
+    { sigunguId: 28, sigunguCode: '42110', sigunguName: '춘천시' }
+  ],
+  10: [ // 충청북도
+    { sigunguId: 29, sigunguCode: '43110', sigunguName: '청주시' }
+  ]
+}
+
+const sigunguList = ref([])
+
+// ✅ API 방식 (백엔드에 API가 있을 경우)
+async function loadSidoFromAPI() {
+  try {
+    const res = await fetch('http://localhost:8000/user-service/api/region/sido')
+    if (!res.ok) throw new Error('API 호출 실패')
+    const data = await res.json()
+    sidoList.value = data
+  } catch (error) {
+    console.warn('API 사용 불가, 하드코딩 데이터 사용:', error)
+    // 하드코딩 데이터는 이미 설정되어 있음
   }
+}
+
+// 시/군/구 목록 불러오기
+function loadSigungu() {
+  if (!form.sidoId) {
+    sigunguList.value = []
+    form.sigunguId = ""
+    return
+  }
+
+  // ✅ 하드코딩된 데이터에서 가져오기
+  sigunguList.value = sigunguData[form.sidoId] || []
+  form.sigunguId = "" // 시/도 변경 시 시/군/구 초기화
   
-  isServerRunning.value = false
-  serverChecked.value = true
-  console.error("JSON Server를 찾을 수 없습니다")
+  // ✅ API가 있다면 아래 코드 사용
+  /*
+  try {
+    const res = await fetch(`http://localhost:8000/user-service/api/region/sigungu/${form.sidoId}`)
+    if (!res.ok) throw new Error('시/군/구 목록 불러오기 실패')
+    const data = await res.json()
+    sigunguList.value = data
+    form.sigunguId = ""
+  } catch (error) {
+    console.error('시/군/구 목록 오류:', error)
+    // 하드코딩 데이터 사용
+    sigunguList.value = sigunguData[form.sidoId] || []
+  }
+  */
 }
 
 onMounted(() => {
-  checkServer()
+  // API 시도 (실패하면 하드코딩 데이터 사용)
+  // loadSidoFromAPI()
 })
 
 function handleFileUpload(e) {
@@ -229,51 +332,56 @@ function handleFileUpload(e) {
 function removeImage(index) {
   previews.value.splice(index, 1)
   files.value.splice(index, 1)
+  
+  if (files.value.length === 0 && fileInput.value) {
+    fileInput.value.value = ''
+  }
 }
 
 async function submitPost() {
+  console.log('submitPost called')
   if (isSubmitting.value) return
-  
-  if (!isServerRunning.value) {
-    errorMessage.value = "JSON Server가 실행되지 않았습니다. 서버를 먼저 실행해주세요."
-    return
-  }
   
   isSubmitting.value = true
   errorMessage.value = ""
 
-  const postData = {
-    title: form.title,
-    animalType: form.animalType,
-    breed: form.breed,
-    age: parseInt(form.age),
-    gender: form.gender,
-    color: form.color,
-    weight: parseFloat(form.weight),
-    vaccination: form.vaccination,
-    neutering: form.neutering,
-    content: form.content,
-    userPhone: form.userPhone,
-    userName: form.userName,
-    location: form.location,
-    sigunguId: parseInt(form.sigunguId),
-    userId: parseInt(form.userId),
-    images: previews.value,
-    createdAt: new Date().toISOString(),
-    viewCount: 0,
-    likeCount: 0,
-    status: "ACTIVE"
-  }
-
   try {
-    console.log("전송할 데이터:", postData)
+    const formData = new FormData()
     
-    const res = await fetch(`http://localhost:${serverPort.value}/adoptionPosts`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(postData)
+    const postData = {
+      title: form.title,
+      animalType: form.animalType,
+      breed: form.breed,
+      age: parseInt(form.age),
+      gender: form.gender,
+      color: form.color || "",
+      weight: parseFloat(form.weight),
+      vaccination: form.vaccination,
+      neutering: form.neutering,
+      status: form.status,
+      content: form.content,
+      userPhone: form.userPhone,
+      sigunguId: parseInt(form.sigunguId),
+      userId: form.userId,
+      headId: form.headId
+    }
+    
+    formData.append('newPost', new Blob([JSON.stringify(postData)], {
+      type: 'application/json'
+    }))
+    
+    if (files.value.length > 0) {
+      files.value.forEach((file) => {
+        formData.append('files', file)
+      })
+    }
+
+    console.log('전송할 데이터:', postData)
+    console.log('전송할 파일 수:', files.value.length)
+    
+    const res = await fetch('http://localhost:8000/post-service/adoption-post/regist', {
+      method: 'POST',
+      body: formData
     })
 
     if (!res.ok) {
@@ -281,21 +389,12 @@ async function submitPost() {
       throw new Error(`등록 실패 (${res.status}): ${errorText}`)
     }
 
-    const result = await res.json()
-    console.log("등록 성공:", result)
-
-    // 성공 모달 표시
+    console.log('등록 성공!')
     showSuccessModal.value = true
     
   } catch (error) {
-    console.error("등록 오류:", error)
-    
-    if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
-      errorMessage.value = "서버에 연결할 수 없습니다. JSON Server가 실행 중인지 확인해주세요.\n\n터미널에서 실행: json-server --watch db.json --port 3001"
-      isServerRunning.value = false
-    } else {
-      errorMessage.value = `등록 실패: ${error.message}`
-    }
+    console.error('등록 오류:', error)
+    errorMessage.value = `등록 실패: ${error.message}`
   } finally {
     isSubmitting.value = false
   }
@@ -453,49 +552,6 @@ textarea {
 
 .remove-btn:hover {
   background: rgba(0,0,0,0.8);
-}
-
-.info-message {
-  margin-bottom: 16px;
-  padding: 12px;
-  background: #e3f2fd;
-  border: 1px solid #90caf9;
-  border-radius: 8px;
-  color: #1565c0;
-  font-size: 14px;
-}
-
-.success-message-small {
-  margin-bottom: 16px;
-  padding: 8px 12px;
-  background: #d4edda;
-  border: 1px solid #c3e6cb;
-  border-radius: 8px;
-  color: #155724;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.warning-message {
-  margin-bottom: 16px;
-  padding: 12px;
-  background: #fff3cd;
-  border: 1px solid #ffc107;
-  border-radius: 8px;
-  color: #856404;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.warning-message code {
-  display: block;
-  margin-top: 8px;
-  padding: 8px;
-  background: #333;
-  color: #fff;
-  border-radius: 4px;
-  font-family: 'Courier New', monospace;
-  font-size: 13px;
 }
 
 .error-message {

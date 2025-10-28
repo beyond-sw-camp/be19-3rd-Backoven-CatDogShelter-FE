@@ -13,6 +13,7 @@ import VolunteerView from '@/views/volunteer/VolunteerView.vue'
 import DonationView from '@/views/DonationView.vue'
 import DonationDetailView from '@/views/donation/DonationDetailView.vue'
 import AdoptionView from '@/views/adoption/AdoptionView.vue'
+import AdoptionWrite from '@/views/adoption/AdoptionWrite.vue'
 import MissingView from '@/views/MissingView.vue'
 import SightingView from '@/views/Sighting/SightingView.vue'
 import PostView from '@/views/Post/PostView.vue'
@@ -137,8 +138,7 @@ const router = createRouter({
     {
       path: '/adoption/write',
       name: 'AdoptionWrite',
-      component: () =>
-        import('@/views/adoption/AdoptionWrite.vue'),
+      component: AdoptionWrite,
     },
 
     // Missing board list
