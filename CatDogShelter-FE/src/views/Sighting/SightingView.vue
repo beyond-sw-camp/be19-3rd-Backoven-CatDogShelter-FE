@@ -74,13 +74,17 @@
 
                 <!-- 시군구 코드 -->
                 <div class="filter-group wide">
-                  <label class="filter-label">지역</label>
-                  <input
-                    v-model="filters.sigunguCode"
-                    class="chip-input"
-                    type="text"
-                    placeholder="시군구 코드를 입력해주세요"
-                  />
+                  <label class="filter-label">시군구</label>
+                  <select v-model="filters.sigunguCode" class="chip-select">
+                    <option value="">전체</option>
+                    <option 
+                      v-for="g in sigunguList" 
+                      :key="g.sigungu_id" 
+                      :value="g.sigungu_id"
+                    >
+                      {{ g.sigungu_name }}
+                    </option>
+                  </select>
                 </div>
 
                 <!-- 품종 -->
@@ -292,6 +296,38 @@ export default {
         color: '',
         order: '0', // 기본값: 최신순
       },
+          // 시군구 하드코딩 데이터
+      sigunguList: [
+        { sigungu_id: 1, sigungu_name: '종로구' },
+        { sigungu_id: 2, sigungu_name: '중구' },
+        { sigungu_id: 3, sigungu_name: '용산구' },
+        { sigungu_id: 4, sigungu_name: '성동구' },
+        { sigungu_id: 5, sigungu_name: '광진구' },
+        { sigungu_id: 6, sigungu_name: '동대문구' },
+        { sigungu_id: 7, sigungu_name: '중랑구' },
+        { sigungu_id: 8, sigungu_name: '성북구' },
+        { sigungu_id: 9, sigungu_name: '강북구' },
+        { sigungu_id: 10, sigungu_name: '도봉구' },
+        { sigungu_id: 11, sigungu_name: '중구' },
+        { sigungu_id: 12, sigungu_name: '서구' },
+        { sigungu_id: 13, sigungu_name: '동구' },
+        { sigungu_id: 14, sigungu_name: '영도구' },
+        { sigungu_id: 15, sigungu_name: '부산진구' },
+        { sigungu_id: 16, sigungu_name: '중구' },
+        { sigungu_id: 17, sigungu_name: '동구' },
+        { sigungu_id: 18, sigungu_name: '서구' },
+        { sigungu_id: 19, sigungu_name: '중구' },
+        { sigungu_id: 20, sigungu_name: '동구' },
+        { sigungu_id: 21, sigungu_name: '남구' },
+        { sigungu_id: 22, sigungu_name: '동구' },
+        { sigungu_id: 23, sigungu_name: '동구' },
+        { sigungu_id: 24, sigungu_name: '중구' },
+        { sigungu_id: 25, sigungu_name: '수원시' },
+        { sigungu_id: 26, sigungu_name: '수원시 장안구' },
+        { sigungu_id: 27, sigungu_name: '수원시 권선구' },
+        { sigungu_id: 28, sigungu_name: '춘천시' },
+        { sigungu_id: 29, sigungu_name: '청주시' },
+      ],
     }
   },
 
