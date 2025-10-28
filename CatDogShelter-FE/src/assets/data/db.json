@@ -1216,7 +1216,7 @@
   "adoptionPosts": [
     {
       "_comment": "여기서부터 메인홈화면뿌려주기 json",
-      "id": 20,
+      "id": 11,
       "name": "리트리버",
       "breed": "리트리버",
       "age": 0,
@@ -1225,7 +1225,7 @@
       "createdAt": "2025-09-12T10:30:00"
     },
     {
-      "id": 19,
+      "id": 10,
       "name": "코숏",
       "breed": "코숏",
       "age": 2,
@@ -1234,7 +1234,7 @@
       "createdAt": "2025-09-12T09:10:00"
     },
     {
-      "id": 18,
+      "id": 9,
       "name": "푸들",
       "breed": "푸들",
       "age": 5,
@@ -1350,17 +1350,17 @@
       "createdAt": "2025-09-11T22:00:00"
     }
   ],
-  "sightingPreview": [
+  "sightingPosts": [
     {
-      "id": 2001,
-      "imgUrl": "/uploads/sighting_cat.jpg",
-      "title": "시장 앞 고양이 목격",
+      "id": 9,
+      "thumbnailUrl": "/uploads/testcat5.png",
+      "title": "경기 수원 장안구 고양이",
       "createdAt": "2025-09-12T11:20:00"
     },
     {
-      "id": 2002,
-      "imgUrl": "/uploads/sighting_dog.jpg",
-      "title": "공원에서 돌아다니는 아이",
+      "id": 8,
+      "thumbnailUrl": "/uploads/testdog1.png",
+      "title": "울산 중구 작은 강아지",
       "createdAt": "2025-09-12T07:15:00",
       "_comment": "여기까지 메인홈화면뿌려주기 json"
     }

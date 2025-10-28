@@ -141,6 +141,14 @@ const router = createRouter({
       component: AdoptionWrite,
     },
 
+
+{
+  path: '/adoption-post/:id',
+  name: 'adoption-detail',
+  component: () =>
+    import('@/views/adoption/AdoptionDetail.vue'),
+  props: true,
+},
     // Missing board list
     {
       path: '/missing',
