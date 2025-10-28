@@ -152,12 +152,12 @@ const router = createRouter({
       name: 'missing.write',
       component: MissingPostWirte,
     },
-    {
-      path: '/missing/:id',
-      name: 'missing-detail',
-      component: MissingDetailView,
-      props: true,
-    },
+    // {
+    //   path: '/missing/:id',
+    //   name: 'missing-detail',
+    //   component: MissingDetailView,
+    //   props: true,
+    // },
 
     // Sighting board list
     {
