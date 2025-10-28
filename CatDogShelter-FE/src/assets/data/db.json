@@ -1142,38 +1142,6 @@
           "content": "다음 주에도 방문하신다니 정말 존경스러워요!"
         }
       ]
-    },
-    {
-      "id": 16,
-      "companyName": "마포 보호소",
-      "title": "테스트제목",
-      "content": "테스트 내용",
-      "writer": "아자뵤",
-      "createdAt": "2025-10-27",
-      "likes": 0,
-      "comments": 0,
-      "views": 0,
-      "detailContent": "테스트 내용",
-      "files": [
-        "@/assets/volunteer/봉사후기1.jpeg"
-      ],
-      "commentList": []
-    },
-    {
-      "id": 17,
-      "companyName": "ㅇ",
-      "title": "ㅇ",
-      "content": "ㅇ",
-      "writer": "아자뵤",
-      "createdAt": "2025-10-28",
-      "likes": 0,
-      "comments": 0,
-      "views": 0,
-      "detailContent": "ㅇ",
-      "files": [
-        "@/assets/volunteer/봉사후기1.jpeg"
-      ],
-      "commentList": []
     }
   ],
   "applications": [
@@ -1666,7 +1634,7 @@
   "shelterHead": {
     "mypage": {
       "shelterInfo": {
-        "name": "부천시 고양이 보호소",
+        "name": "이지윤",
         "email": "dain0404@gmail.com",
         "phone": "010-2244-4422",
         "location": "경기도 부천시",
