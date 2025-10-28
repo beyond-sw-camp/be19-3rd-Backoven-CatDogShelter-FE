@@ -300,9 +300,11 @@ const fetchReviewDetail = async () => {
     }
     
     const data = await response.json()
+    console.log('받아온 데이터:', data)
+    console.log('찾으려는 ID:', reviewId.value, '타입:', typeof reviewId.value)
     
     // 해당 id의 데이터 찾기
-    const foundReview = data.find(item => item.id === reviewId.value)
+    const foundReview = data.find(item => item.id == reviewId.value)
     
     if (foundReview) {
       review.value = foundReview
@@ -311,7 +313,7 @@ const fetchReviewDetail = async () => {
       comments.value = foundReview.commentList || []
       
       // 이전/다음 글 설정
-      const currentIndex = data.findIndex(item => item.id === reviewId.value)
+      const currentIndex = data.findIndex(item => item.id == reviewId.value)
       
       if (currentIndex > 0) {
         prevPost.value = {
@@ -394,7 +396,7 @@ async function submitComment() {
     const updatedCommentList = [...comments.value, commentData]
     
     // JSON Server에 PATCH 요청으로 댓글 목록 업데이트
-    const response = await fetch(`http://localhost:8080/review/${reviewId.value}`, {
+    const response = await fetch(`http://localhost:3000/review/${reviewId.value}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

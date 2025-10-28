@@ -105,6 +105,7 @@
       <div class="recruit-right">
         <div class="right-header">
           <h3 class="right-title">📋 전체 봉사모집</h3>
+          <button class="create-recruit-btn" @click="goToRecruitInsert">봉사모집 글 작성하기</button>
         </div>
 
         <div class="search-filter-area">
@@ -423,6 +424,10 @@ function goToNextGroup() {
 
 function goToPage(page) {
   currentPage.value = page
+}
+
+function goToRecruitInsert() {
+  router.push('/shelter-head/mypage/recruitinsert')
 }
 
 function goToDetail(id) {
@@ -831,6 +836,11 @@ function applyVolunteer(id) {
   margin-bottom: 24px;
   padding-bottom: 16px;
   border-bottom: 2px solid #f5f0e8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .right-title {
@@ -841,6 +851,28 @@ function applyVolunteer(id) {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+
+.create-recruit-btn {
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #f0b762 0%, #e7a150 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(240, 183, 98, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.create-recruit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(240, 183, 98, 0.35);
 }
 
 /* 검색 및 필터 영역 */
@@ -1115,6 +1147,16 @@ function applyVolunteer(id) {
 }
 
 @media (max-width: 640px) {
+  .right-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .create-recruit-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .recruit-container {
     gap: 20px;
   }

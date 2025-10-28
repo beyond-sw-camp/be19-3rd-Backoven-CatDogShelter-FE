@@ -1,6 +1,6 @@
 <template>
   <!-- 자식 라우트가 있으면 해당 컴포넌트 표시 -->
-  <router-view v-if="$route.name === 'VolunteerRecruitInsert'" />
+  <router-view v-if="isChildRoute" />
   
   <!-- 기본 마이페이지 표시 -->
   <div v-else class="shelter-mypage">
@@ -14,45 +14,35 @@
       <div class="left-section">
         <!-- 프로필 카드 -->
         <div class="profile-card">
-          <div class="profile-image">
-            🏠
-          </div>
+          <div class="profile-image">🏠</div>
           <h2 class="shelter-name">{{ shelterInfo.name }}</h2>
           <span class="shelter-badge">보호소장</span>
 
           <div class="contact-info">
-            <div class="info-item">
-              <span class="icon">✉️</span>
-              <span>{{ shelterInfo.email }}</span>
-            </div>
-            <div class="info-item">
-              <span class="icon">📞</span>
-              <span>{{ shelterInfo.phone }}</span>
-            </div>
-            <div class="info-item">
-              <span class="icon">📍</span>
-              <span>{{ shelterInfo.location }}</span>
-            </div>
-            <div class="info-item">
-              <span class="icon">📅</span>
-              <span>가입일: {{ shelterInfo.joinDate }}</span>
-            </div>
+            <div class="info-item"><span class="icon">✉️</span><span>{{ shelterInfo.email }}</span></div>
+            <div class="info-item"><span class="icon">📞</span><span>{{ shelterInfo.phone }}</span></div>
+            <div class="info-item"><span class="icon">📍</span><span>{{ shelterInfo.location }}</span></div>
+            <div class="info-item"><span class="icon">📅</span><span>가입일: {{ shelterInfo.joinDate }}</span></div>
           </div>
 
           <button class="edit-btn" @click="editProfile">내 정보 수정</button>
+          <button class="message-btn" @click="goToMessages">내 쪽지</button>
           <button class="logout-btn" @click="logout">로그아웃</button>
-          <button class="manage-btn" @click="goToRecruitInsert">봉사모집 게시글 작성하기</button>
         </div>
 
         <!-- 신청 내역 -->
         <div class="application-card">
-          <h3 class="section-title">신청 내역</h3>
+          <div class="card-section-header">
+            <h3 class="section-title">신청 내역</h3>
+            <button class="section-more-btn" @click="goToApplicants">더보기</button>
+          </div>
           <table class="application-table">
             <thead>
               <tr>
                 <th>신청자 번호</th>
                 <th>신청자</th>
                 <th>승인상태</th>
+                <th>관리</th>
               </tr>
             </thead>
             <tbody>
@@ -60,19 +50,36 @@
                 <td>{{ applicant.id }}</td>
                 <td>{{ applicant.name }}</td>
                 <td>
-                  <span class="status-badge" :class="applicant.statusClass">
-                    {{ applicant.status }}
-                  </span>
+                  <span class="status-badge" :class="applicant.statusClass">{{ applicant.status }}</span>
+                </td>
+                <td>
+                  <button
+    class="approve-button"
+    :class="{ cancel: applicant.status === '승인완료' }"
+    @click="openApprove(applicant)"
+  >
+    {{ applicant.status === '승인완료' ? '승인취소' : '신청승인' }}
+  </button>
                 </td>
               </tr>
             </tbody>
           </table>
-          <button class="view-all-btn">신청승인하기</button>
         </div>
+
+        <!-- 승인 모달 -->
+        <Approve
+          v-if="showModal && selected"
+          :applicant="selected"
+          @close="closeModal"
+          @approve="handleApprove"
+        />
 
         <!-- 봉사시간 관리 -->
         <div class="volunteer-time-card">
-          <h3 class="section-title">봉사시간 관리</h3>
+          <div class="card-section-header">
+            <h3 class="section-title">봉사시간 관리</h3>
+            <button class="section-more-btn" @click="goToApplicants">더보기</button>
+          </div>
           <table class="time-table">
             <thead>
               <tr>
@@ -86,9 +93,7 @@
                 <td>{{ record.name }}</td>
                 <td>{{ record.date }}</td>
                 <td>
-                  <span class="status-badge" :class="record.statusClass">
-                    {{ record.status }}
-                  </span>
+                  <span class="status-badge" :class="record.statusClass">{{ record.status }}</span>
                 </td>
               </tr>
             </tbody>
@@ -98,7 +103,6 @@
 
       <!-- 우측 영역 -->
       <div class="right-section">
-        <!-- 통계 카드 -->
         <div class="stats-cards">
           <div class="stat-card">
             <div class="stat-icon">💬</div>
@@ -120,12 +124,7 @@
         <div class="recruitment-section">
           <h3 class="section-title">내가 작성한 모집글 보기</h3>
           <div class="recruitment-list">
-            <div 
-              v-for="post in myRecruitments" 
-              :key="post.id" 
-              class="recruitment-item"
-              @click="goToDetail(post.id)"
-            >
+            <div v-for="post in myRecruitments" :key="post.id" class="recruitment-item" @click="goToDetail(post.id)">
               <h4 class="recruitment-title">{{ post.title }}</h4>
               <div class="recruitment-meta">
                 <span class="meta-item">📅 {{ post.date }}</span>
@@ -139,12 +138,7 @@
         <div class="posts-section">
           <h3 class="section-title">내가 작성한 게시글 보기</h3>
           <div class="posts-list">
-            <div 
-              v-for="post in myPosts" 
-              :key="post.id" 
-              class="post-item"
-              @click="goToPost(post.id)"
-            >
+            <div v-for="post in myPosts" :key="post.id" class="post-item" @click="goToPost(post.id)">
               <h4 class="post-title">{{ post.title }}</h4>
               <div class="post-stats">
                 <span class="stat-item">📅 {{ post.date }}</span>
@@ -161,120 +155,82 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import Approve from '@/views/volunteer/shelterhead/Approve.vue'
+import db from '@/assets/data/db.json'
 
 const router = useRouter()
+const route = useRoute()
 
-// 보호소 정보
+const childRouteNames = ['VolunteerRecruitInsert', 'ShelterApplicants']
+const isChildRoute = computed(() => childRouteNames.includes(route.name ?? ''))
+
+const mypageData = db?.shelterHead?.mypage ?? {}
+
 const shelterInfo = ref({
-  name: '부천 유기견 보호소',
-  email: 'dain0404@gmail.com',
-  phone: '010-2244-4422',
-  location: '경기도 부천시',
-  joinDate: '2025-01-19'
+  ...(mypageData.shelterInfo ?? {
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    joinDate: ''
+  })
 })
 
-// 통계
 const stats = ref({
-  recruitments: 8,
-  likes: 56
+  ...(mypageData.stats ?? { recruitments: 0, likes: 0 })
 })
 
-// 신청자 목록
-const applicants = ref([
-  { id: 1, name: '홍길동', status: '승인대기', statusClass: 'pending' },
-  { id: 2, name: '김철수', status: '승인대기', statusClass: 'pending' },
-  { id: 3, name: '이다인', status: '승인대기', statusClass: 'pending' }
-])
+const applicants = ref([...(mypageData.applicants ?? [])])
 
-// 봉사시간 관리
-const volunteerRecords = ref([
-  { id: 1, name: '홍길동', date: '2025-10-10', status: '시간부여', statusClass: 'approved' },
-  { id: 2, name: '김철수', date: '2025-10-05', status: '시간부여', statusClass: 'approved' },
-  { id: 3, name: '이다인', date: '2025-10-28', status: '시간부여', statusClass: 'approved' }
-])
+const volunteerRecords = ref([...(mypageData.volunteerRecords ?? [])])
 
-// 내가 작성한 모집글
-const myRecruitments = ref([
-  {
-    id: 1,
-    title: '서울 보호소 청소',
-    date: '2025-10-10',
-    location: '서울 종로구'
-  },
-  {
-    id: 2,
-    title: '강아지 산책 봉사',
-    date: '2025-10-05',
-    location: '서울 강남구'
-  },
-  {
-    id: 3,
-    title: '보호소 급식 지원',
-    date: '2025-09-28',
-    location: '서울 중구'
-  },
-  {
-    id: 4,
-    title: '입양 행사 도우미',
-    date: '2025-09-20',
-    location: '부산 해운대구'
+const myRecruitments = ref([...(mypageData.myRecruitments ?? [])])
+
+const myPosts = ref([...(mypageData.myPosts ?? [])])
+
+const showModal = ref(false)
+const selected = ref(null)
+
+const openApprove = (applicant) => {
+  selected.value = { ...applicant }
+  showModal.value = true
+}
+
+const closeModal = () => {
+  showModal.value = false
+  selected.value = null
+}
+
+const handleApprove = (updated) => {
+  const target = applicants.value.find(a => a.id === updated.id)
+  if (target) {
+    const isApproved = target.status === '승인완료'
+    target.status = isApproved ? '승인대기' : '승인완료'
+    target.statusClass = isApproved ? 'pending' : 'approved'
   }
-])
-
-// 내가 작성한 게시글
-const myPosts = ref([
-  {
-    id: 1,
-    title: '서울 보호소 청소',
-    date: '2025-10-10',
-    likes: 45,
-    comments: 18,
-    views: 928
-  },
-  {
-    id: 2,
-    title: '강아지 산책 봉사',
-    date: '2025-10-05',
-    likes: 15,
-    comments: 12,
-    views: 306
-  },
-  {
-    id: 3,
-    title: '보호소 급식 지원',
-    date: '2025-09-28',
-    likes: 5,
-    comments: 8,
-    views: 100
-  }
-])
+  closeModal()
+}
 
 function goToDetail(id) {
   console.log('모집글 상세:', id)
-  // router.push(`/volunteer/detail/${id}`)
 }
-
 function goToPost(id) {
   console.log('게시글 상세:', id)
-  // router.push(`/post/${id}`)
 }
-
-function goToRecruitInsert() {
-  router.push('/shelter-head/mypage/recruitinsert')
+function goToMessages() {
+  router.push('/shelter-head/messages')
 }
-
+function goToApplicants() {
+  router.push('/shelter-head/mypage/applicants')
+}
 function editProfile() {
   console.log('내 정보 수정')
-  // router.push('/shelter-head/edit')
 }
-
 function logout() {
   if (confirm('로그아웃 하시겠습니까?')) {
     console.log('로그아웃')
-    // 로그아웃 로직
-    // router.push('/')
   }
 }
 </script>
@@ -392,8 +348,8 @@ function logout() {
 }
 
 .edit-btn,
-.logout-btn,
-.manage-btn {
+.message-btn,
+.logout-btn {
   width: 100%;
   padding: 12px;
   border: none;
@@ -417,24 +373,25 @@ function logout() {
 }
 
 .logout-btn {
-  background: white;
-  border: 2px solid #e8e0d5;
-  color: #8b7355;
+  background: #f8f6f2;
+  border: 1px solid #e0d4c2;
+  color: #6b5744;
 }
 
 .logout-btn:hover {
-  background: #f5f0e8;
+  background: #ebe2d4;
 }
 
-.manage-btn {
-  background: linear-gradient(135deg, #f0b762 0%, #e8a54d 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(240, 183, 98, 0.3);
+.message-btn {
+  background: #fff3da;
+  border: 1px solid #f2c98d;
+  color: #a46b1f;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-.manage-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(240, 183, 98, 0.4);
+.message-btn:hover {
+  background: #ffe6b8;
+  border-color: #e7b86c;
 }
 
 /* 신청 내역 & 봉사시간 관리 카드 */
@@ -446,11 +403,36 @@ function logout() {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
+.card-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
 .section-title {
   font-size: 1.1rem;
   font-weight: 700;
   color: #3d2f1f;
-  margin: 0 0 20px 0;
+  margin: 0;
+}
+
+.section-more-btn {
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1px solid #e4d7c7;
+  background: #faf6ee;
+  color: #6b5744;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.section-more-btn:hover {
+  background: #f0e5d4;
+  border-color: #d8cbbb;
 }
 
 .application-table,
@@ -670,4 +652,25 @@ function logout() {
     font-size: 1.5rem;
   }
 }
+
+.approve-button {
+  background-color: #d1a55c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+.approve-button:hover {
+  background-color: #c29349;
+}
+.approve-button.cancel {
+  background-color: #f16c6c;
+}
+.approve-button.cancel:hover {
+  background-color: #e05555;
+}
+
 </style>
