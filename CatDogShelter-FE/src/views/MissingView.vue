@@ -82,8 +82,6 @@
                   </select>
                 </div>
 
-           
-
                 <!-- 실종 장소 -->
                 <div class="filter-group wide">
                   <label class="filter-label">실종 장소</label>
@@ -152,7 +150,7 @@
       <!-- ===== 게시글 리스트 ===== -->
       <section class="post-list">
         <article
-          v-for="post in posts"
+          v-for="post in pagedPosts"
           :key="post.id"
           class="post-card"
           @click="goDetail(post.id)"
@@ -161,8 +159,8 @@
           <div class="thumb-wrap">
             <img
               class="thumb-img"
-  :src="validThumb(post.thumbnailUrl)"
-  alt=""
+              :src="validThumb(post.thumbnailUrl)"
+              alt="썸네일 이미지"
             />
           </div>
 
@@ -252,7 +250,7 @@
           </aside>
         </article>
 
-        <div v-if="posts.length === 0" class="empty">
+        <div v-if="pagedPosts.length === 0" class="empty">
           게시글이 없습니다.
         </div>
       </section>
@@ -289,33 +287,31 @@
   </main>
 </template>
 
- <script>
-import noImage from '@/assets/dogcat/lostcat1.jpeg'
+<script>
+import noImage from '/uploads/lostcat1.jpeg'
 
 export default {
   name: 'MissingListView',
 
   data() {
-    console.log('DEBUG noImage url >>>', noImage)
     return {
+      // 필터 open 여부
       filterOpen: true,
 
-      // 목록 (화면에 뿌릴 형태로 가공된 애들)
+      // 전체 게시글 원본 (서버에서 받아온 전체 배열)
       posts: [],
-      totalCount: 0,
 
-      // 페이지 정보 (지금 백엔드는 페이지네이션 안 주니까 프론트에서 흉내만)
-      page: 1,
-      pageSize: 10, // 우리가 요청에 전달은 하고 있긴 한데, 응답은 그냥 전체 배열
-      totalPages: 1,
+      // 페이지네이션 상태
+      page: 1,        // 현재 페이지
+      pageSize: 10,   // 한 페이지에 보여줄 게시글 수
 
       // 검색 기준 드롭다운
       searchField: 'title',
 
-      // 기본 썸네일
+      // 기본 썸네일 이미지 (import된 로컬 이미지)
       defaultThumb: noImage,
 
-      // 필터 값들
+      // 필터/검색 값들 (UI만 유지. 지금 단계에선 실제로 서버에 안 던짐)
       filters: {
         keyword: '',
         animalType: '',
@@ -324,12 +320,13 @@ export default {
         location: '',
         breed: '',
         color: '',
-        sort: 'LATEST', // LATEST | VIEW | LIKE (백엔드가 받아주면 사용)
+        sort: 'LATEST',
       },
     }
   },
 
   computed: {
+    // 현재 검색창 placeholder
     placeholderByField() {
       if (this.searchField === 'title') return '제목을 입력해주세요'
       if (this.searchField === 'comment') return '댓글 내용을 입력해주세요'
@@ -337,33 +334,78 @@ export default {
       return '검색어를 입력해주세요'
     },
 
+    // 현재 페이지에 보여줄 잘린 목록
+    pagedPosts() {
+      const start = (this.page - 1) * this.pageSize
+      return this.posts.slice(start, start + this.pageSize)
+    },
+
+    // 전체 게시글 수
+    totalCount() {
+      return this.posts.length
+    },
+
+    // 총 페이지 수
+    totalPages() {
+      if (this.totalCount === 0) return 1
+      return Math.ceil(this.totalCount / this.pageSize)
+    },
+
+    // 페이지네이션 버튼 목록 [1,2,3,...]
     pageNumbers() {
-      const nums = []
+      const arr = []
       for (let i = 1; i <= this.totalPages; i++) {
-        nums.push(i)
+        arr.push(i)
       }
-      return nums
+      return arr
     },
   },
 
   mounted() {
+    // 첫 로드 시 1페이지 불러오기
     this.fetchPosts(1)
   },
 
   methods: {
-    // 썸네일 URL 정리: 없으면 기본 이미지
+    // Vue 빌드 에셋 경로 변환기
+    getAssetUrl(path) {
+      // path 예: "@/assets/dogcat/lostcat1.jpeg"
+      return new URL(path, import.meta.url).href
+    },
+
+    // 썸네일 최종 결정 (없으면 기본 이미지)
     validThumb(url) {
+      // 1) url이 없거나 공백 => 기본 이미지
       if (!url || url.trim() === '') {
         return this.defaultThumb
       }
-      return url
+
+      // 2) 이미 http(s)로 온 경우 (백엔드가 절대경로 주는 경우) 그대로 사용
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url
+      }
+
+      // 3) /uploads/... 처럼 public 정적경로면 그대로 사용
+      if (url.startsWith('/')) {
+        return url
+      }
+
+      // 4) "@/assets/..." 같이 Vite가 번들할 로컬 asset이면 변환
+      if (url.startsWith('@/')) {
+        try {
+          return this.getAssetUrl(url)
+        } catch (e) {
+          console.warn('에셋 변환 실패, fallback 사용', e)
+          return this.defaultThumb
+        }
+      }
+
+      // 5) 기타 이상한 값이면 fallback
+      return this.defaultThumb
     },
 
     // 상세 페이지 이동
     goDetail(id) {
-      // 라우터에서 실종 상세 라우트가 name: 'missing-detail', param 이름이 postId 라고 했었지?
-      // 현재 템플릿에서는 this.$router.push(`/missing/${postId}`) 이런 식도 있었는데
-      // name 기반으로 확실하게 보내자
       this.$router.push({
         name: 'missing-detail',
         params: { postId: id },
@@ -372,107 +414,74 @@ export default {
 
     // 실종 신고하기 버튼
     onReportMissing() {
-      // 라우터에서 name: 'missing.write' 라고 했었잖아?
       this.$router.push({ name: 'missing.write' })
     },
 
-    // 게시글 목록 불러오기
-    // GET http://localhost:8000/post-service/missing-posts/query/posts
+    // ===== 목록 불러오기 / 페이지 변경 =====
+    // json-server를 지금 8080에서 돌리는 걸로 가정
+    // db.json에 "missingPosts": [ { ... }, ... ]
+    // -> GET http://localhost:8080/missingPosts
     async fetchPosts(targetPage) {
-      const pageToLoad = targetPage || this.page
+      // 페이지 범위 가드 (0 이하 금지)
+      const requestedPage = targetPage < 1 ? 1 : targetPage
 
-      // 서버가 현재 이 파라미터들을 실제로 쓰는지/안쓰는지 상관없이,
-      // 일단은 붙여서 보내고 있어도 문제는 없음.
-      const params = new URLSearchParams({
-        page: pageToLoad,
-        size: this.pageSize,
-        keyword: this.filters.keyword,
-        searchField: this.searchField,
-        sort: this.filters.sort,
-        animalType: this.filters.animalType,
-        isFound: this.filters.isFound,
-        sex: this.filters.sex,
-        location: this.filters.location,
-        breed: this.filters.breed,
-        color: this.filters.color,
-      })
+      // 이미 posts가 로드돼 있으면 서버 다시 안 치고 그냥 페이지 변경만
+      if (this.posts.length > 0) {
+        this.page = requestedPage > this.totalPages ? this.totalPages : requestedPage
+        return
+      }
 
       try {
-        const res = await fetch(
-          `http://localhost:8000/post-service/missing-posts/query/posts?${params.toString()}`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              // Authorization: `Bearer ${token}` // 필요하면 나중에
-            },
-          }
-        )
+        const res = await fetch('http://localhost:8080/missingPosts', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
 
         if (!res.ok) {
           console.error('[실종게시글 로드 실패 status]', res.status)
           throw new Error('게시글 로드 실패')
         }
 
-        const data = await res.json()
-        console.log('[fetchPosts] raw data:', data)
+        const raw = await res.json()
+        console.log('[fetchPosts/json-server] raw data:', raw)
 
-        // 현재 백엔드 응답 형태는 배열임 (너가 준 예시)
-        // [
-        //   {
-        //     "id": 10,
-        //     "status": false,
-        //     "title": "춘천에서 고양이를 잃어버렸습니다",
-        //     "createdAt": "2025-09-10 19:30",
-        //     "view": 13,
-        //     "userName": "서민재",
-        //     "likeCount": 0,
-        //     "userRating": "댕냥보호천사"
-        //   },
-        //   ...
-        // ]
-
-        const arr = Array.isArray(data) ? data : []
-
-        // 화면에서 쓰는 필드명으로 변환해 줄게.
-        // (template에서 post.?? 로 참조하는 것들 전부 채워주자)
-        this.posts = arr.map(item => ({
+        // 서버에서 온 데이터 정규화
+        const normalized = (Array.isArray(raw) ? raw : []).map(item => ({
           id: item.id,
-          status: item.status, // false => '실종중', true => '발견'
-          title: item.title,
-          createdAt: item.createdAt, // "2025-09-10 19:30"
-          view: item.view,
+          status: item.status, // false -> 실종중, true -> 발견
+          title: item.title || '',
+          createdAt: item.createdAt || '',
+          view: item.view ?? 0,
           likeCount: item.likeCount ?? 0,
-          userName: item.userName,
+          userName: item.userName || '',
           userRating: item.userRating || '',
 
-          // 아직 백엔드에서 안 주지만 템플릿에서 쓰고 있는 필드들:
-          // 안전하게 기본값 채워서 렌더 에러 안 나게
-          thumbnailUrl: item.thumbnailUrl || '',    // 백엔드에 없으면 기본이미지 나가게
-          animalTypeLabel: item.animalTypeLabel || '', // 예: "고양이", "강아지"
+          thumbnailUrl: item.thumbnailUrl || '',
+
+          animalTypeLabel: item.animalTypeLabel || '',
           breed: item.breed || '',
           color: item.color || '',
           age: item.age || '',
           sexText: item.sexText || '',
           featureDesc: item.featureDesc || '',
-          missingLocation: item.location || item.missingLocation || '',
+          missingLocation: item.missingLocation || item.location || '',
           contact: item.contact || '',
           missingDate: item.missingDate || '',
         }))
 
-        // 개수, 페이지 관련 값 갱신
-        this.totalCount = this.posts.length
+        // 원본 posts 저장
+        this.posts = normalized
 
-        // 지금은 서버가 totalPages 주는 구조가 아니니까
-        // 그냥 프론트에서 1페이지만 있다고 가정
-        this.page = pageToLoad
-        this.totalPages = 1
+        // 현재 페이지 세팅 (요청했던 페이지로 이동)
+        this.page = requestedPage
       } catch (err) {
         console.error('실종 게시글 조회 실패:', err)
+
+        // 실패 시 안전 초기화
         this.posts = []
-        this.totalCount = 0
         this.page = 1
-        this.totalPages = 1
       }
     },
   },

@@ -10,8 +10,14 @@
           <div class="head-left">
             <!-- 뱃지들 -->
             <div class="badge-row">
-              <span class="type-badge">{{ animalTypeLabel }}</span>
+              <span class="type-badge">{{ displayAnimalType }}</span>
               <span class="breed-badge">{{ post.breed || '정보 없음' }}</span>
+              <span
+                class="breed-badge"
+                :class="post.status === false ? 'state-missing' : 'state-found'"
+              >
+                {{ post.status === false ? '실종중' : '발견' }}
+              </span>
             </div>
 
             <h1 class="post-title">{{ post.title || '(제목 없음)' }}</h1>
@@ -20,6 +26,8 @@
               <span class="author">👤 {{ post.userName || '-' }}</span>
               <span class="dot">·</span>
               <span class="date">{{ post.createdAt || '-' }}</span>
+              <span class="dot">·</span>
+              <span class="view">조회 {{ post.view ?? 0 }}</span>
             </div>
           </div>
 
@@ -31,32 +39,22 @@
         <!-- 상단 하단 경계선 -->
         <div class="divider-line"></div>
 
-        <!-- 대표 이미지 + 썸네일들 + 동물 정보 박스 -->
+        <!-- 대표 이미지 + (원래 슬라이더 자리) + 동물 정보 박스 -->
         <section class="media-and-info">
           <!-- 대표 이미지 영역 -->
           <div class="main-image-wrap">
             <img
               class="main-image"
-              :src="currentImageUrl"
+              :src="mainImageUrl"
               alt="animal main"
             />
           </div>
 
-          <!-- 썸네일 슬라이더 -->
+          <!-- 썸네일들: 지금은 단일 이미지라 리스트 대신 단일만 보여주자 -->
           <div class="thumb-row">
-            <button class="thumb-nav" @click="prevImage">‹</button>
-
-            <div
-              v-for="(img, idx) in imageUrls"
-              :key="idx"
-              class="thumb-box"
-              :class="{ active: idx === currentImageIndex }"
-              @click="setImage(idx)"
-            >
-              <img :src="img" alt="thumb" />
+            <div class="thumb-box active">
+              <img :src="mainImageUrl" alt="thumb" />
             </div>
-
-            <button class="thumb-nav" @click="nextImage">›</button>
           </div>
 
           <!-- 동물 정보 카드 -->
@@ -66,7 +64,7 @@
             <ul class="info-list">
               <li>
                 <span class="info-key">종류</span>
-                <span class="info-val">{{ animalTypeLabel }}</span>
+                <span class="info-val">{{ displayAnimalType }}</span>
               </li>
               <li>
                 <span class="info-key">품종</span>
@@ -78,19 +76,29 @@
               </li>
               <li>
                 <span class="info-key">성별</span>
-                <span class="info-val">{{ sexLabel }}</span>
+                <span class="info-val">{{ post.sexText || '-' }}</span>
               </li>
               <li>
                 <span class="info-key">나이</span>
                 <span class="info-val">{{ post.age || '-' }}</span>
               </li>
               <li>
-                <span class="info-key">목격시각</span>
-                <span class="info-val">{{ post.lostDateTime || '-' }}</span>
+                <span class="info-key">실종 일시</span>
+                <span class="info-val">{{ post.missingDate || '-' }}</span>
               </li>
               <li>
-                <span class="info-key">위치</span>
-                <span class="info-val">{{ post.location || '-' }}</span>
+                <span class="info-key">실종 장소</span>
+                <span class="info-val">{{ post.missingLocation || '-' }}</span>
+              </li>
+              <li>
+                <span class="info-key">연락처</span>
+                <span class="info-val">{{ post.contact || '-' }}</span>
+              </li>
+              <li>
+                <span class="info-key">특징</span>
+                <span class="info-val">
+                  {{ post.featureDesc || '상세 내용은 본문을 확인해주세요.' }}
+                </span>
               </li>
             </ul>
           </aside>
@@ -99,18 +107,26 @@
         <!-- 본문 설명 -->
         <section class="content-block">
           <p class="content-text">
-            {{ post.content || '내용이 없습니다.' }}
+            {{ post.featureDesc || '내용이 없습니다.' }}
           </p>
         </section>
 
         <!-- 좋아요 / 공유 -->
         <section class="action-row">
-          <button class="like-btn">💗 좋아요 {{ post.likeCount ?? 0 }}</button>
-          <button class="share-btn">🔗 공유하기</button>
+          <button
+            class="like-btn"
+            :class="{ active: isLiked }"
+            @click.stop="toggleLike"
+          >
+            {{ isLiked ? '💗' : '♡' }}
+            좋아요 {{ displayedLikeCount }}
+          </button>
+
+          <button class="share-btn" @click.stop="openShareModal">🔗 공유하기</button>
 
           <div class="stats-right">
-            <span class="stat-chip">💬 {{ post.commentCount ?? comments.length }}</span>
             <span class="stat-chip">👁 {{ post.view ?? 0 }}</span>
+            <span class="stat-chip">♡ {{ displayedLikeCount }}</span>
           </div>
         </section>
       </section>
@@ -142,7 +158,7 @@
           </li>
         </ul>
 
-        <!-- 댓글 입력창 (아직 POST 안 붙혔지만 UI만) -->
+        <!-- 댓글 입력창 -->
         <div class="comment-write">
           <textarea
             v-model="newComment"
@@ -153,6 +169,43 @@
         </div>
       </section>
     </div>
+
+    <!-- ===== 공유 모달 오버레이 ===== -->
+    <div v-if="isShareOpen" class="share-overlay" @click.self="closeShareModal">
+      <div class="share-modal">
+        <header class="share-header">
+          <div class="share-title">댕냥쉘터 게시글 공유하기</div>
+          <button class="share-close-btn" @click="closeShareModal">✕</button>
+        </header>
+
+        <p class="share-desc">
+          가족을 기다리는 댕냥이의 이야기를 함께 퍼뜨려주세요.
+        </p>
+
+        <div class="share-link-row">
+          <input
+            class="share-link-input"
+            type="text"
+            :value="shareUrl"
+            readonly
+          />
+          <button class="share-copy-icon-btn" @click="copyLink">
+            📋
+          </button>
+        </div>
+
+        <button class="share-copy-main-btn" @click="copyLink">
+          링크 복사
+        </button>
+
+        <button class="share-cancel-btn" @click="closeShareModal">
+          취소
+        </button>
+
+        <p v-if="copyDone" class="copy-done-msg">복사 완료! 🎉</p>
+      </div>
+    </div>
+    <!-- ===== /공유 모달 오버레이 ===== -->
   </main>
 </template>
 
@@ -160,162 +213,182 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-// 라우터 /missing/:id
+/**
+ * 라우터 파라미터
+ * 리스트 쪽에서 this.$router.push({
+ *   name: 'missing-detail',
+ *   params: { postId: id }
+ * })
+ */
 const route = useRoute()
 const router = useRouter()
-const postId = route.params.id
+const postId = route.params.postId
 
-// 상세 게시글 데이터
+// 상세 게시글 데이터 (json-server missingPosts의 단일 row 형태 그대로)
 const post = reactive({
+  id: null,
+  status: false,
   title: '',
-  animalType: '',
-  breed: '',
-  color: '',
-  age: '',
-  sex: '',
-  lostDateTime: '',
-  location: '',
-  content: '',
-  userName: '',
   createdAt: '',
   view: 0,
   likeCount: 0,
-  commentCount: 0,
-  files: [],
+  userName: '',
+  userRating: '',
+  thumbnailUrl: '',
+
+  animalTypeLabel: '',
+  breed: '',
+  color: '',
+  age: '',
+  sexText: '',
+  featureDesc: '',
+  missingLocation: '',
+  contact: '',
+  missingDate: '',
 })
 
-// 댓글 리스트
+// 댓글 리스트 (지금은 아직 dummy)
 const comments = ref([])
 
 // 새 댓글
 const newComment = ref('')
 
-// === 이미지 관련 상태 ===
-const imageUrls = ref([]) // string[]
-const currentImageIndex = ref(0)
+/* =====================
+   좋아요 상태 / 로직
+===================== */
+const isLiked = ref(false)
 
-const currentImageUrl = computed(() => {
-  if (imageUrls.value.length === 0) {
-    return fallbackImage.value
+const displayedLikeCount = computed(() => {
+  const base = post.likeCount ?? 0
+  return isLiked.value ? base + 1 : base
+})
+
+function toggleLike() {
+  isLiked.value = !isLiked.value
+
+  // 서버 동기화 하고 싶으면 여기서 PATCH 날리면 됨
+  // fetch(`http://localhost:8080/missingPosts/${post.id}`, {...})
+}
+
+/* =====================
+   공유 모달 상태 / 로직
+===================== */
+const isShareOpen = ref(false)
+const copyDone = ref(false)
+
+// 공유할 URL. 라우팅 방식에 맞게 구성해 줄 거야.
+const shareUrl = ref(window.location.origin + window.location.pathname)
+
+function openShareModal() {
+  copyDone.value = false
+  // 해시 라우터(#) 쓰고 있다면 이렇게:
+  shareUrl.value = `${window.location.origin}/missing/${post.id ?? postId}`
+  isShareOpen.value = true
+}
+
+function closeShareModal() {
+  isShareOpen.value = false
+}
+
+async function copyLink() {
+  try {
+    await navigator.clipboard.writeText(shareUrl.value)
+    copyDone.value = true
+  } catch (err) {
+    console.error('클립보드 복사 실패:', err)
+    copyDone.value = false
   }
-  return imageUrls.value[currentImageIndex.value] || fallbackImage.value
-})
-
-// fallback 이미지 (프로젝트 내부 기본 이미지)
-import fallbackImageSrc from '@/assets/dogcat/lostcat1.jpeg'
-const fallbackImage = ref(fallbackImageSrc)
-
-// 동물타입 사람이 읽을 라벨
-const animalTypeLabel = computed(() => {
-  if (post.animalType === 'DOG') return '강아지'
-  if (post.animalType === 'CAT') return '고양이'
-  return '기타'
-})
-
-// 성별 라벨
-const sexLabel = computed(() => {
-  if (post.sex === 'MALE') return '수컷'
-  if (post.sex === 'FEMALE') return '암컷'
-  if (post.sex === 'UNKNOWN') return '모름'
-  return post.sex || '-'
-})
-
-// 이미지 인덱스 조작
-function setImage(idx) {
-  currentImageIndex.value = idx
-}
-function prevImage() {
-  if (imageUrls.value.length === 0) return
-  currentImageIndex.value =
-    (currentImageIndex.value - 1 + imageUrls.value.length) %
-    imageUrls.value.length
-}
-function nextImage() {
-  if (imageUrls.value.length === 0) return
-  currentImageIndex.value =
-    (currentImageIndex.value + 1) % imageUrls.value.length
 }
 
-// 목록으로
+/* =====================
+   이미지 / 라벨
+===================== */
+// 없을 때 보여줄 기본 썸네일
+const fallbackImageUrl = '/uploads/lostcat1.jpeg'
+
+const mainImageUrl = computed(() => {
+  if (post.thumbnailUrl && post.thumbnailUrl.trim() !== '') {
+    return post.thumbnailUrl
+  }
+  return fallbackImageUrl
+})
+
+const displayAnimalType = computed(() => {
+  // json-server 데이터에선 animalTypeLabel 자체가 "강아지" / "고양이"
+  return post.animalTypeLabel || '기타'
+})
+
+/* =====================
+   네비 / 댓글 / 데이터 로딩
+===================== */
 function goList() {
   router.push({ name: 'missing' })
 }
 
-// 댓글 전송 (임시 - 실제 API 연동은 나중에)
 function sendComment() {
   if (!newComment.value.trim()) return
-  // 나중에 POST /missing-posts/{id}/comments 같은 곳에 보내면 됨
-  alert('아직 댓글 등록 API 안 붙였어. 나중에 연결하면 돼!')
+  alert('아직 댓글 등록 API 안 붙였어. 나중에 연동하면 돼!')
   newComment.value = ''
 }
 
-// 상세랑 댓글 데이터 가져오기
+// 상세 데이터 가져오기
+// 지금은 /missingPosts/:id 가 404라서 전체 불러와서 찾아온다
 async function fetchDetail() {
   try {
-    const res = await fetch(
-      `http://localhost:8000/post-service/missing-posts/query/posts/${postId}`,
-      {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+    const res = await fetch('http://localhost:8080/missingPosts', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
 
     if (!res.ok) {
-      console.error('상세 조회 실패', res.status)
+      console.error('목록 조회 실패', res.status)
       return
     }
 
-    const data = await res.json()
+    const list = await res.json()
+    const data = list.find(item => String(item.id) === String(postId))
 
-    // post reactive에 주입
-    post.title = data.title
-    post.animalType = data.animalType
-    post.breed = data.breed
-    post.color = data.color
-    post.age = data.age
-    post.sex = data.sex
-    post.lostDateTime = data.lostDateTime || data.missingDate || ''
-    post.location = data.location || data.missingLocation || ''
-    post.content = data.content
-    post.userName = data.userName
-    post.createdAt = data.createdAt
-    post.view = data.view
-    post.likeCount = data.likeCount
-    post.commentCount = data.commentCount
-    post.files = Array.isArray(data.files) ? data.files : []
+    if (!data) {
+      console.error('해당 ID 게시글 없음:', postId)
+      return
+    }
 
-    // 이미지 URL 생성
-    // 백엔드가 파일을 서빙하는 실제 URL 패턴에 맞춰서 바꿔줘.
-    // 지금은 임시로 /files/{fileRename} 로 구성.
-    imageUrls.value =
-      post.files.length > 0
-        ? post.files.map(f => `/files/${f.fileRename}`)
-        : [fallbackImage.value]
+    // reactive post 채우기
+    post.id = data.id
+    post.status = data.status
+    post.title = data.title || ''
+    post.createdAt = data.createdAt || ''
+    post.view = data.view ?? 0
+    post.likeCount = data.likeCount ?? 0
+    post.userName = data.userName || ''
+    post.userRating = data.userRating || ''
 
-    currentImageIndex.value = 0
+    post.thumbnailUrl = data.thumbnailUrl || ''
+
+    post.animalTypeLabel = data.animalTypeLabel || ''
+    post.breed = data.breed || ''
+    post.color = data.color || ''
+    post.age = data.age || ''
+    post.sexText = data.sexText || ''
+    post.featureDesc = data.featureDesc || ''
+    post.missingLocation = data.missingLocation || ''
+    post.contact = data.contact || ''
+    post.missingDate = data.missingDate || ''
+
+    // 좋아요 초기화
+    isLiked.value = false
+
+    // 공유 URL도 post.id 기준으로 최신화
+    shareUrl.value = `${window.location.origin}/#/missing/${post.id}`
   } catch (err) {
     console.error('상세 조회 에러:', err)
   }
 }
 
+// 댓글 데이터 (dummy)
 async function fetchComments() {
   try {
-    const res = await fetch(
-      `http://localhost:8000/post-service/missing-posts/query/posts/${postId}/comments`,
-      {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
-
-    if (!res.ok) {
-      console.error('댓글 조회 실패', res.status)
-      comments.value = []
-      return
-    }
-
-    const list = await res.json()
-    comments.value = Array.isArray(list) ? list : []
+    comments.value = []
   } catch (err) {
     console.error('댓글 조회 에러:', err)
     comments.value = []
@@ -395,6 +468,19 @@ onMounted(() => {
   border-radius: 4px;
   padding: 4px 6px;
 }
+
+.state-missing {
+  background-color: #d53016;
+  color: #fff;
+  border-color: #d53016;
+}
+
+.state-found {
+  background-color: #4caf50;
+  color: #fff;
+  border-color: #4caf50;
+}
+
 .post-title {
   font-size: 18px;
   font-weight: 600;
@@ -467,33 +553,15 @@ onMounted(() => {
   margin: 0 auto 20px;
   flex-wrap: nowrap;
 }
-.thumb-nav {
-  background: #fff;
-  border: 1px solid rgba(0,0,0,0.15);
-  border-radius: 4px;
-  font-size: 16px;
-  line-height: 1;
-  padding: 6px 8px;
-  cursor: pointer;
-  height: 48px;
-  min-width: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #2a1c10;
-}
 .thumb-box {
   width: 80px;
   height: 80px;
   border-radius: 4px;
-  border: 2px solid transparent;
+  border: 2px solid #8a6a48;
   overflow: hidden;
   background: #fff;
   flex-shrink: 0;
   cursor: pointer;
-}
-.thumb-box.active {
-  border-color: #8a6a48;
 }
 .thumb-box img {
   width: 100%;
@@ -578,6 +646,11 @@ onMounted(() => {
   font-size: 13px;
   cursor: pointer;
   color: #2a1c10;
+}
+.like-btn.active {
+  border-color: #d53016;
+  color: #d53016;
+  font-weight: 600;
 }
 .stats-right {
   display: flex;
@@ -692,6 +765,140 @@ onMounted(() => {
   min-width: 64px;
   font-weight: 500;
   color: #2a1c10;
+}
+
+/* ==== 공유 모달 ==== */
+.share-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 16px;
+}
+
+.share-modal {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.18);
+  border: 1px solid rgba(0,0,0,0.07);
+  max-width: 360px;
+  width: 100%;
+  padding: 16px 16px 20px;
+  font-family: inherit;
+  color: #2a1c10;
+}
+
+.share-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.share-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2a1c10;
+  line-height: 1.4;
+}
+
+.share-close-btn {
+  background: none;
+  border: 0;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  color: rgba(0,0,0,0.6);
+  padding: 4px;
+}
+
+.share-desc {
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(0,0,0,0.6);
+  margin-bottom: 12px;
+  white-space: pre-line;
+}
+
+/* 링크 + 복사아이콘 라인 */
+.share-link-row {
+  display: flex;
+  align-items: stretch;
+  background: #fafafa;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.share-link-input {
+  flex: 1;
+  border: 0;
+  background: #fafafa;
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 10px 12px;
+  color: #2a1c10;
+  font-family: inherit;
+  outline: none;
+  resize: none;
+  min-width: 0;
+}
+
+.share-copy-icon-btn {
+  background: #ffe8b8;
+  border: 0;
+  border-left: 1px solid rgba(0,0,0,0.15);
+  padding: 0 10px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  min-width: 40px;
+  color: #2a1c10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 메인 복사 버튼 */
+.share-copy-main-btn {
+  width: 100%;
+  background: #e7ca94;
+  border: 0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #2a1c10;
+  padding: 12px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+/* 취소 버튼 */
+.share-cancel-btn {
+  width: 100%;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #2a1c10;
+  padding: 12px;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+/* 복사 완료 메시지 */
+.copy-done-msg {
+  font-size: 12px;
+  color: #4caf50;
+  text-align: center;
+  line-height: 1.4;
 }
 
 /* 반응형 */

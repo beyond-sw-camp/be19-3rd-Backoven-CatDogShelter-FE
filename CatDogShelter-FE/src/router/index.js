@@ -155,7 +155,7 @@ const router = createRouter({
       component: MissingPostWirte,
     },
     {
-      path: '/missing/:id',
+      path: '/missing/:postId',
       name: 'missing-detail',
       component: MissingDetailView,
       props: true,
