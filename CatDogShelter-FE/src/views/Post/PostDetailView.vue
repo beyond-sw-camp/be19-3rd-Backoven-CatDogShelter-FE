@@ -72,7 +72,7 @@
         </svg>
         좋아요 {{ post.stats.likes }}
       </button>
-      <button class="chip" @click="share">공유하기</button>
+      <button class="chip" @click="openShare">공유하기</button>
     </div>
 
     <!-- (요청으로 제거) 이전/다음 글 네비게이션 없음 -->
@@ -117,11 +117,14 @@
     <p>존재하지 않는 게시글입니다.</p>
     <RouterLink class="back" :to="{ name: 'post' }">목록으로</RouterLink>
   </article>
+
+  <ShareModal v-model="showShare" :share-url="shareUrl" />
 </template>
 
 <script setup>
 import { reactive, ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import ShareModal from '@/components/share/ShareModal.vue'
 import { getDummyDetail } from './detail/dummies.js'
 import { openReport } from '@/components/report'
 
@@ -135,6 +138,12 @@ const newComment = ref('')
 const storageKey = computed(() => `post:detail:${id.value}`)
 const post   = computed(() => state.post)
 const isLiked = computed(() => state.isLiked)
+const showShare = ref(false)
+const shareUrl = computed(() => {
+  const resolved = router.resolve({ name: 'post.detail', params: { id: id.value } })
+  return new URL(resolved.href, window.location.origin).toString()
+})
+const openShare = () => { showShare.value = true }
 
 function load() {
   // 1) 사용자 저장 상세 우선
