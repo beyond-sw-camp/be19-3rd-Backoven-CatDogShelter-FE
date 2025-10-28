@@ -488,7 +488,7 @@ function applyVolunteer(id) {
 }
 
 .recruit-container {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   gap: 40px;

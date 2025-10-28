@@ -55,25 +55,34 @@
 
             <!-- 입양 카드 리스트 -->
             <div class="adoption-card-row">
-              <article
-                class="adoption-card"
-                v-for="pet in adoptionList"
-                :key="pet.id"
-                @click="goAdoptionDetail(pet.id)"
-              >
-                <div class="adoption-thumb">
-                  <div class="thumb-fallback">사진</div>
-                  <!-- TODO: 나중에 <img :src="pet.imgUrl" :alt="pet.name" /> 로 교체 -->
-                </div>
-                <div class="adoption-info">
-                  <h3 class="pet-name">{{ pet.name }}</h3>
-                  <p class="pet-meta">
-                    {{ pet.breed }} / {{ pet.age }}살 / 중성화
-                    {{ pet.neutered ? "O" : "X" }}
-                  </p>
-                </div>
-              </article>
-            </div>
+  <article
+    class="adoption-card"
+    v-for="pet in adoptionList"
+    :key="pet.id"
+    @click="goAdoptionDetail(pet.id)"
+  >
+    <div class="adoption-thumb">
+      <template v-if="pet.thumbnailUrl && pet.thumbnailUrl.trim() !== ''">
+        <img
+          class="adoption-img"
+          :src="pet.thumbnailUrl"
+          :alt="pet.name"
+        />
+      </template>
+      <template v-else>
+        <div class="thumb-fallback">사진</div>
+      </template>
+    </div>
+
+    <div class="adoption-info">
+      <h3 class="pet-name">{{ pet.name }}</h3>
+      <p class="pet-meta">
+        {{ pet.breed }} / {{ pet.age }}살 / 중성화
+        {{ pet.neutered ? "O" : "X" }}
+      </p>
+    </div>
+  </article>
+</div>
           </div>
 
           <!-- [봉사모임 게시판] 리스트 -->
@@ -301,10 +310,10 @@ const router = useRouter();
 
 const API_BASE = "http://localhost:8080";
 
-// 로그인 상태
+// ===== 로그인 상태 관련 상태값 =====
 const isLoggedIn = ref(false);
-const userName = ref("이다인");
-const userTitle = ref("댕냥 보호천사");
+const userName = ref("");
+const userTitle = ref("");
 
 // ===== 라우팅 함수들 =====
 function goLogin() {
@@ -334,11 +343,10 @@ function goMissingDetail(id) {
   });
 }
 function goSightingDetail(id) {
-  // 아직 라우터에 목격 상세가 없다면 이건 추후 연결
   router.push(`/sighting/${id}`);
 }
 
-// ===== json-server 데이터 상태 =====
+// ===== 메인 화면에 뿌릴 데이터들 =====
 const adoptionList = ref([]);
 const volunteerList = ref([]);
 const freeList = ref([]);
@@ -348,14 +356,26 @@ const missingPreview = ref([]);
 const sightingPreview = ref([]);
 
 onMounted(async () => {
-  // 로그인 상태 확인 (토큰 있으면 true)
+  // 1) 로그인 여부/프로필 채우기
   const token = sessionStorage.getItem("accessToken");
+
   if (token) {
     isLoggedIn.value = true;
+
+    // 로그인 시 로그인 로직에서 저장해뒀다고 가정할 값들
+    // (백엔드 연동되면 여기서 실제 /me 같은 API fetch로 바꿔주면 돼)
+    userName.value =
+      sessionStorage.getItem("userName") || "이다인"; // fallback
+    userTitle.value =
+      sessionStorage.getItem("userTitle") || "댕냥 보호천사";
+  } else {
+    isLoggedIn.value = false;
+    userName.value = "";
+    userTitle.value = "";
   }
 
+  // 2) 홈에 필요한 json-server 데이터 로드
   try {
-    // 병렬 요청
     const [
       adoptionRes,
       volunteerRes,
@@ -371,14 +391,12 @@ onMounted(async () => {
       fetch(`${API_BASE}/heroList`),
       fetch(`${API_BASE}/noticeList`),
 
-      // 최근 실종 제보 2건만 (createdAt desc)
+      // 최근 실종 제보
       fetch(
         `${API_BASE}/missingPosts?_sort=createdAt&_order=desc&_limit=2`
       ),
 
-      // 최근 목격 제보 2건만.
-      // 만약 아직 sightingPosts 리소스가 없다면 이 요청은 404 날 거라
-      // try/catch 아래에서 빈 배열로 처리해줄 거야.
+      // 최근 목격 제보
       fetch(
         `${API_BASE}/sightingPosts?_sort=createdAt&_order=desc&_limit=2`
       ).catch(() => null),
@@ -390,10 +408,10 @@ onMounted(async () => {
     heroList.value = await heroRes.json();
     noticeList.value = await noticeRes.json();
 
-    // 실종 제보 미리보기
+    // 실종 미리보기
     const missingRaw = await missingRes.json();
     missingPreview.value = Array.isArray(missingRaw)
-      ? missingRaw.map(item => ({
+      ? missingRaw.map((item) => ({
           id: item.id,
           title: item.title || "",
           thumbnailUrl: item.thumbnailUrl || "",
@@ -402,11 +420,11 @@ onMounted(async () => {
         }))
       : [];
 
-    // 목격 제보 미리보기 (존재하면)
+    // 목격 미리보기
     if (sightingRes && sightingRes.ok) {
       const sightingRaw = await sightingRes.json();
       sightingPreview.value = Array.isArray(sightingRaw)
-        ? sightingRaw.map(item => ({
+        ? sightingRaw.map((item) => ({
             id: item.id,
             title: item.title || "",
             thumbnailUrl: item.thumbnailUrl || "",
@@ -425,10 +443,12 @@ onMounted(async () => {
       noticeList: noticeList.value,
       missingPreview: missingPreview.value,
       sightingPreview: sightingPreview.value,
+      isLoggedIn: isLoggedIn.value,
+      userName: userName.value,
+      userTitle: userTitle.value,
     });
   } catch (error) {
     console.error("❌ 홈 데이터 로드 실패:", error);
-    // 실패 시 안전하게 비워두기
     missingPreview.value = [];
     sightingPreview.value = [];
   }
@@ -1176,5 +1196,31 @@ onMounted(async () => {
   width: 100%;
   height: 100%;
   object-fit: fill;
+}
+
+.adoption-thumb {
+  background-color: #e8d3b5;
+  border-radius: var(--radius-md);
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5a412a;
+  font-weight: 600;
+  font-size: 14px;
+  overflow: hidden;          /* 이미지가 둥근 라운드 밖으로 안 튀게 */
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.adoption-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;         /* 꽉 채우되 비율 유지 */
+  display: block;
+}
+
+.thumb-fallback {
+  /* 예전 fallback 박스 유지하고 싶으면 여기에 스타일 계속 둬도 돼 */
+  text-align: center;
 }
 </style>

@@ -89,7 +89,7 @@ const images = ref([]) // dataURL 배열
 const form = ref({
   title: '',
   body: '',
-  author: '익명',
+  author: '이지윤',
   category:'',
 })
 
