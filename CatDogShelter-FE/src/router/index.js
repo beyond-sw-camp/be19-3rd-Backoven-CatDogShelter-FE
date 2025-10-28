@@ -18,7 +18,7 @@ import SightingView from '@/views/SightingView.vue'
 import PostView from '@/views/Post/PostView.vue'
 import PostDetailView from '@/views/Post/PostDetailView.vue'
 import PostWriteView from '@/views/Post/PostWriteView.vue'
-import HeroesrankingView from '@/views/heros/Heroesranking.vue'
+import HeroesrankingView from '@/views/heros/HeroesrankingView.vue'
 
 // ===== Footer pages =====
 import AboutView from '@/views/footer/AboutView.vue'
@@ -233,6 +233,10 @@ const router = createRouter({
         },
       ],
     },
+
+    // src/router/index.js
+    { path: '/auth/find-id', name: 'find.id', component: () => import('@/views/auth/findIdView.vue') },
+
     
 
     // ===== duplicated routes (kept to match existing structure) =====

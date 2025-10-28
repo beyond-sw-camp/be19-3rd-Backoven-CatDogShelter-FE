@@ -1,6 +1,10 @@
 import { reactive, computed, toRefs } from 'vue'
 import { loginAPI, signupAPI, meAPI } from './service'
+import { ref } from 'vue'
 
+const user = ref(null)
+const loading = ref(false)
+const error = ref(null)
 const state = reactive({
   authed: localStorage.getItem('authed') === '1',  // ✅ 쿠키 대신 그림자 플래그
   loading: false,
@@ -45,19 +49,29 @@ export function logout() {
   localStorage.removeItem('authed')
 }
 
-export async function fetchMe() {
-  if (!state.token) return null
+async function fetchMe() {
+  loading.value = true
   try {
-    const me = await meAPI()
-    state.user = me
-    persist()
-    return me
-  } catch {
-    logout()
+    const res = await fetch('http://localhost:8000/user-service/me', {
+      credentials: 'include',
+      headers: {
+        Authorization: localStorage.getItem('accessToken')
+          ? `Bearer ${localStorage.getItem('accessToken')}`
+          : ''
+      }
+    })
+    if (!res.ok) throw new Error('unauthorized')
+    user.value = await res.json()
+    return user.value
+  } catch (e) {
+    user.value = null
     return null
+  } finally {
+    loading.value = false
   }
 }
 
+
 export function useAuth() {
-  return { ...toRefs(state), isAuthed, login, signup, logout }
+  return { ...toRefs(state), isAuthed, login, signup, logout, fetchMe }
 }
