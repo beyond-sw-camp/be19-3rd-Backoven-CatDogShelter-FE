@@ -428,7 +428,7 @@ onMounted(() => {
   background-color: #efe8dd;
   color: #2a1c10;
   min-height: 100vh;
-  padding: 24px 0px 100px;
+  padding: 40px 20px 100px;
   display: flex;
   flex-direction: column;
   font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
@@ -436,9 +436,8 @@ onMounted(() => {
 
 .donation-inner {
   width: 100%;
-  max-width: 1150px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 24px;
   display: flex;
   flex-direction: column;
   gap: 24px;
