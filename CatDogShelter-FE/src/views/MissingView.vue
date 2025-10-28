@@ -22,7 +22,7 @@
 
           <!-- 검색 인풋 -->
           <div class="top-search-input-wrap">
-            <span class="search-icon">🔍</span>
+            <img class="search-icon" :src="searchIcon" alt="검색 아이콘" />
             <input
               id="searchKeyword"
               v-model.trim="filters.keyword"
@@ -45,7 +45,7 @@
               type="button"
               @click="filterOpen = !filterOpen"
             >
-              <span class="filter-icon">🔍</span>
+              <img class="filter-icon" :src="searchIcon" alt="검색 아이콘" />
               <span class="filter-text">필터</span>
               <span class="arrow" :class="{ open: filterOpen }">⌄</span>
             </button>
@@ -290,12 +290,14 @@
 </template>
 
 <script>
-export default {
+import searchIcon from '@/assets/돋보기아이콘.svg'
+  export default {
   name: 'MissingListView',
 
-  data() {
-    return {
-      filterOpen: true,
+    data() {
+      return {
+        searchIcon,
+        filterOpen: true,
 
       // 목록
       posts: [],
@@ -511,8 +513,11 @@ export default {
 .search-icon {
   position: absolute;
   left: 8px;
-  font-size: 13px;
-  color: var(--input-placeholder);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
 }
 .top-search-input {
   width: 100%;
@@ -568,9 +573,10 @@ export default {
 }
 
 .filter-icon {
-  font-size: 13px;
-  line-height: 1;
-  color: var(--brown-text);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  pointer-events: none;
 }
 
 .filter-text {
