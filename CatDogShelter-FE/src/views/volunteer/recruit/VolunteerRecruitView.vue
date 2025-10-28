@@ -27,7 +27,7 @@
             <button class="nav-btn left" @click="prevSlide" v-if="highlights.length > 1">‹</button>
 
             <div class="card-wrapper">
-              <div class="highlight-card" @click="goToDetail(highlight.id)" v-if="highlight">
+              <div class="highlight-card" v-if="highlight">
                 <div class="file-container">
                   <img class="highlight-img" :src="getImageUrl(highlight.file)" alt="봉사활동 이미지" />
                 </div>
@@ -439,8 +439,7 @@ function goToDetail(id) {
 }
 
 function applyVolunteer(id) {
-  console.log('봉사 신청:', id)
-  alert('봉사 신청이 완료되었습니다!')
+  goToDetail(id)
 }
 </script>
 
@@ -525,13 +524,11 @@ function applyVolunteer(id) {
   overflow: hidden;
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
   padding: 16px;
-  cursor: pointer;
-  transition: all 0.3s;
 }
 
 .highlight-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  transform: none;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
 }
 
 .file-container {
