@@ -1,5 +1,6 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuth } from '@/views/auth/useAuth'
 
 // ===== Auth =====
 import LoginView from '@/views/auth/login/index.vue'
@@ -37,6 +38,11 @@ import LoginPlaceholderView from '@/views/LoginPlaceholderView.vue'
 
 // ===== Missing post writer =====
 import MissingPostWirte from '@/views/missing/MissingPostWirte.vue'
+
+// ===== User MyPage =====
+import UserMyPageView from '@/views/mypage/UserMyPageView.vue'
+import UserEdit from '@/views/mypage/UserEdit.vue'
+import UserMessages from '@/views/mypage/UserMessages.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -215,6 +221,40 @@ const router = createRouter({
       path: '/faq',
       component: FaqView,
     },
+    
+    // ✅ User MyPage
+    {
+      path: '/mypage',
+      component: UserMyPageView,
+      beforeEnter: (to, from, next) => {
+        const { isAuthed } = useAuth()
+        if (!isAuthed.value) {
+          alert("로그인이 필요합니다.")
+          return next('/login')
+        }
+        next()
+      }
+    },
+    {
+      path: '/mypage/edit',
+      name: 'mypage-edit',
+      component: UserEdit,
+      meta: { requiresAuth: true, role: 'user' }
+    },
+    {
+      path: '/mypage/messages',
+      name: 'mypage-messages',
+      component: UserMessages,
+      meta: { requiresAuth: true }
+    },
+
+    // // ✅ Shelter MyPage
+    // {
+    //   path: '/shelter-head/mypage',
+    //   name: 'shelter-mypage',
+    //   component: ShelterheadMypageView,
+    //   meta: { requiresAuth: true, role: 'shelter' }
+    // },
 
     // shelter head mypage
     {
