@@ -6,7 +6,6 @@ import HomeView from '@/views/HomeView.vue'
 import VolunteerView from '@/views/volunteer/VolunteerView.vue'
 import DonationView from '@/views/DonationView.vue'
 import DonationDetailView from '@/views/donation/DonationDetailView.vue'
-import MissingDetailView from '@/views/missing/MissingDetailView.vue'
 import AdoptionView from '@/views/adoption/AdoptionView.vue'
 import MissingView from '@/views/MissingView.vue'
 import SightingView from '@/views/SightingView.vue'
@@ -14,7 +13,7 @@ import PostView from '@/views/Post/PostView.vue'
 import PostDetailView from '@/views/Post/PostDetailView.vue'
 import PostWriteView from '@/views/Post/PostWriteView.vue'
 import HeroesrankingView from '@/views/heros/HeroesrankingView.vue'
-
+import DonationWrite from '@/views/donation/DonationWrite.vue'
 // ===== Footer 영역 페이지 =====
 import AboutView from '@/views/footer/AboutView.vue'
 import TermsView from '@/views/footer/TermsView.vue'
@@ -28,8 +27,9 @@ import FaqView from '@/views/footer/FaqView.vue'
 import ShelterheadMypageView from '@/views/volunteer/shelterhead/ShelterheadMypageView.vue'
 import LoginPlaceholderView from '@/views/LoginPlaceholderView.vue'
 
-// ===== 실종 글 작성 =====
+// ===== 실종게시판=====
 import MissingPostWirte from '@/views/missing/MissingPostWirte.vue'
+import MissingDetailView from '@/views/missing/MissingDetailView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -87,6 +87,12 @@ const router = createRouter({
       component: DonationDetailView,
       props: true,
     },
+    //후원게시판 글작성
+    {
+      path: '/donation/write',
+      name: 'donation.write',
+      component: DonationWrite,
+    },
 
     // 입양 게시판 목록
     {
@@ -118,18 +124,18 @@ const router = createRouter({
       name: 'missing',
       component: MissingView,
     },
-    {
-      path: '/missing/:postId',
-      name: 'missing-detail',
-      component: MissingDetailView,
-      props: true, // 이거 켜두면 route param(postId)을 props로도 받을 수 있음
-    },
 
     // 실종 신고 작성
     {
       path: '/missing/write',
       name: 'missing.write',
       component: MissingPostWirte,
+    },
+    {
+      path: '/missing/:id',
+      name: 'missing-detail',
+      component: MissingDetailView,
+      props: true,
     },
 
     // 목격 게시판
@@ -234,6 +240,12 @@ const router = createRouter({
     { path: '/volunteer-guide', component: VolunteerGuideView },
     { path: '/faq', component: FaqView },
 
+    {
+      path: '/volunteer/detail/:id',
+      name: 'volunteer-detail',
+      component: () => import('@/views/volunteer/VolunteerDetailView.vue'),
+      props: true, // <== 이거 있으면 route params를 props로 받을 수 있음
+    },
     {
       path: '/shelter-head/mypage',                 // 보호소장 마이페이지 라우팅 (중복 선언 존중)
       component: ShelterheadMypageView,

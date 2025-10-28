@@ -35,7 +35,7 @@
 
       <!-- 하단 곡선 장식 + 움직이는 물결 -->
       <div class="hero-wave">
-  <img src="@/assets/wave-bottom.svg" alt="" class="wave-static-svg" />
+        <img src="@/assets/wave-bottom.svg" alt="" class="wave-static-svg" />
       </div>
     </section>
 
@@ -48,7 +48,9 @@
           <div class="board-section">
             <div class="board-header">
               <h2>댕냥이들 입양하러 가기</h2>
-              <a class="more-link" href="/adoption">더보기 ></a>
+
+              <!-- 더보기: 입양 페이지로 -->
+              <router-link class="more-link" to="/adoption">더보기 ></router-link>
             </div>
 
             <!-- 입양 카드 리스트 -->
@@ -57,6 +59,7 @@
                 class="adoption-card"
                 v-for="pet in adoptionList"
                 :key="pet.id"
+                @click="goAdoptionDetail(pet.id)"
               >
                 <div class="adoption-thumb">
                   <div class="thumb-fallback">사진</div>
@@ -77,19 +80,23 @@
           <div class="board-section">
             <div class="board-header">
               <h2>유기견&유기묘 봉사모임</h2>
-              <a class="more-link" href="/volunteer">더보기 ></a>
+
+              <!-- 더보기: 봉사 게시판 메인으로 -->
+              <router-link class="more-link" to="/volunteer">더보기 ></router-link>
             </div>
 
             <ul class="post-list">
               <li
                 v-for="post in volunteerList"
                 :key="post.id"
-                class="post-row"
+                class="post-row post-row-clickable"
+                @click="goVolunteerDetail(post.id)"
               >
+              
                 <span class="title">{{ post.title }}</span>
-                <span class="meta">
-                  💬 {{ post.commentCount }}
-                  · 👀 {{ post.viewCount }}
+           
+                 <span class="meta">
+                   👥 모집현황 {{ post.viewCount }}
                 </span>
               </li>
             </ul>
@@ -99,11 +106,18 @@
           <div class="board-section">
             <div class="board-header">
               <h2>자유게시판</h2>
-              <a class="more-link" href="/post">더보기 ></a>
+
+              <!-- 더보기: 자유게시판 목록으로 -->
+              <router-link class="more-link" to="/post">더보기 ></router-link>
             </div>
 
             <ul class="post-list">
-              <li v-for="post in freeList" :key="post.id" class="post-row">
+              <li
+                v-for="post in freeList"
+                :key="post.id"
+                class="post-row post-row-clickable"
+                @click="goFreeDetail(post.id)"
+              >
                 <span class="title">{{ post.title }}</span>
                 <span class="meta">
                   💬 {{ post.commentCount }}
@@ -166,7 +180,7 @@
           <div class="side-card hero-card">
             <div class="hero-header">
               <h3>이달의 댕냥 히어로즈 🐾</h3>
-              <a href="/volunteer" class="more-link">더보기 ></a>
+              <router-link to="/volunteer" class="more-link">더보기 ></router-link>
             </div>
 
             <ol class="hero-list">
@@ -182,7 +196,7 @@
           <div class="side-card photo-board">
             <div class="board-header tight">
               <h3>댕냥이들을 찾아주세요</h3>
-              <a href="/missing" class="more-link">더보기 ></a>
+              <router-link to="/missing" class="more-link">더보기 ></router-link>
             </div>
 
             <div class="photo-list">
@@ -195,7 +209,7 @@
           <div class="side-card photo-board">
             <div class="board-header tight">
               <h3>댕냥이들을 목격했어요</h3>
-              <a href="/sighting" class="more-link">더보기 ></a>
+              <router-link to="/sighting" class="more-link">더보기 ></router-link>
             </div>
 
             <div class="photo-list">
@@ -221,104 +235,92 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const isLoggedIn = ref(false);
 const userName = ref("이다인");
 const userTitle = ref("댕냥 보호천사");
 
+// ===== 라우팅 함수들 =====
 function goLogin() {
-  window.location.href = "/login";
+  router.push("/login");
 }
 function goMypage() {
-  window.location.href = "/mypage";
+  router.push("/mypage");
 }
 function goAdoption() {
-  window.location.href = "/adoption";
+  router.push("/adoption");
 }
 
-const adoptionList = ref([
-  { id: 1, name: "코숏", breed: "믹스", age: 2, neutered: true },
-  { id: 2, name: "몰티즈", breed: "몰티즈", age: 1, neutered: false },
-  { id: 3, name: "믹스견", breed: "믹스", age: 3, neutered: true },
-]);
+// 디테일 페이지용 (id 넘겨서 이동)
+function goVolunteerDetail(id) {
+  router.push(`/volunteer/detail/${id}`);
+}
+function goFreeDetail(id) {
+  router.push(`/post/${id}`);
+}
+// 입양 디테일 페이지도 똑같이 구성한다면:
+function goAdoptionDetail(id) {
+  router.push(`/adoption/detail/${id}`);
+}
 
-const volunteerList = ref([
-  {
-    id: 11,
-    title: "서울 종로구 동묘 거리정화",
-    commentCount: 12,
-    viewCount: 234,
-  },
-  {
-    id: 12,
-    title: "부산 해운대구 해변 비치클린",
-    commentCount: 8,
-    viewCount: 456,
-  },
-  {
-    id: 13,
-    title: "대구 중구 대구 중앙로역 미화",
-    commentCount: 5,
-    viewCount: 189,
-  },
-  {
-    id: 14,
-    title: "인천 남구 인천 센터 봉사 준비",
-    commentCount: 10,
-    viewCount: 567,
-  },
-  {
-    id: 15,
-    title: "광주 동구 공구 유기묘 캠페인",
-    commentCount: 9,
-    viewCount: 345,
-  },
-  {
-    id: 16,
-    title: "대전 중구 대전 보호소 정비",
-    commentCount: 7,
-    viewCount: 123,
-  },
-]);
-
-const freeList = ref([
-  {
-    id: 21,
-    title: "우리집 강아지 첫 산책",
-    commentCount: 8,
-    viewCount: 234,
-  },
-  {
-    id: 22,
-    title: "고양이 멍때리는 짤 봐라",
-    commentCount: 12,
-    viewCount: 456,
-  },
-  {
-    id: 23,
-    title: "강아지 미용하다 울었어요",
-    commentCount: 8,
-    viewCount: 234,
-  },
-]);
-
-const heroList = ref([
-  { rank: 1, name: "최희원", hours: 32 },
-  { rank: 2, name: "박민형", hours: 31 },
-  { rank: 3, name: "이승연", hours: 29 },
-]);
-
-const noticeList = ref([
-  { id: 31, text: "이용 규칙 안내" },
-  { id: 32, text: "허위 게시물 신고" },
-  { id: 33, text: "봉사 인증 방법" },
-]);
+// ===== json-server 데이터 상태 =====
+const adoptionList = ref([]);
+const volunteerList = ref([]);
+const freeList = ref([]);
+const heroList = ref([]);
+const noticeList = ref([]);
+const missingPreview = ref([]);
+const sightingPreview = ref([]);
 
 onMounted(async () => {
+  // 로그인 상태 확인 (토큰 있으면 true)
   const token = sessionStorage.getItem("accessToken");
   if (token) {
     isLoggedIn.value = true;
-    // 여기서 유저 정보 fetch 해서 userName, userTitle 갱신하면 됨
+  }
+
+  // json-server에서 데이터 fetch
+  try {
+    const [
+      adoptionRes,
+      volunteerRes,
+      freeRes,
+      heroRes,
+      noticeRes,
+      missingRes,
+      sightingRes,
+    ] = await Promise.all([
+      fetch("http://localhost:8080/adoptionPosts"),
+      fetch("http://localhost:8080/volunteerPosts"),
+      fetch("http://localhost:8080/freePosts"),
+      fetch("http://localhost:8080/heroList"),
+      fetch("http://localhost:8080/noticeList"),
+      fetch("http://localhost:8080/missingPreview"),
+      fetch("http://localhost:8080/sightingPreview"),
+    ]);
+
+    adoptionList.value = await adoptionRes.json();
+    volunteerList.value = await volunteerRes.json();
+    freeList.value = await freeRes.json();
+    heroList.value = await heroRes.json();
+    noticeList.value = await noticeRes.json();
+    missingPreview.value = await missingRes.json();
+    sightingPreview.value = await sightingRes.json();
+
+    console.log("✅ 홈 데이터 로드 완료:", {
+      adoptionList: adoptionList.value,
+      volunteerList: volunteerList.value,
+      freeList: freeList.value,
+      heroList: heroList.value,
+      noticeList: noticeList.value,
+      missingPreview: missingPreview.value,
+      sightingPreview: sightingPreview.value,
+    });
+  } catch (error) {
+    console.error("❌ 홈 데이터 로드 실패:", error);
   }
 });
 </script>
@@ -497,8 +499,6 @@ onMounted(async () => {
 }
 
 /* ===== 하단 웨이브 ===== */
-
-/* hero-wave 자체는 배너 바닥에 붙어있는 영역 */
 .hero-wave {
   position: absolute;
   left: 0;
@@ -507,12 +507,10 @@ onMounted(async () => {
   height: 160px;
   z-index: 1;
   pointer-events: none;
-  /* 기존 둥근 라운드 톤 그대로 유지 (배경과 자연스럽게 페이드) */
- 
   overflow: hidden;
   border-bottom-left-radius: 32px;
   border-bottom-right-radius: 32px;
-   background: radial-gradient(
+  background: radial-gradient(
     200% 100px at 50% 0%,
     var(--surface-light) 0%,
     var(--surface-light) 60%,
@@ -520,7 +518,6 @@ onMounted(async () => {
   );
 }
 
-/* wave-layer 2장 겹쳐서 흐르는 효과 */
 .wave-layer {
   position: absolute;
   left: 0;
@@ -533,7 +530,7 @@ onMounted(async () => {
   filter: blur(0.3px) drop-shadow(0 -2px 6px rgba(0,0,0,0.08));
 }
 
-/* 뒤 웨이브 (넓고 부드러운 곡선) */
+/* 뒤 웨이브 */
 .wave-back {
   background-image: radial-gradient(
     circle at 50% 10%,
@@ -549,7 +546,7 @@ onMounted(async () => {
   to   { transform: translateX(-25%); }
 }
 
-/* 앞 웨이브 (조금 더 진하고 살짝 다른 속도) */
+/* 앞 웨이브 */
 .wave-front {
   background-image: radial-gradient(
     circle at 50% 0%,
@@ -628,6 +625,10 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   row-gap: 12px;
+  cursor: pointer;
+}
+.adoption-card:hover .pet-name {
+  color: #7a4417;
 }
 .adoption-thumb {
   background-color: #e8d3b5;
@@ -645,6 +646,7 @@ onMounted(async () => {
   font-weight: 600;
   color: #3a2514;
   line-height: 1.3;
+  transition: color 0.15s;
 }
 .adoption-info .pet-meta {
   font-size: 0.875rem;
@@ -677,6 +679,17 @@ onMounted(async () => {
   color: #8a7461;
   font-size: 0.875rem;
   white-space: nowrap;
+}
+
+/* 클릭 가능한 리스트일 때 */
+.post-row-clickable {
+  cursor: pointer;
+}
+.post-row-clickable:hover .title {
+  color: #7a4417;
+}
+.post-row-clickable:hover .meta {
+  color: #7a4417;
 }
 
 /* ===== 우측 사이드 ===== */
@@ -833,19 +846,25 @@ onMounted(async () => {
 .hero-list li {
   display: grid;
   grid-template-columns: auto 1fr auto;
+  align-items: center; 
   column-gap: 8px;
   font-size: 0.9rem;
   color: #5a412a;
   line-height: 1.5;
 }
 .hero-rank {
+  min-width: 1.5em;
   font-weight: 600;
   color: #7a4417;
+  text-align: right;
 }
 .hero-name {
   text-align: left;
+ padding : 0 0 0 10px;
 }
 .hero-hours {
+   min-width: 2em; 
+   text-align: right;
   font-style: normal;
   font-weight: 600;
   color: #7a4417;
@@ -953,27 +972,27 @@ onMounted(async () => {
     grid-template-columns: 1fr;
   }
 }
+
 .hero-section {
   position: relative;
-  background-color: #eacf9f; 
-  overflow: visible; 
+  background-color: #eacf9f;
+  overflow: visible;
 }
 
 .hero-wave-static {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -40px;          
+  bottom: -40px;
   height: 140px;
   z-index: 1;
   pointer-events: none;
   overflow: hidden;
-
 }
 .wave-static-svg {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: fill;        
+  object-fit: fill;
 }
 </style>

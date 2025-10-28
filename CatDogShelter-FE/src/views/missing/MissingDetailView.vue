@@ -1,595 +1,725 @@
 <template>
-  <main class="missing-write-page">
-    <section class="write-container">
-      <!-- 상단 이동 -->
-      <button class="back-to-list" @click="goList">← 목록으로</button>
+  <main class="detail-page">
+    <div class="detail-inner">
+      <!-- 상단 돌아가기 -->
+      <button class="back-line" @click="goList">← 목록으로 돌아가기</button>
 
-      <!-- 타이틀 -->
-      <h1 class="page-title">실종 신고 작성</h1>
-      <p class="page-desc">
-        실종된 반려동물이 무사히 돌아올 수 있도록 정확한 정보를 남겨주세요.
-      </p>
+      <section class="post-card">
+        <!-- 카드 헤더 영역 -->
+        <header class="post-head">
+          <div class="head-left">
+            <!-- 뱃지들 -->
+            <div class="badge-row">
+              <span class="type-badge">{{ animalTypeLabel }}</span>
+              <span class="breed-badge">{{ post.breed || '정보 없음' }}</span>
+            </div>
 
-      <!-- 폼 시작 -->
-      <form class="write-form" @submit.prevent="handleSubmit">
-        <!-- ===== 제목 ===== -->
-        <div class="form-block">
-          <label class="form-label">
-            제목 <span class="req">*</span>
-          </label>
-          <input
-            v-model.trim="form.title"
-            class="text-input full"
-            placeholder="예) 춘천에서 고양이를 잃어버렸습니다"
-            required
-          />
-        </div>
+            <h1 class="post-title">{{ post.title || '(제목 없음)' }}</h1>
 
-        <!-- ===== 동물 정보 섹션 ===== -->
-        <h2 class="section-head">동물 정보</h2>
-
-        <div class="two-col-row">
-          <div class="col">
-            <label class="form-label">
-              반려동물 종류 <span class="req">*</span>
-            </label>
-            <select v-model="form.animalType" class="select-input" required>
-              <option value="" disabled>선택하세요</option>
-              <option value="DOG">강아지</option>
-              <option value="CAT">고양이</option>
-            </select>
-          </div>
-
-          <div class="col">
-            <label class="form-label">품종</label>
-            <input
-              v-model.trim="form.breed"
-              class="text-input"
-              placeholder="예: 말티즈 / 코숏 / 믹스 등"
-            />
-          </div>
-        </div>
-
-        <div class="two-col-row">
-          <div class="col">
-            <label class="form-label">
-              반려동물 성별 <span class="req">*</span>
-            </label>
-            <select v-model="form.gender" class="select-input" required>
-              <option value="" disabled>선택하세요</option>
-              <option value="MALE">수컷</option>
-              <option value="FEMALE">암컷</option>
-              <option value="UNKNOWN">모름</option>
-            </select>
-          </div>
-
-          <div class="col">
-            <label class="form-label">나이</label>
-            <input
-              v-model.trim="form.age"
-              class="text-input"
-              placeholder="예: 3살 / 2~3살 추정"
-            />
-          </div>
-        </div>
-
-        <div class="two-col-row">
-          <div class="col">
-            <label class="form-label">색상</label>
-            <input
-              v-model.trim="form.color"
-              class="text-input"
-              placeholder="예: 크림색, 검정+흰색 등"
-            />
-          </div>
-
-          <div class="col">
-            <label class="form-label">체중</label>
-            <input
-              v-model.trim="form.weight"
-              class="text-input"
-              placeholder="예: 약 4kg / 작고 마름"
-            />
-          </div>
-        </div>
-
-        <div class="two-col-row">
-          <div class="col">
-            <label class="form-label">등록 번호</label>
-            <input
-              v-model.trim="form.registrationNum"
-              class="text-input"
-              placeholder="반려동물 등록번호 (있는 경우)"
-            />
-          </div>
-
-          <div class="col">
-            <label class="form-label">
-              연락처 <span class="req">*</span>
-            </label>
-            <input
-              v-model.trim="form.contact"
-              class="text-input"
-              placeholder="010-0000-0000"
-              required
-            />
-          </div>
-        </div>
-
-        <div class="two-col-row">
-          <div class="col">
-            <label class="form-label">
-              실종된 시/도 <span class="req">*</span>
-            </label>
-            <input
-              v-model.trim="form.sido"
-              class="text-input"
-              placeholder="예: 강원도 / 서울특별시"
-              required
-            />
-          </div>
-
-          <div class="col">
-            <label class="form-label">
-              실종된 시/군/구 <span class="req">*</span>
-            </label>
-            <input
-              v-model.trim="form.sigungu"
-              class="text-input"
-              placeholder="예: 춘천시 / 강남구"
-              required
-            />
-          </div>
-        </div>
-
-        <div class="form-block">
-          <label class="form-label">실종 상세 위치</label>
-          <input
-            v-model.trim="form.detailAddress"
-            class="text-input full"
-            placeholder="예: 집 근처 공원, ○○아파트 103동 주변 등"
-          />
-        </div>
-
-        <div class="form-block">
-          <label class="form-label">반려동물 특징</label>
-          <textarea
-            v-model.trim="form.feature"
-            class="textarea-input"
-            placeholder="예: 오른쪽 귀 끝이 접혀 있음 / 빨간 목줄 착용"
-          />
-        </div>
-
-        <!-- ===== 실종 일자/시간 ===== -->
-        <h2 class="section-head">실종 일자</h2>
-
-        <div class="lostdate-row">
-          <div class="lostdate-field">
-            <label class="form-label">년도 <span class="req">*</span></label>
-            <input
-              v-model.trim="lostDate.year"
-              class="text-input"
-              required
-            />
-          </div>
-
-          <div class="lostdate-field">
-            <label class="form-label">월 <span class="req">*</span></label>
-            <input
-              v-model.trim="lostDate.month"
-              class="text-input"
-              required
-            />
-          </div>
-
-          <div class="lostdate-field">
-            <label class="form-label">일 <span class="req">*</span></label>
-            <input
-              v-model.trim="lostDate.day"
-              class="text-input"
-              required
-            />
-          </div>
-
-          <div class="lostdate-field">
-            <label class="form-label">시 <span class="req">*</span></label>
-            <input
-              v-model.trim="lostDate.hour"
-              class="text-input"
-              required
-            />
-          </div>
-
-          <div class="lostdate-field">
-            <label class="form-label">분 <span class="req">*</span></label>
-            <input
-              v-model.trim="lostDate.minute"
-              class="text-input"
-              required
-            />
-          </div>
-
-          <div class="lostdate-field">
-            <label class="form-label">초</label>
-            <input
-              v-model.trim="lostDate.second"
-              class="text-input"
-              placeholder="00"
-            />
-          </div>
-        </div>
-
-        <!-- ===== 상세 설명 (본문 내용) ===== -->
-        <div class="form-block">
-          <label class="form-label">상세 상황 설명</label>
-          <textarea
-            v-model.trim="form.content"
-            class="textarea-input"
-            placeholder="실종 상황, 마지막 목격 정보 등 자세히 적어주세요."
-          />
-        </div>
-
-        <!-- ===== 파일 업로드 ===== -->
-        <h2 class="section-head">사진 업로드</h2>
-
-        <p class="upload-desc">최대 5장까지 업로드 가능합니다.</p>
-
-        <div class="form-block">
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            @change="onFilesChange"
-          />
-          <div class="file-preview-list" v-if="previewUrls.length">
-            <div
-              v-for="(url, idx) in previewUrls"
-              :key="idx"
-              class="file-preview-item"
-            >
-              <img :src="url" alt="preview" />
+            <div class="meta-line">
+              <span class="author">👤 {{ post.userName || '-' }}</span>
+              <span class="dot">·</span>
+              <span class="date">{{ post.createdAt || '-' }}</span>
             </div>
           </div>
-        </div>
 
-        <!-- ===== 버튼 ===== -->
-        <button class="submit-btn" type="submit" :disabled="submitting">
-          {{ submitting ? '등록 중...' : '실종 신고 등록' }}
-        </button>
-      </form>
-    </section>
+          <div class="head-right">
+            <button class="report-btn">🚨 게시글 신고</button>
+          </div>
+        </header>
+
+        <!-- 상단 하단 경계선 -->
+        <div class="divider-line"></div>
+
+        <!-- 대표 이미지 + 썸네일들 + 동물 정보 박스 -->
+        <section class="media-and-info">
+          <!-- 대표 이미지 영역 -->
+          <div class="main-image-wrap">
+            <img
+              class="main-image"
+              :src="currentImageUrl"
+              alt="animal main"
+            />
+          </div>
+
+          <!-- 썸네일 슬라이더 -->
+          <div class="thumb-row">
+            <button class="thumb-nav" @click="prevImage">‹</button>
+
+            <div
+              v-for="(img, idx) in imageUrls"
+              :key="idx"
+              class="thumb-box"
+              :class="{ active: idx === currentImageIndex }"
+              @click="setImage(idx)"
+            >
+              <img :src="img" alt="thumb" />
+            </div>
+
+            <button class="thumb-nav" @click="nextImage">›</button>
+          </div>
+
+          <!-- 동물 정보 카드 -->
+          <aside class="pet-info-card">
+            <h2 class="info-head">동물 정보</h2>
+
+            <ul class="info-list">
+              <li>
+                <span class="info-key">종류</span>
+                <span class="info-val">{{ animalTypeLabel }}</span>
+              </li>
+              <li>
+                <span class="info-key">품종</span>
+                <span class="info-val">{{ post.breed || '-' }}</span>
+              </li>
+              <li>
+                <span class="info-key">색상</span>
+                <span class="info-val">{{ post.color || '-' }}</span>
+              </li>
+              <li>
+                <span class="info-key">성별</span>
+                <span class="info-val">{{ sexLabel }}</span>
+              </li>
+              <li>
+                <span class="info-key">나이</span>
+                <span class="info-val">{{ post.age || '-' }}</span>
+              </li>
+              <li>
+                <span class="info-key">목격시각</span>
+                <span class="info-val">{{ post.lostDateTime || '-' }}</span>
+              </li>
+              <li>
+                <span class="info-key">위치</span>
+                <span class="info-val">{{ post.location || '-' }}</span>
+              </li>
+            </ul>
+          </aside>
+        </section>
+
+        <!-- 본문 설명 -->
+        <section class="content-block">
+          <p class="content-text">
+            {{ post.content || '내용이 없습니다.' }}
+          </p>
+        </section>
+
+        <!-- 좋아요 / 공유 -->
+        <section class="action-row">
+          <button class="like-btn">💗 좋아요 {{ post.likeCount ?? 0 }}</button>
+          <button class="share-btn">🔗 공유하기</button>
+
+          <div class="stats-right">
+            <span class="stat-chip">💬 {{ post.commentCount ?? comments.length }}</span>
+            <span class="stat-chip">👁 {{ post.view ?? 0 }}</span>
+          </div>
+        </section>
+      </section>
+
+      <!-- 댓글 영역 -->
+      <section class="comment-card">
+        <header class="comment-head">
+          <h2 class="comment-title">
+            댓글 <span class="count">{{ comments.length }}</span>
+          </h2>
+        </header>
+
+        <!-- 댓글 리스트 -->
+        <ul class="comment-list">
+          <li
+            v-for="c in comments"
+            :key="c.id"
+            class="comment-item"
+          >
+            <div class="comment-meta">
+              <span class="comment-writer">{{ c.userName || '익명' }}</span>
+              <span class="comment-date">{{ c.createdAt || '' }}</span>
+            </div>
+            <p class="comment-text">{{ c.text || '' }}</p>
+          </li>
+
+          <li v-if="comments.length === 0" class="comment-empty">
+            아직 댓글이 없습니다.
+          </li>
+        </ul>
+
+        <!-- 댓글 입력창 (아직 POST 안 붙혔지만 UI만) -->
+        <div class="comment-write">
+          <textarea
+            v-model="newComment"
+            class="comment-input"
+            placeholder="댓글을 남겨주세요."
+          />
+          <button class="comment-send-btn" @click="sendComment">등록</button>
+        </div>
+      </section>
+    </div>
   </main>
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
+// 라우터 /missing/:id
+const route = useRoute()
 const router = useRouter()
+const postId = route.params.id
 
-// 작성 폼 데이터
-const form = reactive({
+// 상세 게시글 데이터
+const post = reactive({
   title: '',
-  animalType: '', // DOG / CAT
+  animalType: '',
   breed: '',
-  gender: '', // MALE / FEMALE / UNKNOWN
-  age: '',
   color: '',
-  weight: '',
-  registrationNum: '',
-  contact: '',
-  sido: '',
-  sigungu: '',
-  detailAddress: '',
-  feature: '',
-  content: '' // 상세 상황 설명
+  age: '',
+  sex: '',
+  lostDateTime: '',
+  location: '',
+  content: '',
+  userName: '',
+  createdAt: '',
+  view: 0,
+  likeCount: 0,
+  commentCount: 0,
+  files: [],
 })
 
-// 날짜/시간 입력 파츠
-const lostDate = reactive({
-  year: '2025',
-  month: '09',
-  day: '10',
-  hour: '19',
-  minute: '30',
-  second: '00'
-})
+// 댓글 리스트
+const comments = ref([])
 
-// 업로드 파일들
-const files = ref([])           // 실제 File 객체 리스트
-const previewUrls = ref([])     // 미리보기용 blob url
+// 새 댓글
+const newComment = ref('')
 
-const submitting = ref(false)
+// === 이미지 관련 상태 ===
+const imageUrls = ref([]) // string[]
+const currentImageIndex = ref(0)
 
-// 목록으로 돌아가기
-function goList() {
-  router.push({ name: 'MissingView' })
-}
-
-function onFilesChange(e) {
-  const selected = Array.from(e.target.files || [])
-
-  // 최대 5장 제한
-  const merged = [...files.value, ...selected].slice(0, 5)
-  files.value = merged
-
-  // 미리보기 URL 갱신
-  previewUrls.value = files.value.map(f => URL.createObjectURL(f))
-}
-
-// 날짜 문자열 합치기
-function buildLostDateTime() {
-  // 예: "2025-09-10 19:30:00"
-  const y = lostDate.year || '0000'
-  const m = lostDate.month || '00'
-  const d = lostDate.day || '00'
-  const hh = lostDate.hour || '00'
-  const mm = lostDate.minute || '00'
-  const ss = lostDate.second || '00'
-
-  return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
-}
-
-async function handleSubmit() {
-  if (submitting.value) return
-
-  // 기본 필수값 체크(프론트 1차)
-  if (!form.title || !form.animalType || !form.gender || !form.contact || !form.sido || !form.sigungu) {
-    alert('필수 항목을 입력해주세요.')
-    return
+const currentImageUrl = computed(() => {
+  if (imageUrls.value.length === 0) {
+    return fallbackImage.value
   }
+  return imageUrls.value[currentImageIndex.value] || fallbackImage.value
+})
 
-  submitting.value = true
+// fallback 이미지 (프로젝트 내부 기본 이미지)
+import fallbackImageSrc from '@/assets/dogcat/lostcat1.jpeg'
+const fallbackImage = ref(fallbackImageSrc)
+
+// 동물타입 사람이 읽을 라벨
+const animalTypeLabel = computed(() => {
+  if (post.animalType === 'DOG') return '강아지'
+  if (post.animalType === 'CAT') return '고양이'
+  return '기타'
+})
+
+// 성별 라벨
+const sexLabel = computed(() => {
+  if (post.sex === 'MALE') return '수컷'
+  if (post.sex === 'FEMALE') return '암컷'
+  if (post.sex === 'UNKNOWN') return '모름'
+  return post.sex || '-'
+})
+
+// 이미지 인덱스 조작
+function setImage(idx) {
+  currentImageIndex.value = idx
+}
+function prevImage() {
+  if (imageUrls.value.length === 0) return
+  currentImageIndex.value =
+    (currentImageIndex.value - 1 + imageUrls.value.length) %
+    imageUrls.value.length
+}
+function nextImage() {
+  if (imageUrls.value.length === 0) return
+  currentImageIndex.value =
+    (currentImageIndex.value + 1) % imageUrls.value.length
+}
+
+// 목록으로
+function goList() {
+  router.push({ name: 'missing' })
+}
+
+// 댓글 전송 (임시 - 실제 API 연동은 나중에)
+function sendComment() {
+  if (!newComment.value.trim()) return
+  // 나중에 POST /missing-posts/{id}/comments 같은 곳에 보내면 됨
+  alert('아직 댓글 등록 API 안 붙였어. 나중에 연결하면 돼!')
+  newComment.value = ''
+}
+
+// 상세랑 댓글 데이터 가져오기
+async function fetchDetail() {
   try {
-    // 서버에 보낼 FormData 구성
-    const fd = new FormData()
+    const res = await fetch(
+      `http://localhost:8000/post-service/missing-posts/query/posts/${postId}`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
 
-    // 글 정보
-    fd.append('title', form.title)
-    fd.append('animalType', form.animalType) // DOG / CAT
-    fd.append('breed', form.breed)
-    fd.append('gender', form.gender) // MALE / FEMALE / UNKNOWN
-    fd.append('age', form.age)
-    fd.append('color', form.color)
-    fd.append('weight', form.weight)
-    fd.append('registrationNum', form.registrationNum)
-    fd.append('contact', form.contact)
-    fd.append('sido', form.sido)
-    fd.append('sigungu', form.sigungu)
-    fd.append('detailAddress', form.detailAddress)
-    fd.append('feature', form.feature)
-    fd.append('content', form.content)
-
-    // 실종 시간
-    fd.append('lostDateTime', buildLostDateTime())
-
-    // 파일들
-    files.value.forEach((file, idx) => {
-      // 백엔드 컨트롤러에서 @RequestPart("files") List<MultipartFile> files 이런 식으로 받는다고 가정
-      fd.append('files', file, file.name)
-    })
-
-    // JWT 토큰 (세션스토리지에 있다고 했지?)
-    const token = sessionStorage.getItem('accessToken')
-
-    // 실제 요청 (엔드포인트는 프로젝트에 맞게 수정)
-    const resp = await fetch('http://localhost:8000/post-service/missing-posts', {
-      method: 'POST',
-      headers: {
-        // FormData 쓸 땐 Content-Type 자동 세팅되니까 넣지 말 것
-        ...(token ? { Authorization: `Bearer ${token}` } : {})
-      },
-      body: fd
-    })
-
-    if (!resp.ok) {
-      console.error('실종 신고 등록 실패 status=', resp.status)
-      const errText = await resp.text().catch(() => '')
-      console.error('response text:', errText)
-      alert('등록에 실패했습니다. 서버 상태를 확인해주세요.')
-      submitting.value = false
+    if (!res.ok) {
+      console.error('상세 조회 실패', res.status)
       return
     }
 
-    // 성공 후 동작
-    alert('등록이 완료되었습니다.')
-    router.push({ name: 'MissingView' })
+    const data = await res.json()
+
+    // post reactive에 주입
+    post.title = data.title
+    post.animalType = data.animalType
+    post.breed = data.breed
+    post.color = data.color
+    post.age = data.age
+    post.sex = data.sex
+    post.lostDateTime = data.lostDateTime || data.missingDate || ''
+    post.location = data.location || data.missingLocation || ''
+    post.content = data.content
+    post.userName = data.userName
+    post.createdAt = data.createdAt
+    post.view = data.view
+    post.likeCount = data.likeCount
+    post.commentCount = data.commentCount
+    post.files = Array.isArray(data.files) ? data.files : []
+
+    // 이미지 URL 생성
+    // 백엔드가 파일을 서빙하는 실제 URL 패턴에 맞춰서 바꿔줘.
+    // 지금은 임시로 /files/{fileRename} 로 구성.
+    imageUrls.value =
+      post.files.length > 0
+        ? post.files.map(f => `/files/${f.fileRename}`)
+        : [fallbackImage.value]
+
+    currentImageIndex.value = 0
   } catch (err) {
-    console.error('실종 신고 등록 중 오류:', err)
-    alert('오류가 발생했습니다.')
-    submitting.value = false
+    console.error('상세 조회 에러:', err)
   }
 }
+
+async function fetchComments() {
+  try {
+    const res = await fetch(
+      `http://localhost:8000/post-service/missing-posts/query/posts/${postId}/comments`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+
+    if (!res.ok) {
+      console.error('댓글 조회 실패', res.status)
+      comments.value = []
+      return
+    }
+
+    const list = await res.json()
+    comments.value = Array.isArray(list) ? list : []
+  } catch (err) {
+    console.error('댓글 조회 에러:', err)
+    comments.value = []
+  }
+}
+
+onMounted(() => {
+  fetchDetail()
+  fetchComments()
+})
 </script>
 
 <style scoped>
-.missing-write-page {
+.detail-page {
+  background-color: #efe8dd;
+  min-height: 100vh;
+  padding: 24px 16px 80px;
+  font-family: "Pretendard", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #2a1c10;
   display: flex;
   justify-content: center;
-  padding: 24px 16px 80px;
-  background-color: #fafafa;
-  color: #222;
-  font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Inter", system-ui, sans-serif;
 }
 
-.write-container {
+.detail-inner {
   width: 100%;
-  max-width: 960px;
-  background-color: #fff;
-  border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.04);
-  padding: 24px;
-  border: 1px solid #eee;
+  max-width: 1100px;
 }
 
-.back-to-list {
+/* 돌아가기 */
+.back-line {
   background: none;
   border: none;
-  color: #000;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.4;
+  color: #2a1c10;
   cursor: pointer;
   padding: 0;
   margin-bottom: 16px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   font-weight: 500;
 }
 
-.page-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #222;
-  margin: 0 0 8px;
-  line-height: 1.4;
-}
-
-.page-desc {
-  font-size: 14px;
-  color: #555;
-  margin: 0 0 24px;
-  line-height: 1.5;
-}
-
-.write-form {
-  border: 1px solid #eee;
-  background-color: #fcfcfc;
-  border-radius: 12px;
-  padding: 16px;
-}
-
-.section-head {
-  font-size: 18px;
-  font-weight: 600;
-  color: #6b4b2a;
-  margin: 24px 0 16px;
-  line-height: 1.4;
-  border-top: 1px solid #eadfcf;
-  padding-top: 16px;
-}
-
-.req {
-  color: #c62828;
-  font-weight: 500;
-  margin-left: 2px;
-}
-
-.form-block {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
-}
-
-.form-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #3d2a12;
-  margin-bottom: 8px;
-  line-height: 1.4;
-}
-
-.text-input,
-.select-input,
-.textarea-input {
-  width: 100%;
-  background-color: #f5f5f5;
-  border: 1px solid #dcdcdc;
-  border-radius: 8px;
-  padding: 12px 14px;
-  font-size: 14px;
-  line-height: 1.4;
-  color: #222;
-  outline: none;
-  font-family: inherit;
-}
-.text-input:focus,
-.select-input:focus,
-.textarea-input:focus {
+/* 메인 카드 */
+.post-card {
   background-color: #fff;
-  border-color: #bfa67a;
-  box-shadow: 0 0 0 3px rgba(191,166,122,0.2);
-}
-
-.full {
-  width: 100%;
-}
-
-.textarea-input {
-  min-height: 80px;
-  resize: vertical;
-}
-
-.two-col-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-.col {
-  flex: 1 1 320px;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.lostdate-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.07);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.06);
+  padding: 16px 20px 24px;
   margin-bottom: 24px;
 }
 
-.lostdate-field {
-  flex: 0 0 90px;
+/* 헤더 영역 */
+.post-head {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  row-gap: 12px;
 }
-
-.upload-desc {
-  font-size: 13px;
-  color: #444;
-  margin: 0 0 8px;
-}
-
-.file-preview-list {
+.badge-row {
   display: flex;
-  gap: 12px;
   flex-wrap: wrap;
-  margin-top: 12px;
+  gap: 6px;
+  margin-bottom: 8px;
 }
-.file-preview-item {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid #ddd;
-  background: #fafafa;
+.type-badge,
+.breed-badge {
+  background-color: #f5f0e8;
+  border: 1px solid rgba(0,0,0,0.07);
+  color: #6e5336;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  border-radius: 4px;
+  padding: 4px 6px;
+}
+.post-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2a1c10;
+  line-height: 1.4;
+  margin: 0 0 8px;
+  word-break: keep-all;
+}
+.meta-line {
+  font-size: 12px;
+  color: rgba(0,0,0,0.6);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  line-height: 1.4;
+}
+.dot {
+  color: rgba(0,0,0,0.3);
+}
+.head-right {
   flex-shrink: 0;
 }
-.file-preview-item img {
+.report-btn {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.3;
+  padding: 6px 8px;
+  color: #2a1c10;
+  cursor: pointer;
+}
+
+/* 구분선 */
+.divider-line {
+  border-top: 1px solid rgba(0,0,0,0.07);
+  margin: 16px 0 20px;
+}
+
+/* 미디어 + 정보 */
+.media-and-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 대표 이미지 */
+.main-image-wrap {
+  width: 100%;
+  max-width: 480px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.1);
+  background: #fff;
+  margin: 0 auto 16px;
+}
+.main-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  background: #fdfdfd;
+}
+
+/* 썸네일 줄 */
+.thumb-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto 20px;
+  flex-wrap: nowrap;
+}
+.thumb-nav {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 4px;
+  font-size: 16px;
+  line-height: 1;
+  padding: 6px 8px;
+  cursor: pointer;
+  height: 48px;
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2a1c10;
+}
+.thumb-box {
+  width: 80px;
+  height: 80px;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  overflow: hidden;
+  background: #fff;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.thumb-box.active {
+  border-color: #8a6a48;
+}
+.thumb-box img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.submit-btn {
+/* 동물 정보 카드 */
+.pet-info-card {
   width: 100%;
-  display: block;
-  background-color: #dcbf7d;
-  border: 1px solid #c2a564;
-  color: #2e1e00;
-  font-size: 16px;
-  font-weight: 600;
-  font-family: inherit;
-  text-align: center;
-  line-height: 1.4;
+  max-width: 480px;
+  background-color: #fffdf8;
+  border: 1px solid rgba(0,0,0,0.08);
   border-radius: 6px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.03);
   padding: 16px;
-  cursor: pointer;
+  margin: 0 auto 28px;
+  color: #2a1c10;
 }
-.submit-btn:disabled {
-  opacity: 0.6;
-  cursor: default;
+.info-head {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6e5336;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+.info-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.info-list li {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  row-gap: 4px;
+  column-gap: 8px;
+  margin-bottom: 6px;
+}
+.info-key {
+  color: rgba(0,0,0,0.6);
+}
+.info-val {
+  color: #2a1c10;
+  word-break: keep-all;
+}
+
+/* 본문 */
+.content-block {
+  max-width: 680px;
+  margin: 0 auto 24px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #2a1c10;
+  white-space: pre-line;
+  text-align: center;
+}
+.content-text {
+  word-break: keep-all;
+}
+
+/* 좋아요/공유 */
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 12px;
+  column-gap: 8px;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  border-top: 1px solid rgba(0,0,0,0.07);
+  padding-top: 16px;
+}
+.like-btn,
+.share-btn {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  padding: 8px 12px;
+  line-height: 1.3;
+  font-size: 13px;
+  cursor: pointer;
+  color: #2a1c10;
+}
+.stats-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(0,0,0,0.6);
+  font-size: 12px;
+}
+.stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 댓글 카드 */
+.comment-card {
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.07);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.06);
+  padding: 16px 20px 24px;
+}
+.comment-head {
+  margin-bottom: 16px;
+}
+.comment-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2a1c10;
+  line-height: 1.4;
+}
+.count {
+  color: #8a6a48;
+  margin-left: 4px;
+}
+
+/* 댓글 리스트 */
+.comment-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+}
+.comment-item {
+  border-top: 1px solid rgba(0,0,0,0.05);
+  padding: 12px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #2a1c10;
+}
+.comment-item:first-child {
+  border-top: 0;
+}
+.comment-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+.comment-writer {
+  font-weight: 600;
+  color: #2a1c10;
+}
+.comment-date {
+  color: rgba(0,0,0,0.5);
+}
+.comment-text {
+  white-space: pre-line;
+  word-break: keep-all;
+}
+
+/* 빈 댓글 */
+.comment-empty {
+  font-size: 13px;
+  color: rgba(0,0,0,0.5);
+  padding: 16px 0;
+  text-align: center;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+/* 댓글 입력 */
+.comment-write {
+  border-top: 1px solid rgba(0,0,0,0.07);
+  padding-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: flex-start;
+}
+.comment-input {
+  width: 100%;
+  min-height: 60px;
+  border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.15);
+  background: #fffdf8;
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 10px;
+  outline: none;
+  resize: vertical;
+  color: #2a1c10;
+}
+.comment-send-btn {
+  background: #f5f0e8;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.3;
+  cursor: pointer;
+  min-width: 64px;
+  font-weight: 500;
+  color: #2a1c10;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .post-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .media-and-info {
+    align-items: stretch;
+  }
+
+  .main-image-wrap {
+    max-width: 100%;
+  }
+
+  .pet-info-card {
+    max-width: 100%;
+  }
+
+  .content-block {
+    text-align: left;
+  }
+
+  .thumb-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
 }
 </style>
