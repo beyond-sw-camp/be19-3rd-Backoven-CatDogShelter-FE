@@ -49,7 +49,11 @@ const submit = () => {
 }
 </script>
 
-<style scoped>
+<style>
+body {
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+}
+
 /* 핵심: 푸터를 바닥에 고정시키는 레이아웃 */
 .layout {
   min-height: 100vh;
