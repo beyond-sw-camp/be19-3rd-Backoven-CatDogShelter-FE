@@ -42,16 +42,16 @@
           :pagination="{ clickable: true }"
           class="detail-swiper"
         >
-          <swiper-slide
-            v-for="file in post.files"
-            :key="file.id"
-          >
-            <img
-              :src="`http://localhost:8000/post-service/adoption-post/image/${file.fileRename}`"
-              alt="post image"
-              class="post-image"
-            />
-          </swiper-slide>
+            <swiper-slide
+              v-for="file in post.files"
+              :key="file.id"
+            >
+              <img
+                :src="getFileUrl(file)"
+                alt="post image"
+                class="post-image"
+              />
+            </swiper-slide>
         </swiper>
 
         <!-- ▶ 페이지 번호 표시 -->
@@ -161,13 +161,13 @@
             <div class="comment-author">{{ c.writerName }}</div>
             <div class="comment-time">{{ formatDate(c.displayDate) }}</div>
             <p class="comment-message">{{ c.content }}</p>
-            <button class="reply-link">💬 답글하기</button>
+              <button class="reply-link" @click="reportComment(c)">🚨 신고하기</button>
           </div>
         </div>
 
         <div class="comment-input-wrapper">
-          <textarea class="comment-textarea" placeholder="댓글을 입력하세요"></textarea>
-          <button class="submit-btn">댓글 작성</button>
+          <textarea v-model="commentText" class="comment-textarea" placeholder="댓글을 입력하세요"></textarea>
+          <button class="submit-btn" @click="postComment">댓글 작성</button>
         </div>
       </section>
 
@@ -214,6 +214,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
+import { openReport } from '@/components/report'
 
 const activeIndex = ref(0);
 
@@ -224,6 +225,7 @@ function onSlideChange(swiper) {
 const route = useRoute();
 const post = ref({});
 const comments = ref([]);
+const commentText = ref('');
 
 // ✅ 좋아요 상태
 const isLiked = ref(false);
@@ -297,14 +299,76 @@ function copyUrl() {
 
 function getImage(name) {
   return name
-    ? `http://localhost:8000/post-service/adoption-post/${route.params.id}/image/${name}`
+    ? `http://localhost:8000/post-service/adoption-post/${route.params.id}/files/${name}`
     : "/no-image.png";
+}
+
+// Return the best available URL for a file object returned by the backend.
+function getFileUrl(file) {
+  if (!file) return '/no-image.png'
+
+  // If backend already provided a fileUrl, use it (prefix host when it's a relative path)
+  if (file.fileUrl) {
+    try {
+      if (file.fileUrl.startsWith('http')) return file.fileUrl
+      // ensure leading slash
+      const path = file.fileUrl.startsWith('/') ? file.fileUrl : `/${file.fileUrl}`
+      return `http://localhost:8000${path}`
+    } catch (e) {
+      // fallthrough
+    }
+  }
+
+  // Prefer fileRename if available (uses per-post files endpoint)
+  if (file.fileRename) {
+    return `http://localhost:8000/post-service/adoption-post/${route.params.id}/files/${file.fileRename}`
+  }
+
+  // fallback
+  return '/no-image.png'
 }
 
 function formatDate(dateString) {
   if (!dateString) return "";
   const date = new Date(dateString);
   return date.toISOString().split("T")[0];
+}
+
+// 댓글 작성: 작성자는 고정으로 '이지윤'
+async function postComment() {
+  const content = commentText.value && commentText.value.trim();
+  if (!content) {
+    alert('댓글을 입력해주세요.');
+    return;
+  }
+
+  const newComment = {
+    writerName: '이지윤',
+    content,
+    displayDate: new Date().toISOString(),
+  };
+
+  // Optimistic UI 업데이트
+  comments.value = [newComment, ...comments.value];
+  commentText.value = '';
+
+  // 시도: 백엔드에 저장 (실패해도 UI는 유지)
+  try {
+    await fetch(`http://localhost:8000/post-service/adoption-post/${route.params.id}/comment`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ writerName: newComment.writerName, content: newComment.content })
+    });
+  } catch (err) {
+    // 백엔드가 없거나 API가 다르면 콘솔에만 기록
+    console.warn('댓글 저장 실패(무시됨):', err);
+  }
+}
+
+// 댓글 신고: 전역 리포트 모달 열기
+function reportComment(comment) {
+  const targetId = comment && (comment.id ?? null);
+  openReport({ targetType: 'comment', targetId });
 }
 </script>
 

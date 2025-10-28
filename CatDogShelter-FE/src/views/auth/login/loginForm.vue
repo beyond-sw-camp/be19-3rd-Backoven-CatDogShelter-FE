@@ -51,6 +51,15 @@ const submit = async () => {
   }
 }
 
+// 아래 3줄 추가
+const hasFindId = computed(() => Boolean(router.hasRoute?.('find.id')))
+const findPwRoute = computed(() => {
+  if (router.hasRoute?.('find.password.request')) return { name: 'find.password.request' }
+  if (router.hasRoute?.('find.password'))         return { name: 'find.password' }
+  return null
+})
+
+
 const emit = defineEmits(['success'])
 </script>
 
@@ -129,20 +138,12 @@ const emit = defineEmits(['success'])
 
       <!-- 아이디 / 비밀번호 찾기 (한 줄) -->
       <p class="find-links">
-        <router-link
-          v-if="router.hasRoute && router.hasRoute('find.id')"
-          :to="{ name:'find.id' }"
-          class="link"
-        >아이디</router-link>
-        <span class="sep"> / </span>
-        <router-link
-          v-if="router.hasRoute
-                && (router.hasRoute('find.password.request') || router.hasRoute('find.password'))"
-          :to="router.hasRoute('find.password.request')
-                ? { name:'find.password.request' }
-                : { name:'find.password' }"
-          class="link"
-        >비밀번호 찾기</router-link>
+        <!-- 아이디 찾기 -->
+        <router-link v-if="hasFindId" :to="{ name:'find.id' }" class="link">아이디</router-link>
+        <span v-if="hasFindId && findPwRoute" class="sep"> / </span>
+
+        <!-- 비밀번호 찾기 -->
+        <router-link v-if="findPwRoute" :to="findPwRoute" class="link">비밀번호 찾기</router-link>
       </p>
     </div>
   </section>

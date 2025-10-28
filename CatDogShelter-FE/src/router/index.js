@@ -11,16 +11,19 @@ import HomeView from '@/views/HomeView.vue'
 import VolunteerView from '@/views/volunteer/VolunteerView.vue'
 import DonationView from '@/views/DonationView.vue'
 import DonationDetailView from '@/views/donation/DonationDetailView.vue'
-import MissingDetailView from '@/views/missing/MissingDetailView.vue'
 import AdoptionView from '@/views/adoption/AdoptionView.vue'
+import AdoptionWrite from '@/views/adoption/AdoptionWrite.vue'
 import MissingView from '@/views/MissingView.vue'
 import SightingView from '@/views/Sighting/SightingView.vue'
 import PostView from '@/views/Post/PostView.vue'
 import PostDetailView from '@/views/Post/PostDetailView.vue'
 import PostWriteView from '@/views/Post/PostWriteView.vue'
 import HeroesrankingView from '@/views/heros/HeroesrankingView.vue'
+import DonationWrite from '@/views/donation/DonationWrite.vue'
+
 
 // ===== Footer pages =====
+
 import AboutView from '@/views/footer/AboutView.vue'
 import TermsView from '@/views/footer/TermsView.vue'
 import PrivacyView from '@/views/footer/PrivacyView.vue'
@@ -35,8 +38,15 @@ import ShelterheadMypageView from '@/views/volunteer/shelterhead/ShelterheadMypa
 import ApplicantsView from '@/views/volunteer/shelterhead/Applicants.vue'
 import LoginPlaceholderView from '@/views/LoginPlaceholderView.vue'
 
+
+// ===== 실종게시판=====
 // ===== Missing post writer =====
 import MissingPostWirte from '@/views/missing/MissingPostWirte.vue'
+
+// ===== User MyPage =====
+import UserMyPageView from '@/views/mypage/UserMyPageView.vue'
+import UserEdit from '@/views/mypage/UserEdit.vue'
+import UserMessages from '@/views/mypage/UserMessages.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -99,6 +109,12 @@ const router = createRouter({
       component: DonationDetailView,
       props: true,
     },
+    //후원게시판 글작성
+    {
+      path: '/donation/write',
+      name: 'donation.write',
+      component: DonationWrite,
+    },
 
     // Adoption board list
     {
@@ -120,8 +136,7 @@ const router = createRouter({
     {
       path: '/adoption/write',
       name: 'AdoptionWrite',
-      component: () =>
-        import('@/views/adoption/AdoptionWrite.vue'),
+      component: AdoptionWrite,
     },
 
     // Missing board list
@@ -130,18 +145,18 @@ const router = createRouter({
       name: 'missing',
       component: MissingView,
     },
-    {
-      path: '/missing/:postId',
-      name: 'missing-detail',
-      component: MissingDetailView,
-      props: true, // allow route param(postId) as prop
-    },
 
     // Missing report write
     {
       path: '/missing/write',
       name: 'missing.write',
       component: MissingPostWirte,
+    },
+    {
+      path: '/missing/:id',
+      name: 'missing-detail',
+      component: MissingDetailView,
+      props: true,
     },
 
     // Sighting board list
@@ -215,6 +230,40 @@ const router = createRouter({
       path: '/faq',
       component: FaqView,
     },
+    
+    // ✅ User MyPage
+    {
+      path: '/mypage',
+      component: UserMyPageView,
+      beforeEnter: (to, from, next) => {
+        const { isAuthed } = useAuth()
+        if (!isAuthed.value) {
+          alert("로그인이 필요합니다.")
+          return next('/login')
+        }
+        next()
+      }
+    },
+    {
+      path: '/mypage/edit',
+      name: 'mypage-edit',
+      component: UserEdit,
+      meta: { requiresAuth: true, role: 'user' }
+    },
+    {
+      path: '/mypage/messages',
+      name: 'mypage-messages',
+      component: UserMessages,
+      meta: { requiresAuth: true }
+    },
+
+    // // ✅ Shelter MyPage
+    // {
+    //   path: '/shelter-head/mypage',
+    //   name: 'shelter-mypage',
+    //   component: ShelterheadMypageView,
+    //   meta: { requiresAuth: true, role: 'shelter' }
+    // },
 
     // shelter head mypage
     {
@@ -237,8 +286,12 @@ const router = createRouter({
 
     // src/router/index.js
     { path: '/auth/find-id', name: 'find.id', component: () => import('@/views/auth/findIdView.vue') },
+    { path: '/auth/find-password',        name: 'find.password.request', component: () => import('@/views/auth/findPasswordRequestView.vue') },
+    { path: '/auth/find-password/verify', name: 'find.password.verify',  component: () => import('@/views/auth/findPasswordVerifyView.vue') },
+    { path: '/auth/find-password/reset',  name: 'find.password.reset',   component: () => import('@/views/auth/findPasswordResetView.vue') },
 
-    
+
+
 
     // ===== duplicated routes (kept to match existing structure) =====
     { path: '/post', name: 'post', component: PostView },
@@ -254,8 +307,16 @@ const router = createRouter({
     { path: '/volunteer-guide', component: VolunteerGuideView },
     { path: '/faq', component: FaqView },
 
+    // {
+
+    //   path: '/volunteer/detail/:id',
+    //   name: 'volunteer-detail',
+    //   component: () => import('@/views/volunteer/VolunteerDetailView.vue'),
+    //   props: true, // <== 이거 있으면 route params를 props로 받을 수 있음
+    // },
     {
-      path: '/shelter-head/mypage',
+      path: '/shelter-head/mypage',                 // 보호소장 마이페이지 라우팅 (중복 선언 존중)
+
       component: ShelterheadMypageView,
       children: [
         {
@@ -285,6 +346,8 @@ const router = createRouter({
   // ],
     // 404 → home
     { path: '/:pathMatch(.*)*', redirect: '/' },
+
+    
   ],
   // always scroll to top on route change
   scrollBehavior: () => ({ top: 0 }),

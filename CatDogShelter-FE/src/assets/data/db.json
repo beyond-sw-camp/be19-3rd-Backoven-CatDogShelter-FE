@@ -1181,6 +1181,158 @@
       "appliedAt": "2025-10-26"
     }
   ],
+  "adoptionPosts": [
+    {
+      "_comment": "여기서부터 메인홈화면뿌려주기 json",
+      "id": 1,
+      "name": "코숏",
+      "breed": "믹스",
+      "age": 2,
+      "neutered": true,
+      "imgUrl": "/uploads/cat1.jpg",
+      "createdAt": "2025-09-12T10:30:00"
+    },
+    {
+      "id": 2,
+      "name": "말티즈",
+      "breed": "말티즈",
+      "age": 1,
+      "neutered": false,
+      "imgUrl": "/uploads/dog1.jpg",
+      "createdAt": "2025-09-12T09:10:00"
+    },
+    {
+      "id": 3,
+      "name": "믹스견",
+      "breed": "믹스",
+      "age": 3,
+      "neutered": true,
+      "imgUrl": "/uploads/dog2.jpg",
+      "createdAt": "2025-09-11T20:00:00"
+    }
+  ],
+  "volunteerPosts": [
+    {
+      "id": 15,
+      "title": "창원 동물보호센터 주말 봉사",
+      "createdAt": "2025-09-12T11:00:00",
+      "viewCount": "1/3명"
+    },
+    {
+      "id": 14,
+      "title": "포항 유기동물 보호소 봉사",
+      "createdAt": "2025-09-12T09:00:00",
+      "viewCount": "2/4명"
+    },
+    {
+      "id": 13,
+      "title": "전주 유기견 보호소 봉사자 모집",
+      "createdAt": "2025-09-11T18:00:00",
+      "viewCount": "4/5명"
+    },
+    {
+      "id": 12,
+      "title": "청주 동물보호센터 봉사자 모집",
+      "createdAt": "2025-09-11T18:00:00",
+      "viewCount": "5/5명"
+    },
+    {
+      "id": 11,
+      "title": "춘천 유기동물 보호소 긴급 모집",
+      "createdAt": "2025-09-11T18:00:00",
+      "viewCount": "4/4명"
+    }
+  ],
+  "freePosts": [
+    {
+      "id": 24,
+      "title": "고양이 간식 추천 받아요",
+      "commentCount": 8,
+      "viewCount": 57,
+      "createdAt": "2025-09-12T12:10:00"
+    },
+    {
+      "id": 25,
+      "title": "강아지 치석 관리 어떻게?",
+      "commentCount": 1,
+      "viewCount": 33,
+      "createdAt": "2025-09-12T11:50:00"
+    },
+    {
+      "id": 26,
+      "title": "하네스 vs 목줄 뭐 쓰세요?",
+      "commentCount": 5,
+      "viewCount": 17,
+      "createdAt": "2025-09-11T22:40:00"
+    },
+    {
+      "id": 27,
+      "title": "사료 바꾸고 설사 멈췄어요",
+      "commentCount": 2,
+      "viewCount": 23,
+      "createdAt": "2025-09-11T22:40:00"
+    }
+  ],
+  "heroList": [
+    {
+      "rank": 1,
+      "name": " 최혜원",
+      "hours": 32
+    },
+    {
+      "rank": 2,
+      "name": "변민철",
+      "hours": 31
+    },
+    {
+      "rank": 3,
+      "name": "이승건",
+      "hours": 29
+    }
+  ],
+  "noticeList": [
+    {
+      "id": 31,
+      "text": "이용 규칙 안내"
+    },
+    {
+      "id": 32,
+      "text": "허위 게시물 신고"
+    },
+    {
+      "id": 33,
+      "text": "봉사 인증 방법"
+    }
+  ],
+  "missingPreview": [
+    {
+      "id": 1001,
+      "imgUrl": "/uploads/missing_cat.jpg",
+      "title": "춘천 중앙로 인근 실종",
+      "createdAt": "2025-09-12T03:00:00"
+    },
+    {
+      "id": 1002,
+      "imgUrl": "/uploads/missing_dog.jpg",
+      "title": "강남 삼성동 말티즈 찾아요",
+      "createdAt": "2025-09-11T22:00:00"
+    }
+  ],
+  "sightingPreview": [
+    {
+      "id": 2001,
+      "imgUrl": "/uploads/sighting_cat.jpg",
+      "title": "시장 앞 고양이 목격",
+      "createdAt": "2025-09-12T11:20:00"
+    },
+    {
+      "id": 2002,
+      "imgUrl": "/uploads/sighting_dog.jpg",
+      "title": "공원에서 돌아다니는 아이",
+      "createdAt": "2025-09-12T07:15:00",
+      "_comment": "여기까지 메인홈화면뿌려주기 json"
+    }
+  ],
   "shelterHead": {
     "mypage": {
       "shelterInfo": {
@@ -1195,26 +1347,130 @@
         "likes": 56
       },
       "applicants": [
-        { "id": 1, "name": "홍길동", "status": "승인대기", "statusClass": "pending" },
-        { "id": 2, "name": "김철수", "status": "승인대기", "statusClass": "pending" },
-        { "id": 3, "name": "박다혜", "status": "승인대기", "statusClass": "pending" }
+        {
+          "id": 1,
+          "name": "홍길동",
+          "status": "승인대기",
+          "statusClass": "pending"
+        },
+        {
+          "id": 2,
+          "name": "김철수",
+          "status": "승인대기",
+          "statusClass": "pending"
+        },
+        {
+          "id": 3,
+          "name": "박다혜",
+          "status": "승인대기",
+          "statusClass": "pending"
+        }
       ],
       "volunteerRecords": [
-        { "id": 1, "name": "홍길동", "date": "2025-10-10", "status": "승인완료", "statusClass": "approved" },
-        { "id": 2, "name": "김철수", "date": "2025-10-05", "status": "승인완료", "statusClass": "approved" },
-        { "id": 3, "name": "박다혜", "date": "2025-10-28", "status": "승인완료", "statusClass": "approved" }
+        {
+          "id": 1,
+          "name": "홍길동",
+          "date": "2025-10-10",
+          "status": "승인완료",
+          "statusClass": "approved"
+        },
+        {
+          "id": 2,
+          "name": "김철수",
+          "date": "2025-10-05",
+          "status": "승인완료",
+          "statusClass": "approved"
+        },
+        {
+          "id": 3,
+          "name": "박다혜",
+          "date": "2025-10-28",
+          "status": "승인완료",
+          "statusClass": "approved"
+        }
       ],
       "myRecruitments": [
-        { "id": 1, "title": "서울 보호소 가을 대청소", "date": "2025-10-10", "location": "서울 종로구" },
-        { "id": 2, "title": "강아지 산책 봉사", "date": "2025-10-05", "location": "서울 강남구" },
-        { "id": 3, "title": "보호소 급식 지원", "date": "2025-09-28", "location": "서울 중구" },
-        { "id": 4, "title": "입양 상담 도우미", "date": "2025-09-20", "location": "부천 원미구" }
+        {
+          "id": 1,
+          "title": "서울 보호소 가을 대청소",
+          "date": "2025-10-10",
+          "location": "서울 종로구"
+        },
+        {
+          "id": 2,
+          "title": "강아지 산책 봉사",
+          "date": "2025-10-05",
+          "location": "서울 강남구"
+        },
+        {
+          "id": 3,
+          "title": "보호소 급식 지원",
+          "date": "2025-09-28",
+          "location": "서울 중구"
+        },
+        {
+          "id": 4,
+          "title": "입양 상담 도우미",
+          "date": "2025-09-20",
+          "location": "부천 원미구"
+        }
       ],
       "myPosts": [
-        { "id": 1, "title": "서울 보호소 가을 대청소", "date": "2025-10-10", "likes": 45, "comments": 18, "views": 928 },
-        { "id": 2, "title": "강아지 산책 봉사", "date": "2025-10-05", "likes": 15, "comments": 12, "views": 306 },
-        { "id": 3, "title": "보호소 급식 지원", "date": "2025-09-28", "likes": 5, "comments": 8, "views": 100 }
+        {
+          "id": 1,
+          "title": "서울 보호소 가을 대청소",
+          "date": "2025-10-10",
+          "likes": 45,
+          "comments": 18,
+          "views": 928
+        },
+        {
+          "id": 2,
+          "title": "강아지 산책 봉사",
+          "date": "2025-10-05",
+          "likes": 15,
+          "comments": 12,
+          "views": 306
+        },
+        {
+          "id": 3,
+          "title": "보호소 급식 지원",
+          "date": "2025-09-28",
+          "likes": 5,
+          "comments": 8,
+          "views": 100
+        }
       ]
     }
+  },
+  "userMypage": {
+    "user": {
+      "profileAscii": "⋆｡⋆✩°｡⋆｡✧ ░(๑˃̵ᴗ˂̵)و ░ ✧｡⋆｡✩°⋆｡",
+      "profileEmoji": "(=^･ω･^=)♡",
+      "badgeLabel": "당신의 댕냥",
+      "userName": "이지윤",
+      "userAccount": "jiyoon0404@gmail.com",
+      "phone": "010-2244-4422",
+      "address": "서울특별시 강남구",
+      "createdAt": "2025-01-19"
+    },
+    "stats": {
+      "posts": 1,
+      "likes": 0
+    },
+    "heroInfo": {
+      "rank": 140,
+      "label": "이달의댕냥 히어로즈"
+    },
+    "myPosts": [
+      {
+        "id": 1,
+        "category": "입양게시판",
+        "title": "길고양이 임보 중입니다.",
+        "date": "2025-10-21",
+        "views": 0,
+        "likes": 0
+      }
+    ]
   }
 }

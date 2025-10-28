@@ -35,7 +35,7 @@
         </div>
         <div class="card-controls">
           <div class="search-field">
-            <span class="search-icon">🔍</span>
+            <img class="search-icon" :src="searchIcon" alt="검색 아이콘" />
             <input
               v-model.trim="applicantKeyword"
               type="search"
@@ -200,7 +200,7 @@
         </div>
         <div class="card-controls">
           <div class="search-field">
-            <span class="search-icon">🔎</span>
+            <img class="search-icon" :src="searchIcon" alt="검색 아이콘" />
             <input
               v-model.trim="recordKeyword"
               type="search"
@@ -265,6 +265,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import db from '@/assets/data/db.json'
+import searchIcon from '@/assets/돋보기아이콘.svg'
 
 const router = useRouter()
 
@@ -715,8 +716,9 @@ function formatHours(value) {
   top: 50%;
   left: 14px;
   transform: translateY(-50%);
-  font-size: 0.95rem;
-  color: #a38d76;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
 }
 
 .control-select {
