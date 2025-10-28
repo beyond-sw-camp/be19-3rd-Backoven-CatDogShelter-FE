@@ -1,5 +1,5 @@
 # 🐾 댕냥쉼터 <img src="https://github.com/user-attachments/assets/0aff8f8d-da27-4c78-a406-ceca80f924bc" align="right" height="90" />
-<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/77099251-5ece-4ba5-98be-04d7e4beaadb" />
+<img width="872" height="300" alt="Image" src="https://github.com/user-attachments/assets/6eddbfd0-127a-4933-9cb7-5b3341164377" />
 
 ## 🍞 BackOven 팀 소개
 
@@ -34,6 +34,9 @@
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
 ![Vue.js](https://img.shields.io/badge/Vue.js-3.0-4FC08D?style=flat&logo=vue.js&logoColor=white)
+![Fetch API](https://img.shields.io/badge/Fetch%20API-333333?style=flat&logo=firefoxbrowser&logoColor=white)
+![Axios](https://img.shields.io/badge/Axios-5A29E4?style=flat&logo=axios&logoColor=white)
+
 
 ### 🪄 Design
 ![Figma](https://img.shields.io/badge/Figma-F24E1E?style=flat&logo=figma&logoColor=white)
