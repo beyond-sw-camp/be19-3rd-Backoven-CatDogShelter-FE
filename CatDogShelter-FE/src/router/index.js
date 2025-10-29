@@ -16,6 +16,8 @@ import AdoptionView from '@/views/adoption/AdoptionView.vue'
 import AdoptionWrite from '@/views/adoption/AdoptionWrite.vue'
 import MissingView from '@/views/MissingView.vue'
 import SightingView from '@/views/Sighting/SightingView.vue'
+import SightingDetailView from '@/views/Sighting/SightingDetailView.vue'
+import SightingWriteView from '@/views/Sighting/SightingWriteView.vue'
 import PostView from '@/views/Post/PostView.vue'
 import PostDetailView from '@/views/Post/PostDetailView.vue'
 import PostWriteView from '@/views/Post/PostWriteView.vue'
@@ -109,11 +111,86 @@ const router = createRouter({
     // Sighting board
     { path: '/sighting', name: 'sighting', component: SightingView },
 
-    // Community board
-    { path: '/post', name: 'post', component: PostView },
-    { path: '/post/write', name: 'post.write', component: PostWriteView },
-    { path: '/post/:id', name: 'post.detail', component: PostDetailView, props: true },
-    { path: '/post.write', redirect: { name: 'post.write' } },
+    // Adoption write
+    {
+      path: '/adoption/write',
+      name: 'AdoptionWrite',
+      component: AdoptionWrite,
+    },
+
+
+{
+  path: '/adoption-post/:id',
+  name: 'adoption-detail',
+  component: () =>
+    import('@/views/adoption/AdoptionDetail.vue'),
+  props: true,
+},
+    // Missing board list
+    {
+      path: '/missing',
+      name: 'missing',
+      component: MissingView,
+    },
+
+    // Missing report write
+    {
+      path: '/missing/write',
+      name: 'missing.write',
+      component: MissingPostWirte,
+    },
+    {
+      path: '/missing/:postId',
+      name: 'missing-detail',
+      component: MissingDetailView,
+      props: true,
+    },
+
+    // Sighting board list
+    {
+      path: '/sighting',
+      name: 'sighting',
+      component: SightingView
+    },
+    {
+      path: "/sighting/:id",
+      name: "sighting-detail",
+      component: SightingDetailView
+    },
+    {
+      path: "/sighting/write",
+      name: "sighting-write",
+      component: SightingWriteView
+    },
+      
+
+    // Community board list
+    {
+      path: '/post',
+      name: 'post',
+      component: PostView,
+    },
+
+    // Community board write
+    {
+      path: '/post/write',
+      name: 'post.write',
+      component: PostWriteView,
+    },
+
+    // Community board detail
+    {
+      path: '/post/:id',
+      name: 'post.detail',
+      component: PostDetailView,
+      props: true,
+    },
+
+    // Redirect if someone hits /post.write directly
+    {
+      path: '/post.write',
+      redirect: { name: 'post.write' },
+    },
 
     // Heroes
     { path: '/heroes', name: 'heroes', component: HeroesrankingView },
