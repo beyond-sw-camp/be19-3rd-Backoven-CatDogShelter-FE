@@ -36,6 +36,7 @@
 ![Vue.js](https://img.shields.io/badge/Vue.js-3.0-4FC08D?style=flat&logo=vue.js&logoColor=white)
 ![Fetch API](https://img.shields.io/badge/Fetch%20API-333333?style=flat&logo=firefoxbrowser&logoColor=white)
 ![Axios](https://img.shields.io/badge/Axios-5A29E4?style=flat&logo=axios&logoColor=white)
+![dayjs](https://img.shields.io/badge/day.js-FF5F00?style=flat&logo=javascript&logoColor=white)
 
 
 ### 🪄 Design
