@@ -16,6 +16,8 @@ import AdoptionView from '@/views/adoption/AdoptionView.vue'
 import AdoptionWrite from '@/views/adoption/AdoptionWrite.vue'
 import MissingView from '@/views/MissingView.vue'
 import SightingView from '@/views/Sighting/SightingView.vue'
+import SightingDetailView from '@/views/Sighting/SightingDetailView.vue'
+import SightingWriteView from '@/views/Sighting/SightingWriteView.vue'
 import PostView from '@/views/Post/PostView.vue'
 import PostDetailView from '@/views/Post/PostDetailView.vue'
 import PostWriteView from '@/views/Post/PostWriteView.vue'
@@ -173,8 +175,19 @@ const router = createRouter({
     {
       path: '/sighting',
       name: 'sighting',
-      component: SightingView,
+      component: SightingView
     },
+    {
+      path: "/sighting/:id",
+      name: "sighting-detail",
+      component: SightingDetailView
+    },
+    {
+      path: "/sighting/write",
+      name: "sighting-write",
+      component: SightingWriteView
+    },
+      
 
     // Community board list
     {
