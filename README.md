@@ -261,7 +261,7 @@
 - 로그인
   <details>
   <summary>회원가입 & 로그인</summary>
-  <p><img width="1092" height="564" alt="스크린샷 2025-10-30 오전 4 10 46" src="https://github.com/user-attachments/assets/38a320e3-9a90-4f95-a028-376408002fc9" /></p>
+  <p><img width="809" height="431" alt="스크린샷 2025-10-30 오전 5 27 21" src="https://github.com/user-attachments/assets/bde8ce4c-bfde-44fa-bc5e-eb82d508282e" /></p>
   </details>
 
 
@@ -280,7 +280,7 @@
 
   <details>
   <summary>내 쪽지</summary>
-  <p><img width="885" height="690" alt="스크린샷 2025-10-30 오전 4 40 05" src="https://github.com/user-attachments/assets/544666d9-44d6-44a7-a970-182d50ea9198" /></p>
+  <p><img width="984" height="729" alt="스크린샷 2025-10-30 오전 5 28 07" src="https://github.com/user-attachments/assets/019f379f-f9dc-4e71-886a-a4361761c71c" /></p>
   </details>
 
   <details>
@@ -310,22 +310,26 @@
   
   <details>
   <summary>게시글 작성자 정보</summary>
-  <p><img width="834" height="658" alt="스크린샷 2025-10-30 오전 5 08 25" src="https://github.com/user-attachments/assets/cddb8833-37ee-44d8-a399-aef1c8074ae9" /></p>
+  <p><img width="830" height="610" alt="스크린샷 2025-10-30 오전 5 34 11" src="https://github.com/user-attachments/assets/36dc3e92-cb9d-4520-aa17-34a3d4ec7452" />
+</p>
   </details>
 
   <details>
   <summary>게시글 좋아요 & 공유하기</summary>
-  <p><img width="503" height="617" alt="스크린샷 2025-10-30 오전 5 12 32" src="https://github.com/user-attachments/assets/27f918b7-d948-49b4-bdd3-e2967c838131" /></p>
+  <p><img width="570" height="585" alt="스크린샷 2025-10-30 오전 5 34 39" src="https://github.com/user-attachments/assets/b7a23471-bd31-4bfa-b99b-22baefbdd054" />
+</p>
   </details>
 
   <details>
   <summary>게시글 댓글 작성</summary>
-  <p><img width="522" height="450" alt="스크린샷 2025-10-30 오전 5 20 35" src="https://github.com/user-attachments/assets/80bf7fce-067f-495d-9c27-37dd7046fdcc" /></p>
+  <p><img width="455" height="355" alt="스크린샷 2025-10-30 오전 5 34 55" src="https://github.com/user-attachments/assets/77ac15d1-557a-4a44-967f-267c66d753ba" />
+</p>
   </details>
 
   <details>
   <summary>게시글 & 댓글 신고</summary>
-  <p><img width="1148" height="486" alt="스크린샷 2025-10-30 오전 5 24 23" src="https://github.com/user-attachments/assets/80f8523d-be20-46f0-a9a8-aa69ca8e4266" /></p>
+  <p><img width="923" height="374" alt="스크린샷 2025-10-30 오전 5 35 22" src="https://github.com/user-attachments/assets/b6f08254-2603-41fb-9703-088b178ade50" />
+</p>
   </details>
 
  
