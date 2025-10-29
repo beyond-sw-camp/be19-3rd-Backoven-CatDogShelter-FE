@@ -35,12 +35,13 @@ const submit = async () => {
     localStorage.setItem('user', JSON.stringify({
       account: 'admin',
       name: '관리자',
+      role: 'ADMIN'
     }))
     await router.push({ name: 'home' })
     return
   }
 
-  // 2) ✅ 하드코딩된 보호소장 계정 (db.json 데이터 기반)
+  // 2) ✅ 하드코딩된 보호소장 계정
   if (form.value.email === 'shelter' && form.value.password === 'Shelter!2025') {
     authed.value = true
     localStorage.setItem('authed', '1')
@@ -148,10 +149,14 @@ const emit = defineEmits(['success'])
       {{ signupHint }}
     </p>
     
-    <!-- 보호소장 테스트 계정 안내 -->
-    <!-- <p v-if="role === 'SHELTER_HEAD'" class="test-info"> -->
-      <!-- 💡 테스트 계정: shelter / Shelter!2025 -->
-    <!-- </p> -->
+
+    <!-- 테스트 계정 안내 -->
+    <!-- <div v-if="role === 'SHELTER_HEAD'" class="test-info">
+      💡 보호소장 테스트: shelter / Shelter!2025
+    </div>
+    <div v-else class="test-info">
+      💡 관리자 테스트: admin / Admin!2025demo
+    </div> -->
     
     <div class="links">
       <!-- 회원가입 -->
