@@ -149,9 +149,9 @@ const emit = defineEmits(['success'])
     </p>
     
     <!-- 보호소장 테스트 계정 안내 -->
-    <p v-if="role === 'SHELTER_HEAD'" class="test-info">
-      💡 테스트 계정: shelter / Shelter!2025
-    </p>
+    <!-- <p v-if="role === 'SHELTER_HEAD'" class="test-info"> -->
+      <!-- 💡 테스트 계정: shelter / Shelter!2025 -->
+    <!-- </p> -->
     
     <div class="links">
       <!-- 회원가입 -->
