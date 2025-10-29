@@ -152,7 +152,7 @@
         </div>
 
         <ul class="list">
-          <li v-for="(item, i) in filteredList" :key="i" class="list-item" @click="goToDetail(item.id)">
+          <li v-for="(item, i) in paginatedList" :key="i" class="list-item" @click="goToDetail(item.id)">
             <div class="list-item-left">
               <div class="item-badges">
                 <span class="item-badge companyName-badge">{{ item.companyName }}</span>
@@ -406,7 +406,7 @@ const filteredList = computed(() => {
 })
 
 // 페이지네이션
-const itemsPerPage = 10
+const itemsPerPage = 8
 const totalPages = computed(() => Math.ceil(filteredList.value.length / itemsPerPage))
 
 const paginatedList = computed(() => {
