@@ -34,9 +34,9 @@
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
 ![Vue.js](https://img.shields.io/badge/Vue.js-3.0-4FC08D?style=flat&logo=vue.js&logoColor=white)
-![Fetch API](https://img.shields.io/badge/Fetch%20API-333333?style=flat&logo=firefoxbrowser&logoColor=white)
-![Axios](https://img.shields.io/badge/Axios-5A29E4?style=flat&logo=axios&logoColor=white)
-![dayjs](https://img.shields.io/badge/day.js-FF5F00?style=flat&logo=javascript&logoColor=white)
+![Fetch API](https://img.shields.io/badge/Fetch%20API-ES2024-333333?style=flat&logo=firefoxbrowser&logoColor=white)
+![Axios](https://img.shields.io/badge/Axios-v1.12.2-5A29E4?style=flat&logo=axios&logoColor=white)
+![dayjs](https://img.shields.io/badge/day.js-v1.11.18-FF5F00?style=flat&logo=javascript&logoColor=white)
 
 
 ### 🪄 Design
