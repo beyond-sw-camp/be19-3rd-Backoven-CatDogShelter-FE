@@ -288,6 +288,11 @@
   <p><img width="431" height="367" alt="스크린샷 2025-10-30 오전 5 55 07" src="https://github.com/user-attachments/assets/86762bed-4452-400c-afce-926d288b6c1a" /></p>
   </details>
 
+  <details>
+  <summary>관리자</summary>
+  <p><img width="577" height="717" alt="스크린샷 2025-10-30 오전 6 39 25" src="https://github.com/user-attachments/assets/a4832647-17e2-4795-8523-cae0a4e9182b" /></p>
+  </details>
+
 
 - 댕냥히어로즈
   <details>
