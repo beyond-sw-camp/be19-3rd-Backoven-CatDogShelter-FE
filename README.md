@@ -234,7 +234,7 @@
 
 ## 📊 WBS
 
-<img width="900" height="490" alt="Image" src="https://github.com/user-attachments/assets/22a0728e-5906-46c3-8a8a-1d436bbcf160" />
+<img width="700" height="490" alt="Image" src="https://github.com/user-attachments/assets/22a0728e-5906-46c3-8a8a-1d436bbcf160" />
 
 
 <br>
@@ -243,13 +243,13 @@
 
 ## 🗒️ 요구사항 명세서
 
-<img width="851" height="526" alt="Image" src="https://github.com/user-attachments/assets/a580ef4d-65f8-4526-9c17-9ee15380947c" />
+<img width="701" height="526" alt="Image" src="https://github.com/user-attachments/assets/a580ef4d-65f8-4526-9c17-9ee15380947c" />
 
-<img width="851" height="526" alt="Image" src="https://github.com/user-attachments/assets/8f51b399-efd9-4274-9565-9248d3ef4e9e" />
+<img width="701" height="526" alt="Image" src="https://github.com/user-attachments/assets/8f51b399-efd9-4274-9565-9248d3ef4e9e" />
 
-<img width="851" height="526" alt="Image" src="https://github.com/user-attachments/assets/68ab1f5c-9535-4f8a-8c72-eb869312854a" />
+<img width="701" height="526" alt="Image" src="https://github.com/user-attachments/assets/68ab1f5c-9535-4f8a-8c72-eb869312854a" />
 
-<img width="851" height="538" alt="Image" src="https://github.com/user-attachments/assets/25ceca71-c3d2-471f-bbf2-1b037542301a" />
+<img width="701" height="538" alt="Image" src="https://github.com/user-attachments/assets/25ceca71-c3d2-471f-bbf2-1b037542301a" />
 
 
 ---
