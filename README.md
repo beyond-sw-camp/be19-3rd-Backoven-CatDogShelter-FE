@@ -300,11 +300,14 @@
   <p><img width="1118" height="379" alt="스크린샷 2025-10-30 오전 4 44 52" src="https://github.com/user-attachments/assets/b1f3725e-c92c-441a-afca-67fb18a39f37" /></p>
   </details>
   
-- 게시판 3
+- 게시판
   <details>
   <summary>게시글</summary>
-  <p>(작성자/작성일 자동 저장)</p>
+  <p><img width="743" height="788" alt="스크린샷 2025-10-30 오전 10 48 29" src="https://github.com/user-attachments/assets/f302c807-34aa-463c-a491-f032575c6e91" />
+      <img width="726" height="625" alt="스크린샷 2025-10-30 오전 11 01 47" src="https://github.com/user-attachments/assets/64406fe5-15e5-4847-aef8-3da5ab440fbc" /></p>
   </details>
+
+
 
 - 게시글의 공통적인 기능
   <details>
