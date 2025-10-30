@@ -418,6 +418,7 @@
   <details>
     <summary>봉사후기 게시판</summary>
     
+  ![봉사후기게시판](https://github.com/user-attachments/assets/60d6b5e3-9dc7-4c1b-b0ec-df957ae420f3)
   </details>
 
 </details>
