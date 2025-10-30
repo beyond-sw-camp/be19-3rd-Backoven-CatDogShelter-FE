@@ -406,6 +406,11 @@
 
 ## 결과보고서
 
+<details>
+  <summary>메인 홈 화면</summary>
+
+  ![Image](https://github.com/user-attachments/assets/a961ed5b-4e0d-4117-acdc-66787ba4161d)
+</details>
 
 <details>
   <summary> 회원 </summary>
@@ -491,19 +496,15 @@
   <summary> 실종게시판 </summary>
 
   <details>
-    <summary>작성</summary>
+    <summary>실종게시판 게시글목록</summary>
+   
+  ![Image](https://github.com/user-attachments/assets/343d4877-f418-429a-a967-806d05fbacd6)
   </details>
 
   <details>
-    <summary>작성</summary>
-  </details>
-
-  <details>
-    <summary>작성</summary>
-  </details>
-
-  <details>
-    <summary>작성</summary>
+    <summary>실종게시판 글작성</summary>
+  
+  ![Image](https://github.com/user-attachments/assets/46c68beb-3a06-4ba8-ba3e-362abcd010a8)
   </details>
 </details>
 
@@ -528,22 +529,14 @@
 <details>
   <summary> 후원게시판 </summary>
 
-  <details>
-    <summary>작성</summary>
-  </details>
-
-  <details>
-    <summary>작성</summary>
-  </details>
-
-  <details>
-    <summary>작성</summary>
-  </details>
-
-  <details>
-    <summary>작성</summary>
+  
+<details>
+    <summary>후원게시판 글작성</summary>
+  
+  ![Image](https://github.com/user-attachments/assets/76c62dd5-1f7d-446f-ba57-53409d91f7c4)
   </details>
 </details>
+
 
 <details>
   <summary> 입양게시판 </summary>
