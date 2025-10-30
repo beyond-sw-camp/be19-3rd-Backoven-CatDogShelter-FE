@@ -379,39 +379,36 @@
 
   <details>
     <summary>회원가입</summary>
+    <img src="https://github.com/user-attachments/assets/244e4c5a-f4a0-4d5b-a4ed-b875574da0e1" width="500"/>
   </details>
 
   <details>
     <summary>로그인</summary>
+    <img src="https://github.com/user-attachments/assets/570d9637-9f22-4618-beec-27fa47d9bbdb" width="500"/>
   </details>
 
   <details>
     <summary>아이디 찾기</summary>
+    <img src="https://github.com/user-attachments/assets/e9f6dada-5db9-45a4-a8bd-819ccab5d1c9" width="500"/>
   </details>
 
   <details>
     <summary>비밀번호 찾기</summary>
+    <img src="https://github.com/user-attachments/assets/8ffca747-f2c0-4f16-af37-693998f58f31" width="500"/>
   </details>
 </details>
 
-
 <details>
-  <summary> 자유게시판 </summary>
+    <summary> 자유게시판 </summary>
 
   <details>
-    <summary>작성</summary>
+    <summary>자유게시판 - 상세 페이지</summary>
+    <img src="https://github.com/user-attachments/assets/2aeb4309-7388-4bb8-9b20-202a48ea966d" width="500"/>
   </details>
 
   <details>
-    <summary>작성</summary>
-  </details>
-
-  <details>
-    <summary>작성</summary>
-  </details>
-
-  <details>
-    <summary>작성</summary>
+    <summary>자유게시판 - 게시글 작성</summary>
+    <img src="https://github.com/user-attachments/assets/dcca8e25-49f8-4256-ab14-70a8152e2f42" width="500"/>
   </details>
 </details>
 
