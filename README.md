@@ -554,14 +554,7 @@
   ![Image](https://github.com/user-attachments/assets/525b7c4c-b78d-4330-843c-b5b1b14f925a)
   </details>
 
-
-  <details>
-    <summary>작성</summary>
-  </details>
-
-  <details>
-    <summary>작성</summary>
-  </details>
+  
 </details>
 
 <details>
