@@ -407,7 +407,7 @@
 
   <details>
     <summary>비밀번호 찾기</summary>
-    <img src="https://github.com/user-attachments/assets/8ffca747-f2c0-4f16-af37-693998f58f31" width="500"/>
+    <img src="https://github.com/user-attachments/assets/76d19ade-57cd-4bf4-ba40-0a0d6c055714" width="500"/>
   </details>
 </details>
 
