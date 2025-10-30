@@ -540,7 +540,8 @@
 
   <details>
     <summary>입양게시판 상세페이지</summary>
-    ![Image](https://github.com/user-attachments/assets/525b7c4c-b78d-4330-843c-b5b1b14f925a)
+  
+  ![Image](https://github.com/user-attachments/assets/525b7c4c-b78d-4330-843c-b5b1b14f925a)
   </details>
 
 
