@@ -1,4 +1,4 @@
-# 🐾 댕냥쉼터 <img src="https://github.com/user-attachments/assets/0aff8f8d-da27-4c78-a406-ceca80f924bc" align="right" height="90" />
+![이용약관](https://github.com/user-attachments/assets/1ff3b571-a5a6-4502-892d-a52abf16d325)# 🐾 댕냥쉼터 <img src="https://github.com/user-attachments/assets/0aff8f8d-da27-4c78-a406-ceca80f924bc" align="right" height="90" />
 <img width="872" height="300" alt="Image" src="https://github.com/user-attachments/assets/6eddbfd0-127a-4933-9cb7-5b3341164377" />
 
 ## 🍞 BackOven 팀 소개
@@ -561,7 +561,7 @@
   <details>
     <summary>이용약관</summary>
 
-    
+  ![이용약관](https://github.com/user-attachments/assets/bbd40281-8525-4d9d-a6ee-0b08d76c84ef)
   </details>
 
   <details>
