@@ -357,12 +357,22 @@
 </details>
 
 <details>
-  <summary> ㅁ </summary>
+  <summary> 게시판 도메인 </summary>
   <details>
-    <summary>ㅁ</summary>
+    <summary>후원게시판 글 목록</summary>
+    <img width="708" height="460" alt="Image" src="https://github.com/user-attachments/assets/87af02ab-c8b5-4a4d-9019-7899d1e1584a" />
   </details>
     <details>
-    <summary>ㅁ</summary>
+    <summary>실종게시판 글 작성 양식</summary>
+      <img width="700" height="460" alt="Image" src="https://github.com/user-attachments/assets/652df3ea-dc46-490f-82a3-a5d4f1bcea0e" />
+  </details>
+      <details>
+    <summary>입양게시글 상세 내용</summary>
+      <img width="702" height="460" alt="Image" src="https://github.com/user-attachments/assets/57b42282-07ae-4ea0-bf73-24ef598b8e63" />
+  </details>
+      <details>
+    <summary>댕냥히어로즈 페이지</summary>
+      <img width="695" height="460" alt="Image" src="https://github.com/user-attachments/assets/bc68f98d-8dac-45d7-a4f8-6db2a92aa66c" />
   </details>
 </details>
 
