@@ -401,30 +401,6 @@
 </details>
 
 <details>
-  <summary> 봉사게시판 </summary>
-
-  <details>
-    <summary>봉사모집 게시글 작성</summary>
-    
-   ![봉사모집글 등록](https://github.com/user-attachments/assets/b63c4c5b-b520-47ee-9d23-53edc1d9678e)
-  </details>
-
-  <details>
-    <summary>봉사신청하기</summary>
-  
-  ![봉사신청하기](https://github.com/user-attachments/assets/d8e0740e-1474-42b2-ac03-4c2706124d60)
-  </details>
-
-  <details>
-    <summary>봉사후기 게시판</summary>
-    
-  ![봉사후기게시판](https://github.com/user-attachments/assets/60d6b5e3-9dc7-4c1b-b0ec-df957ae420f3)
-  </details>
-
-</details>
-
-
-<details>
   <summary>ㅇ</summary>
 </details>
 
