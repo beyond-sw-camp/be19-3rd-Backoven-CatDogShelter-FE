@@ -565,6 +565,30 @@
 </details>
 
 <details>
+  <summary>관리자 페이지</summary>
+  <details>
+    <summary>대시보드</summary>
+
+  ![대시보드](https://github.com/user-attachments/assets/b9c44951-ee07-44b8-b779-f48e58730916)
+  </details>
+
+  <details>
+    <summary>신고 처리</summary>
+    
+  ![신고처리](https://github.com/user-attachments/assets/c3fe83e4-e22b-4083-8460-555a37477221)
+  </details>
+
+  <details>
+    <summary>회원 조회</summary>
+    
+  ![회원조회](https://github.com/user-attachments/assets/ee616f91-e78a-4678-9ce2-349c343c283f)
+    
+  ![회원조회-검색](https://github.com/user-attachments/assets/fa8a8ad7-ba81-461a-b137-35481c182103)
+  </details>
+</details>
+
+
+<details>
   <summary> Footer </summary>
 
   <details>
