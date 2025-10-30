@@ -350,12 +350,18 @@
 ## 스토리보드
 
 <details>
-  <summary> ㅇ </summary>
+  <summary> 자유게시판 </summary>
   <details>
-    <summary>ㅇㅇ</summary>
+    <summary>자유게시판 목록</summary>
+    <img width="802" height="456" alt="Image" src="https://github.com/user-attachments/assets/1f4cc7dc-6a11-4933-93aa-7908f311ff99" />
   </details>
-    <details>
-    <summary>ㅇㅇ</summary>
+  <details>
+    <summary>자유게시판 - 상세보기</summary>
+    <img width="802" height="456" alt="image" src="https://github.com/user-attachments/assets/28f9edad-76dd-4da7-86d0-d005884538bc" />
+  </details>
+  <details>
+    <summary>자유게시판 - 게시글 작성</summary>
+    <img width="796" height="458" alt="image" src="https://github.com/user-attachments/assets/7b9e9a15-db3c-44d9-a9aa-def6681029bd" />
   </details>
 </details>
 
