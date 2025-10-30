@@ -349,23 +349,23 @@
 ## 스토리보드
 
 <details>
-  <summary> 자유게시판 </summary>
-  <details>
-    <summary>자유게시판 목록</summary>
-    <img width="802" height="456" alt="Image" src="https://github.com/user-attachments/assets/1f4cc7dc-6a11-4933-93aa-7908f311ff99" />
-  </details>
-  <details>
-    <summary>자유게시판 - 상세보기</summary>
-    <img width="802" height="456" alt="image" src="https://github.com/user-attachments/assets/28f9edad-76dd-4da7-86d0-d005884538bc" />
-  </details>
-  <details>
-    <summary>자유게시판 - 게시글 작성</summary>
-    <img width="796" height="458" alt="image" src="https://github.com/user-attachments/assets/7b9e9a15-db3c-44d9-a9aa-def6681029bd" />
-  </details>
-</details>
-
-<details>
   <summary> 게시판 도메인 </summary>
+  
+<details>
+  <summary> 자유게시판 </summary>
+    <details>
+      <summary>자유게시판 목록</summary>
+      <img width="802" height="456" alt="Image" src="https://github.com/user-attachments/assets/1f4cc7dc-6a11-4933-93aa-7908f311ff99" />
+    </details>
+    <details>
+      <summary>자유게시판 - 상세보기</summary>
+      <img width="802" height="456" alt="image" src="https://github.com/user-attachments/assets/28f9edad-76dd-4da7-86d0-d005884538bc" />
+    </details>
+    <details>
+      <summary>자유게시판 - 게시글 작성</summary>
+      <img width="796" height="458" alt="image" src="https://github.com/user-attachments/assets/7b9e9a15-db3c-44d9-a9aa-def6681029bd" />
+    </details>
+  </details>
   <details>
     <summary>후원게시판 글 목록</summary>
     <img width="708" height="460" alt="Image" src="https://github.com/user-attachments/assets/87af02ab-c8b5-4a4d-9019-7899d1e1584a" />
