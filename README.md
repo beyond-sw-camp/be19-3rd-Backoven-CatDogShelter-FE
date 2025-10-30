@@ -410,39 +410,36 @@
 
 
 <details>
-  <summary> 봉사게시판 </summary>
+  <summary>봉사게시판</summary>
 
+  <!-- 봉사모집 게시판 -->
   <details>
     <summary>봉사모집 게시판</summary>
-    
-      <details>
-        <summary>작성</summary>
-      </details>
-  
-      <details>
-        <summary>작성</summary>
-      </details>
+    <details>
+      <summary>작성 1</summary>
+    </details>
+    <details>
+      <summary>작성 2</summary>
     </details>
   </details>
-  
 
+  <!-- 봉사후기 게시판 -->
   <details>
     <summary>봉사후기 게시판</summary>
     <details>
-      <summary>작성</summary>
+      <summary>작성 1</summary>
     </details>
-  
     <details>
-      <summary>작성</summary>
+      <summary>작성 2</summary>
     </details>
   </details>
 
+  <!-- 나의 봉사활동 -->
   <details>
     <summary>나의 봉사활동</summary>
   </details>
 
 </details>
-
 
 ---
 
