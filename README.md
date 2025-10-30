@@ -554,34 +554,50 @@
 
   <details>
     <summary>댕냥쉼터 소개</summary>
+    
+  ![댕냥쉼터 소개](https://github.com/user-attachments/assets/ecd3ed2a-1255-4d96-8ab7-1a5087749514)
   </details>
 
   <details>
     <summary>이용약관</summary>
+
+    
   </details>
 
   <details>
     <summary>개인정보 처리방침</summary>
+
+    
   </details>
 
   <details>
     <summary>커뮤니티 가이드</summary>
+
+    
   </details>
 
   <details>
     <summary>입양 절차 안내</summary>
+
+  ![입양안내](https://github.com/user-attachments/assets/f5f6f0b9-0a67-42fa-88d9-b9e1858af223)
   </details>
 
   <details>
     <summary>자원 봉사 안내</summary>
+  
+  ![봉사안내](https://github.com/user-attachments/assets/6908749e-11a2-49db-b496-b93369a536df)
   </details>
 
   <details>
     <summary>FAQ</summary>
+
+  ![FAQ](https://github.com/user-attachments/assets/e82ceac8-d921-4530-a685-c1edb5b1e160)
   </details>
 
   <details>
     <summary>문의하기</summary>
+
+  ![문의하기](https://github.com/user-attachments/assets/0d87f23a-5cb0-453d-8593-0aa585f24d50)
   </details>
 </details>
 
