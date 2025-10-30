@@ -337,7 +337,7 @@
 
 - 고객지원
   <details>
-  <summary>게시글 등록</summary>
+  <summary>고객지원</summary>
   <p><img width="970" height="717" alt="스크린샷 2025-10-30 오전 10 20 30" src="https://github.com/user-attachments/assets/86df8a1b-024a-46f1-968a-2965f125c255" /></p>
   </details>
   
