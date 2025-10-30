@@ -405,14 +405,14 @@
 
   <details>
     <summary>봉사모집 게시글 작성</summary>
-    ![봉사모집글 등록](https://github.com/user-attachments/assets/b63c4c5b-b520-47ee-9d23-53edc1d9678e)
-
+    
+   ![봉사모집글 등록](https://github.com/user-attachments/assets/b63c4c5b-b520-47ee-9d23-53edc1d9678e)
   </details>
 
   <details>
     <summary>봉사신청하기</summary>
-    ![봉사신청하기](https://github.com/user-attachments/assets/d8e0740e-1474-42b2-ac03-4c2706124d60)
-
+  
+  ![봉사신청하기](https://github.com/user-attachments/assets/d8e0740e-1474-42b2-ac03-4c2706124d60)
   </details>
 
   <details>
