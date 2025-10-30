@@ -576,7 +576,7 @@
   <details>
     <summary>커뮤니티 가이드</summary>
 
-  ![커뮤니티 가이드 (1)](https://github.com/user-attachments/assets/987e360d-0912-4528-94ba-f69e8aa2eeca)
+  ![커뮤니티 가이드 (3) (1)](https://github.com/user-attachments/assets/536b28a5-db7f-42b3-a75a-15ea7fc83855)
   </details>
 
   <details>
