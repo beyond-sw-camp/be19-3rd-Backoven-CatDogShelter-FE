@@ -371,158 +371,77 @@
   <summary> 회원 </summary>
 
   <details>
-    <summary>ㅇ</summary>
+    <summary>회원가입</summary>
   </details>
 
   <details>
-    <summary>ㅇ</summary>
+    <summary>로그인</summary>
   </details>
 
   <details>
-    <summary>ㅇ</summary>
+    <summary>아이디 찾기</summary>
   </details>
 
   <details>
-    <summary>ㅇ</summary>
+    <summary>비밀번호 찾기</summary>
   </details>
-
-  <details>
-    <summary>ㅇ</summary>
-  </details>
-
-  <details>
-    <summary>ㅇ</summary>
-  </details>
-
-  <details>
-    <summary>ㅇ</summary>
-  </details>
-
 </details>
+
 
 <details>
-  <summary>ㅇ</summary>
+  <summary> 자유게시판 </summary>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+
+  <details>
+    <summary>작성</summary>
+  </details>
 </details>
+
 
 <details>
-  <summary>ㅇ</summary>
+  <summary> 봉사게시판 </summary>
 
   <details>
-    <summary>ㅇ</summary>
+    <summary>봉사모집 게시판</summary>
+    
+      <details>
+        <summary>작성</summary>
+      </details>
+  
+      <details>
+        <summary>작성</summary>
+      </details>
+     </details>
+  </details>
+  
+
+  <details>
+    <summary>봉사후기 게시판</summary>
+    <details>
+      <summary>작성</summary>
+    </details>
+  
+    <details>
+      <summary>작성</summary>
+    </details>
   </details>
 
   <details>
-    <summary>ㅇ</summary>
-  </details>
-
-  <details>
-    <summary>ㅇ</summary>
-  </details>
-</details>
-
-<details>
-  <summary>ㅇ</summary>
-
-</details>
-
-<details>
-  <summary>ㅇ</summary>
-
-  <details>
-    <summary>ㅇ</summary>
-
-   <details>
-      <summary>ㅇ</summary>
-    </details>
-
-   <details>
-      <summary>ㅇ</summary>
-    </details>
-
-   <details>
-      <summary>ㅇ</summary>
-    </details>
-
-  <details>
-      <summary>ㅇ</summary>
-    </details>
-
-  <details>
-      <summary>ㅇ</summary>
-    </details>
-
+    <summary>나의 봉사활동</summary>
   </details>
 
 </details>
-
-<details>
-  <summary>ㅇ/summary>
-
-  <details>
-    <summary>ㅇ</summary>
-
-  <details>
-      <summary>ㅇ</summary>
-    </details>
-
-  <details>
-      <summary>ㅇ</summary>
-    </details>
-
-   <details>
-      <summary>ㅇ</summary>
-    </details>
-
-  <details>
-      <summary>ㅇ</summary>
-    </details>
-
-  <details>
-      <summary>ㅇ</summary>
-    </details>
-
-  <details>
-      <summary>ㅇ</summary>
-    </details>
-
-   <details>
-      <summary>ㅇ</summary>
-    </details>
-
-  </details>
-
-  <details>
-    <summary>ㅇ</summary>
-
-  <details>
-      <summary>ㅇ</summary>
-    </details>
-
-  <details>
-      <summary>ㅇ</summary>
-    </details>
-
-  <details>
-      <summary>ㅇ</summary>
-    </details>
-
-  </details>
-
-  <details>
-    <summary>ㅇ</summary>
-
-  <details>
-      <summary>ㅇ</summary>
-    </details>
-
-  <details>
-      <summary>ㅇ</summary>
-    </details>
-
-  </details>
-
-</details>
-
 
 
 ---
