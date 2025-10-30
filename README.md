@@ -570,7 +570,7 @@
   <details>
     <summary>개인정보 처리방침</summary>
 
-    
+  ![개인정보 처리방침](https://github.com/user-attachments/assets/4b351b04-f5ee-42d7-bba8-0d837f1f037a)
   </details>
 
   <details>
