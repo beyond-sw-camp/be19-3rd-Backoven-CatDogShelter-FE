@@ -491,20 +491,18 @@
   <summary> 목격제보게시판 </summary>
 
   <details>
-    <summary>작성</summary>
+    <summary>목격제보 상세페이지</summary>
+
+  ![목격상세페이지](https://github.com/user-attachments/assets/1d153023-6154-43d3-a1a6-33a7ab248cd8)
   </details>
 
   <details>
-    <summary>작성</summary>
+    <summary>목격제보 검색 조회</summary>
+
+  ![목격제보 게시판 검색](https://github.com/user-attachments/assets/05dae0ab-d5b0-4d07-8ba8-3b004ad5c785)
   </details>
 
-  <details>
-    <summary>작성</summary>
-  </details>
-
-  <details>
-    <summary>작성</summary>
-  </details>
+  
 </details>
 
 <details>
