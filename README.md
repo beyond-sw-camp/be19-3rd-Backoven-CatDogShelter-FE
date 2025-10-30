@@ -389,6 +389,16 @@
   </details>
 </details>
 
+<details>
+  <summary>관리자 페이지</summary>
+  <img width="2586" height="1510" alt="Image" src="https://github.com/user-attachments/assets/26c3726a-eb04-45a7-bf92-ecc252ee61e2" />
+
+  <img width="2586" height="1510" alt="Image" src="https://github.com/user-attachments/assets/aa9953fc-ed5f-4102-beb5-b0474b6e399f" />
+
+  <img width="2586" height="1510" alt="Image" src="https://github.com/user-attachments/assets/fc0754d0-efb4-43c2-a16b-3eb1ff357140" />
+
+  <img width="2586" height="1510" alt="Image" src="https://github.com/user-attachments/assets/fb27d8a4-253e-400a-81d9-c2875826a8b8" />
+</details>
 
 ---
 
