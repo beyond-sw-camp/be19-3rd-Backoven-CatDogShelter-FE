@@ -416,27 +416,36 @@
   <details>
     <summary>봉사모집 게시판</summary>
     <details>
-      <summary>작성 1</summary>
+      <summary>봉사모집게시글 작성</summary>
+
+  ![봉사모집글 등록](https://github.com/user-attachments/assets/b63c4c5b-b520-47ee-9d23-53edc1d9678e)
     </details>
     <details>
-      <summary>작성 2</summary>
+      <summary>봉사신청하기</summary>
+
+  ![봉사신청하기](https://github.com/user-attachments/assets/d8e0740e-1474-42b2-ac03-4c2706124d60)
     </details>
   </details>
 
   <!-- 봉사후기 게시판 -->
   <details>
     <summary>봉사후기 게시판</summary>
-    <details>
-      <summary>작성 1</summary>
-    </details>
-    <details>
-      <summary>작성 2</summary>
-    </details>
+
+  ![봉사후기게시판](https://github.com/user-attachments/assets/60d6b5e3-9dc7-4c1b-b0ec-df957ae420f3)
   </details>
 
   <!-- 나의 봉사활동 -->
   <details>
     <summary>나의 봉사활동</summary>
+
+  ![내 봉사활동](https://github.com/user-attachments/assets/2190a79d-df2f-4954-9e83-1d8a9f8e0177)
+  </details>
+
+  <!-- 보호소장 -->
+  <details>
+    <summary>보호소장 마이페이지</summary>
+    
+  ![보호소장 마이페이지](https://github.com/user-attachments/assets/723c4980-54e0-403a-bf8a-d81f9dba1755)
   </details>
 
 </details>
