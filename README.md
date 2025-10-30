@@ -450,6 +450,127 @@
 
 </details>
 
+<details>
+  <summary> 실종게시판 </summary>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+</details>
+
+<details>
+  <summary> 목격제보게시판 </summary>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+</details>
+
+<details>
+  <summary> 후원게시판 </summary>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+</details>
+
+<details>
+  <summary> 입양게시판 </summary>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+
+  <details>
+    <summary>작성</summary>
+  </details>
+</details>
+
+<details>
+  <summary> 댕냥히어로즈 </summary>
+
+</details>
+
+<details>
+  <summary> Footer </summary>
+
+  <details>
+    <summary>댕냥쉼터 소개</summary>
+  </details>
+
+  <details>
+    <summary>이용약관</summary>
+  </details>
+
+  <details>
+    <summary>개인정보 처리방침</summary>
+  </details>
+
+  <details>
+    <summary>커뮤니티 가이드</summary>
+  </details>
+
+  <details>
+    <summary>입양 절차 안내</summary>
+  </details>
+
+  <details>
+    <summary>자원 봉사 안내</summary>
+  </details>
+
+  <details>
+    <summary>FAQ</summary>
+  </details>
+
+  <details>
+    <summary>문의하기</summary>
+  </details>
+</details>
+
 ---
 
 ## 프로젝트 회고록
