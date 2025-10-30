@@ -243,13 +243,12 @@
 
 ## 요구사항 명세서
 
-<img width="701" height="526" alt="Image" src="https://github.com/user-attachments/assets/a580ef4d-65f8-4526-9c17-9ee15380947c" />
+<img width="702" height="573" alt="스크린샷 2025-10-30 오후 2 01 49" src="https://github.com/user-attachments/assets/ef002b22-8a3f-4303-a6e6-788424cfd8da" />
 
-<img width="701" height="526" alt="Image" src="https://github.com/user-attachments/assets/8f51b399-efd9-4274-9565-9248d3ef4e9e" />
+<img width="702" height="556" alt="스크린샷 2025-10-30 오후 2 02 10" src="https://github.com/user-attachments/assets/e38fbec8-ce3c-46f0-925f-20a0a5ae31a1" />
 
-<img width="701" height="526" alt="Image" src="https://github.com/user-attachments/assets/68ab1f5c-9535-4f8a-8c72-eb869312854a" />
+<img width="702" height="233" alt="스크린샷 2025-10-30 오후 2 01 36" src="https://github.com/user-attachments/assets/0e912221-1723-4b4a-ae15-4ff581048fd5" />
 
-<img width="701" height="538" alt="Image" src="https://github.com/user-attachments/assets/25ceca71-c3d2-471f-bbf2-1b037542301a" />
 
 
 ---
