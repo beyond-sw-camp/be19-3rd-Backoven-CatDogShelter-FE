@@ -422,7 +422,7 @@
       <details>
         <summary>작성</summary>
       </details>
-     </details>
+    </details>
   </details>
   
 
