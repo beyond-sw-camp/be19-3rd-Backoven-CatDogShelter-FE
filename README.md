@@ -332,7 +332,14 @@
   <p><img width="922" height="349" alt="스크린샷 2025-10-30 오전 5 59 34" src="https://github.com/user-attachments/assets/0bc611e5-076b-4714-bcb3-8ff072a091c8" /></p>
   </details>
 
- 
+- 고객지원
+  <details>
+  <summary>게시글 등록</summary>
+  <p><img width="970" height="717" alt="스크린샷 2025-10-30 오전 10 20 30" src="https://github.com/user-attachments/assets/86df8a1b-024a-46f1-968a-2965f125c255" /></p>
+  </details>
+  
+
+
 ---
 
 <br>
