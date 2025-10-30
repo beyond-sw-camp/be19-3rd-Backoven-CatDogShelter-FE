@@ -347,156 +347,155 @@
 
 
 <details>
-  <summary>🙍🏻‍♀️ 회원 API</summary>
+  <summary> 회원 </summary>
 
   <details>
-    <summary>회원가입</summary>
+    <summary>ㅇ</summary>
   </details>
 
   <details>
-    <summary>회원 로그인</summary>
+    <summary>ㅇ</summary>
   </details>
 
   <details>
-    <summary>회원 로그인이력 조회</summary>
+    <summary>ㅇ</summary>
   </details>
 
   <details>
-    <summary>회원 마이페이지 조회</summary>
+    <summary>ㅇ</summary>
   </details>
 
   <details>
-    <summary>회원 정보 수정</summary>
+    <summary>ㅇ</summary>
   </details>
 
   <details>
-    <summary>회원 비밀번호 수정</summary>
+    <summary>ㅇ</summary>
   </details>
 
   <details>
-    <summary>회원 탈퇴</summary>
-  </details>
-
-</details>
-
-<details>
-  <summary>💳 회원등급 API</summary>
-  <br>받을 수 있는 등급 -> 회원의 등급 조회
-</details>
-
-<details>
-  <summary>보호소장 회원 API</summary>
-
-  <details>
-    <summary>보호소장 회원가입</summary>
-  </details>
-
-  <details>
-    <summary>보호소장 로그인</summary>
-  </details>
-
-  <details>
-    <summary>보호소장 마이페이지 조회</summary>
-  </details>
-</details>
-
-<details>
-  <summary>🤳🏻쪽지 API</summary>
-  <br>쪽지 보내기 -> 쪽지 목록 조회(받은사람 기준, 보낸사람 기준) -> 쪽지 상세 확인
-</details>
-
-<details>
-  <summary>🤝 봉사모임 API</summary>
-
-  <details>
-    <summary>📝 게시글</summary>
-
-   <details>
-      <summary>게시글 작성</summary>
-    </details>
-
-   <details>
-      <summary>게시글 수정</summary>
-    </details>
-
-   <details>
-      <summary>게시글 목록 조회</summary>
-    </details>
-
-  <details>
-      <summary>게시글 상세 조회</summary>
-    </details>
-
-  <details>
-      <summary>봉사모임 신청/승인/취소</summary>
-    </details>
-
+    <summary>ㅇ</summary>
   </details>
 
 </details>
 
 <details>
-  <summary>🤝 봉사후기 API</summary>
+  <summary>ㅇ</summary>
+</details>
+
+<details>
+  <summary>ㅇ</summary>
 
   <details>
-    <summary>📝 게시글</summary>
+    <summary>ㅇ</summary>
+  </details>
 
   <details>
-      <summary>게시글 작성</summary>
-    </details>
+    <summary>ㅇ</summary>
+  </details>
 
   <details>
-      <summary>게시글 수정</summary>
+    <summary>ㅇ</summary>
+  </details>
+</details>
+
+<details>
+  <summary>ㅇ</summary>
+
+</details>
+
+<details>
+  <summary>ㅇ</summary>
+
+  <details>
+    <summary>ㅇ</summary>
+
+   <details>
+      <summary>ㅇ</summary>
     </details>
 
    <details>
-      <summary>게시글 삭제</summary>
-    </details>
-
-  <details>
-      <summary>게시글 목록 검색 조회</summary>
-    </details>
-
-  <details>
-      <summary>게시글 목록 페이지 조회</summary>
-    </details>
-
-  <details>
-      <summary>게시글 상세 조회</summary>
+      <summary>ㅇ</summary>
     </details>
 
    <details>
-      <summary>게시글 좋아요</summary>
+      <summary>ㅇ</summary>
+    </details>
+
+  <details>
+      <summary>ㅇ</summary>
+    </details>
+
+  <details>
+      <summary>ㅇ</summary>
+    </details>
+
+  </details>
+
+</details>
+
+<details>
+  <summary>ㅇ/summary>
+
+  <details>
+    <summary>ㅇ</summary>
+
+  <details>
+      <summary>ㅇ</summary>
+    </details>
+
+  <details>
+      <summary>ㅇ</summary>
+    </details>
+
+   <details>
+      <summary>ㅇ</summary>
+    </details>
+
+  <details>
+      <summary>ㅇ</summary>
+    </details>
+
+  <details>
+      <summary>ㅇ</summary>
+    </details>
+
+  <details>
+      <summary>ㅇ</summary>
+    </details>
+
+   <details>
+      <summary>ㅇ</summary>
     </details>
 
   </details>
 
   <details>
-    <summary>💬 댓글</summary>
+    <summary>ㅇ</summary>
 
   <details>
-      <summary>댓글 작성</summary>
+      <summary>ㅇ</summary>
     </details>
 
   <details>
-      <summary>댓글 수정</summary>
+      <summary>ㅇ</summary>
     </details>
 
   <details>
-      <summary>댓글 삭제</summary>
+      <summary>ㅇ</summary>
     </details>
 
   </details>
 
   <details>
-    <summary>🚨 신고</summary>
+    <summary>ㅇ</summary>
 
   <details>
-      <summary>게시글 신고하기</summary>
+      <summary>ㅇ</summary>
     </details>
 
   <details>
-      <summary>댓글 신고하기</summary>
+      <summary>ㅇ</summary>
     </details>
 
   </details>
@@ -510,7 +509,7 @@
 ## 📃 프로젝트 회고록
 | 조원명 | 회고 |
 |--------|-------|
-| 곽동근  |  |
+| 곽동근  | 이번 프로젝트에는 바로 직전에 진행했던 백엔드 개발을 통해 디자인을 직접 기획하고 설계 프론트 개발을 진행했다. 처음엔 도메인과 기능이 정말 많아서 구현 범위가 방대했는데, 실제 개발 단계에 들어가 보니 짧은 시간 안에 처리해야 할 작업이 생각보다 훨씬 많았지만 그럼에도 불구하고 팀원들과 역할을 잘 나눠서 핵심 기능들을 완성도 높게 구현할 수 있었다. 특히 모두가 백엔드 구조를 좀 더 다듬으면서, 동시에 프론트엔드와 UI 설계, 디자인까지 병행했다. 짧은 기간이었지만, 기획+디자인+프론트 개발+백엔드 연동까지 한 번에 경험할 수 있었던 게 큰 배움이었다. 이 과정에서 추가적으로 Ai 기능을 넣으려고 시도도 했었는데, 상업적으로 사용될만한것들은 api찾기가 어려워서 직접 사진 몇만장을 학습을 시켰었지만 이 이상의 환경 구축의 어려움으로 완성하지 못해서 추가를 못했었다. 하지만 머신러닝 모델을 실제 서비스에 적용하기 위한 구조를 직접 설계해보면서 Ai 서비스 구현에 대한 전반적인 흐름을 이해 할 수 있었다. 백엔드와 프론트의 연동이 처음엔 단순할 줄 알았는데, 실제로는 API 연결과 데이터 흐름 설계가 훨씬 복잡하다는 걸 느꼈다. 특히 데이터 구조나 응답 형태가 조금만 달라도 화면이 깨지거나 오류가 나는 경험을 하면서, 서버-클라이언트 간의 명확한 협업의 중요성을 깨달았다. 물론 완벽하게 연동되지 않은 부분도 있었지만, 반대로 성공적으로 연결된 기능들을 직접 눈으로 확인할 때의 성취감도 컸다. 짧은 기간이었지만, 기획부터 배포까지 전 과정을 직접 수행하면서 프로젝트를 하나의 완성된 형태로 이끌 수 있었다. 결과적으로 이 경험은 프론트와 백엔드를 모두 이해하는 풀스택적인 시야를 넓혀주는 좋은 계기가 되었다. |
 | 변민철  | 이번 프로젝트를 진행하면서 백엔드 개발을 주로 목표로 해왔던 저는, 프론트엔드 개발의 중요성을 깊이 체감할 수 있었습니다. 이전에는 단순히 API를 제공하는 관점에서만 데이터를 다뤘다면, 이번 경험을 통해 서비스 로직 전반에서 데이터를 어떻게 설계하고 전달해야 하는지 진지하게 고민하는 계기가 되었습니다. 특히 DML 작업을 수행할 때, 프론트엔드에서 전달받은 데이터를 어떻게 DTO로 매핑하고 검증할지 구체적으로 이해하게 되었습니다. 백엔드만 고려했을 때는 간과했던 입력값 유효성 검사, 예외 처리 흐름, UX를 고려한 응답 구조 설계 등도 직접 체감할 수 있었습니다. 또한, 프론트엔드에서 고려해야 할 요소가 예상보다 훨씬 많다는 점을 깨달았고, 데이터 로드 실패 시의 예외 처리, 권한 상태값의 유지 관리, 성능 최적화 등의 영역에서 백엔드가 미치는 영향을 명확히 인식하게 되었습니다. 이 과정을 통해 백엔드 개발자로서 한 단계 성장할 수 있었고, 프론트와의 긴밀한 협업이 서비스 완성도에 얼마나 중요한지를 깊이 배우는 경험이었습니다. |
 | 이승건  | 이번 프로젝트는 이전에 진행했던 백엔드 프로젝트를 기반으로 진행하면서 초기 설계의 중요성을 느낄 수 있었습니다. 당시에는 필요한 API를 모두 만들었고, 반환 타입들도 충분하다고 생각했습니다. 그런데 프론트 작업을 시작하고 피그마로 UI를 설계하면서 새롭게 필요한 API들이 생겼고, 기존 API의 반환형 중에서도 부족한 부분들이 보였습니다. 또 DB에 있어야 하는데 빠져 있는 속성들도 몇 가지 발견되었습니다. 백엔드 프로젝트를 할 때 DDD를 진행하고 요구사항 명세서를 작성해서 템원들끼리 용어를 통일하고 기능을 어느 정도 정리했지만, 결국 목업을 통해 필요한 데이터를 명확하게 정의하는 과정이 꼭 필요하다는 것을 알게 됐습니다. 이 경험을 통해 목업을 초반에 만들어야 이후 개발 과정에서 수정이나 혼란이 줄어든다는 점을 깨달았고, 앞으로는 설계 단계에서부터 목업 작업을 우선으로 진행해야겠다는 생각을 하게 되었습니다. |
 | 이지윤  |  Vue.js와 Redis를 활용해 로그인, 회원가입, 아이디/비밀번호 찾기, 자유게시판을 구현했습니다. 로그인·회원가입은 백엔드와 연동하고, 프론트엔드에서 빠르고 안정적으로 데이터를 가져오기 위해 axios를 사용했습니다. 아이디 찾기는 사용자가 이메일을 입력하면 DB에 저장된 아이디를 해당 이메일로 발송하도록 구성했고, 비밀번호 찾기는 보안을 강화하기 위해 Redis로 인증번호를 전송한 뒤, 암호화된 비밀번호를 전달하는 대신 사용자가 새 비밀번호를 직접 재설정하는 방식으로 설계했습니다. 자유게시판은 JavaScript로 게시글 작성과 상세 페이지 조회 등 핵심 기능을 완성했습니다. 이번 프로젝트를 통해 DB 설계와 프론트엔드 요구가 어긋나는 지점이 생각보다 자주 발생한다는 점을 체감했습니다. 초기 구상한 디자인과 실제 기능 사이의 불일치도 여러 차례 드러났습니다. 이를 교훈 삼아 다음 프로젝트에서는 Figma로 프론트엔드 초기안을 먼저 확정하고, 그에 맞춰 필요한 데이터 스키마와 API를 선제적으로 정의·조율하는 프로세스를 마련할 필요가 있다고 느꼈습니다.|
